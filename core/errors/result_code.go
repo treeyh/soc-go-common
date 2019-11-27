@@ -1,86 +1,72 @@
 package errors
 
 var (
-	//成功
-	OK = AddResultCode(0, "OK", "ResultCode.OK")
+	// OK 成功
+	OK = NewResultCode(0, "ok")
 
-	//token错误
-	RequestError = AddResultCode(400, "请求错误", "ResultCode.RequestError")
+	// RequestError 请求错误
+	RequestError = NewResultCode(400, "请求错误")
 
-	//认证错误
-	Unauthorized = AddResultCode(401, "认证错误", "ResultCode.Unauthorized")
+	// Unauthorized 认证错误
+	Unauthorized = NewResultCode(401, "认证错误")
 
-	//禁止访问
-	ForbiddenAccess = AddResultCode(403, "禁止访问", "ResultCode.ForbiddenAccess")
+	// ForbiddenAccess 禁止访问
+	ForbiddenAccess = NewResultCode(403, "禁止访问")
 
-	//请求地址不存在
-	PathNotFound = AddResultCode(404, "请求地址不存在", "ResultCode.PathNotFound")
+	// PathNotFound 请求地址不存在
+	PathNotFound = NewResultCode(404, "请求地址不存在")
 
-	//不支持该方法
-	MethodNotAllowed = AddResultCode(405, "不支持该方法", "ResultCode.MethodNotAllowed")
+	// MethodNotAllowed 不支持该方法
+	MethodNotAllowed = NewResultCode(405, "不支持该方法")
 
-	//Token过期
-	TokenExpires = AddResultCode(450, "登录失效", "ResultCode.TokenExpires")
+	// LoginExpires 登录失效
+	LoginExpires = NewResultCode(450, "登录失效")
 
-	//请求参数错误
-	ServerError = AddResultCode(500, "服务器错误", "ResultCode.ServerError")
+	// ServerError 服务器错误
+	ServerError = NewResultCode(500, "服务器错误")
 
-	//过载保护,服务暂不可用
-	ServiceUnavailable = AddResultCode(503, "过载保护,服务暂不可用", "ResultCode.ServiceUnavailable")
+	// ServiceUnavailable 过载保护,服务暂不可用
+	ServiceUnavailable = NewResultCode(503, "过载保护,服务暂不可用")
 
-	//服务调用超时
-	Deadline = AddResultCode(504, "服务调用超时", "ResultCode.Deadline")
+	// Deadline 服务调用超时
+	Deadline = NewResultCode(504, "服务调用超时")
 
-	//超出限制
-	LimitExceed = AddResultCode(509, "超出限制", "ResultCode.LimitExceed")
+	// LimitExceed 超出限制
+	LimitExceed = NewResultCode(509, "超出限制")
 
-	//参数错误
-	ParamError = AddResultCode(600, "参数错误", "ResultCode.ParamError")
+	// ParamError 参数错误
+	ParamError = NewResultCode(600, "参数错误")
 
-	//文件过大
-	FileTooLarge = AddResultCode(610, "文件过大", "ResultCode.FileTooLarge")
+	// FileTooLarge 文件过大
+	FileTooLarge = NewResultCode(610, "文件过大")
 
-	//文件类型错误
-	FileTypeError = AddResultCode(611, "文件类型错误", "ResultCode.FileTypeError")
+	// FileTypeError 文件类型错误
+	FileTypeError = NewResultCode(611, "文件类型错误")
 
-	//文件或目录不存在
-	FileNotExist = AddResultCode(612, "文件或目录不存在", "ResultCode.FileNotExist")
+	// FileNotExist 文件或目录不存在
+	FileNotExist = NewResultCode(612, "文件或目录不存在")
 
-	//文件路径为空
-	FilePathIsNull = AddResultCode(613, "文件路径为空", "ResultCode.FilePathIsNull")
+	// FilePathIsNull 文件路径为空
+	FilePathIsNull = NewResultCode(613, "文件路径为空")
 
-	//读取文件失败
-	FileReadFail = AddResultCode(614, "读取文件失败", "ResultCode.FileReadFail")
+	// FileReadFail 读取文件失败
+	FileReadFail = NewResultCode(614, "读取文件失败")
 
-	//错误未定义
-	ErrorUndefined = AddResultCode(996, "错误未定义", "ResultCode.ErrorUndefined")
+	// ErrorUndefined 错误未定义
+	ErrorUndefined = NewResultCode(996, "错误未定义")
 
-	//业务失败
-	BusinessFail = AddResultCode(997, "业务失败", "ResultCode.BusinessFail")
+	// BusinessFail 业务失败
+	BusinessFail = NewResultCode(997, "业务失败")
 
-	//系统异常
-	SystemErr = AddResultCode(998, "系统异常", "ResultCode.SystemErr")
+	// SystemErr 系统异常
+	SystemErr = NewResultCode(998, "系统异常")
 
-	//未知错误
-	UnknownError = AddResultCode(999, "未知错误", "ResultCode.UnknownError")
+	// UnknownError 未知错误
+	UnknownError = NewResultCode(999, "未知错误")
 
-	RocketMQProduceInitError   = AddResultCode(10001, "RocketMQ Produce 初始化异常", "ResultCode.RocketMQProduceInitError")
-	RocketMQSendMsgError       = AddResultCode(10002, "RocketMQ SendMsg 失败", "ResultCode.RocketMQSendMsgError")
-	RocketMQConsumerInitError  = AddResultCode(10003, "RocketMQ Consumer 初始化异常", "ResultCode.RocketMQConsumerInitError")
-	RocketMQConsumerStartError = AddResultCode(10004, "RocketMQ Consumer 启动异常", "ResultCode.RocketMQConsumerStartError")
-	RocketMQConsumerStopError  = AddResultCode(10005, "RocketMQ Consumer 停止异常", "ResultCode.RocketMQConsumerStopError")
+	// DbOperationFail 数据库操作失败
+	DbOperationFail = NewResultCode(100001, "数据库操作失败")
 
-	KafkaMqSendMsgError           = AddResultCode(10101, "Kafka发送消息失败", "ResultCode.KafkaMqSendMsgError")
-	KafkaMqSendMsgCantBeNullError = AddResultCode(10102, "Kafka发送的消息不能为空", "ResultCode.KafkaMqSendMsgCantBeNullError")
-	KafkaMqConsumeMsgError        = AddResultCode(10103, "Kafka消费消息失败", "ResultCode.KafkaMqConsumeMsgError")
-	KafkaMqConsumeStartError      = AddResultCode(10104, "Kafka消费启动失败", "ResultCode.KafkaMqConsumeStartError")
-
-	TryDistributedLockError = AddResultCode(10201, "获取分布式锁异常", "ResultCode.TryDistributedLockError")
-	GetDistributedLockError = AddResultCode(10202, "获取分布式锁失败", "ResultCode.GetDistributedLockError")
-	MysqlOperateError       = AddResultCode(10203, "db操作出现异常", "ResultCode.MysqlOperateError")
-	RedisOperateError       = AddResultCode(10204, "redis操作出现异常", "ResultCode.RedisOperateError")
-
-	DbMQSendMsgError         = AddResultCode(10301, "Db 保存 message queue 失败", "ResultCode.DbMQSendMsgError")
-	DbMQCreateConsumerError  = AddResultCode(10302, "Db 创建 message queue consumer 失败", "ResultCode.DbMQCreateConsumerError")
-	DbMQConsumerStartedError = AddResultCode(10303, "Db 创建 message queue consumer 已启动", "ResultCode.DbMQConsumerStartedError")
+	// CacheOperationFail 缓存操作失败
+	CacheOperationFail = NewResultCode(100002, "缓存操作失败")
 )
