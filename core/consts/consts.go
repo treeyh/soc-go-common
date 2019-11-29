@@ -1,5 +1,7 @@
 package consts
 
+import "time"
+
 //默认空时间
 const BlankTime = "1970-01-01 00:00:00"
 const BlankDate = "1970-01-01"
@@ -9,3 +11,8 @@ const AppDateFormat = "2006-01-02"
 const AppTimeFormat = "2006-01-02 15:04:05"
 const AppSystemTimeFormat = "2006-01-02T15:04:05Z"
 const AppSystemTimeFormat8 = "2006-01-02T15:04:05+08:00"
+
+var BlankTimeObject, _ = time.Parse(AppTimeFormat, BlankTime)
+
+//默认空字符串
+const BlankString = ""

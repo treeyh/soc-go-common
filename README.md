@@ -1,2 +1,2 @@
 # soc-go-common
-Golang基础库
+云海Golang基础库

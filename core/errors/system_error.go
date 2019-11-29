@@ -2,7 +2,7 @@ package errors
 
 import (
 	"fmt"
-	"strconv"
+	"github.com/treeyh/soc-go-common/core/utils/json"
 )
 
 var (
@@ -16,6 +16,8 @@ type ResultCode struct {
 	message string
 
 	args []interface{}
+
+	err error
 }
 
 // System Error interface
@@ -25,10 +27,13 @@ type SystemError interface {
 	Code() int
 
 	Message() string
+
+	GetError() error
 }
 
 func (rc *ResultCode) Error() string {
-	return "{\"code\":" + strconv.Itoa(rc.code) + ",\"message\":\"" + rc.message + "\"}"
+	str, _ := json.ToJson(rc)
+	return str
 }
 
 // Code 返回状态编号
@@ -41,7 +46,12 @@ func (rc *ResultCode) Message() string {
 	if rc.args == nil || len(rc.args) == 0 {
 		return rc.message
 	}
-	return fmt.Sprintf(rc.message, (rc.args)...)
+	return fmt.Sprintf(rc.message, rc.args...)
+}
+
+// GetError 返回error
+func (rc *ResultCode) GetError() error {
+	return rc.err
 }
 
 // SetCode 不开放  code readonly
@@ -72,7 +82,10 @@ func NewResultCode(code int, message string) ResultCode {
 	return rci
 }
 
-func NewSystemError(rc ResultCode, e ...interface{}) SystemError {
+func NewSystemErrorExistError(rc ResultCode, err error, e ...interface{}) SystemError {
+	if err != nil {
+		rc.err = err
+	}
 	if e == nil || (e != nil && len(e) == 0) {
 		return &rc
 	}
@@ -81,3 +94,10 @@ func NewSystemError(rc ResultCode, e ...interface{}) SystemError {
 	return &rc
 }
 
+func NewSystemError(rc ResultCode, e ...interface{}) SystemError {
+	if e == nil || (e != nil && len(e) == 0) {
+		return &rc
+	}
+	rc.args = e
+	return &rc
+}

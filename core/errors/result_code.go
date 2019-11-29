@@ -69,4 +69,13 @@ var (
 
 	// CacheOperationFail 缓存操作失败
 	CacheOperationFail = NewResultCode(100002, "缓存操作失败")
+
+	// ObjectCopyFail 对象转换失败
+	ObjectCopyFail = NewResultCode(100003, "对象转换失败")
+
+	// ParseTimeFail 转换时间失败
+	ParseTimeFail = NewResultCode(100005, "转换时间失败")
+
+	// TemplateRenderFail 模板解析失败
+	TemplateRenderFail = NewResultCode(100006, "模板解析失败")
 )
