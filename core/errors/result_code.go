@@ -78,4 +78,10 @@ var (
 
 	// TemplateRenderFail 模板解析失败
 	TemplateRenderFail = NewResultCode(100006, "模板解析失败")
+
+	// EncryptDecryptFail 加解密失败
+	EncryptDecryptFail = NewResultCode(100007, "加解密失败")
+
+	// ObjectNotArray 对象不是数组
+	ObjectNotArray = NewResultCode(100008, "对象不是数组")
 )
