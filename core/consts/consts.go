@@ -16,3 +16,21 @@ var BlankTimeObject, _ = time.Parse(AppTimeFormat, BlankTime)
 
 //默认空字符串
 const BlankString = ""
+
+// linux操作系统
+const (
+	// GOOSLinux linux 系统标识
+	GOOSLinux = "linux"
+	// GOOSMac mac 系统标识
+	GOOSMac = "darwin"
+	// GOOSAndroid android 系统标识
+	GOOSAndroid = "android"
+	// GOOSFreebsd freebsd 系统标识
+	GOOSFreebsd = "freebsd"
+	// GOOSOpenbsd openbsd 系统标识
+	GOOSOpenbsd = "openbsd"
+	// GOOSSolaris solaris 系统标识
+	GOOSSolaris = "solaris"
+	// GOOSWindows windows 系统标识
+	GOOSWindows = "windows"
+)
