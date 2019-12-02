@@ -44,6 +44,8 @@ github.com/stretchr/testify v1.4.0 h1:2E4SXV/wtOkTonXsotYi4li6zVWxYlZuYNCXe9XRJy
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
 github.com/tealeg/xlsx/v2 v2.0.1 h1:RP+VEscpPFjH2FnpKh1p9HVLAk1htqb9Urcxi2AU1ns=
 github.com/tealeg/xlsx/v2 v2.0.1/go.mod h1:l9GvhCCjdaIGkAyZcFedDALcYcXUOei55f6umRMOz9c=
+github.com/treeyh/soc-go-boot v0.0.0-20191130112108-0d30a4f2dc31 h1:R/z4HNmaLxrIXWLasYJigyLKEaxY94GK9+W0TrUSjok=
+github.com/treeyh/soc-go-boot v0.0.0-20191130112108-0d30a4f2dc31/go.mod h1:TL3RciEM4epJ5RXSqqW/dcRY9PqHdFT1TSfP1+PfEcY=
 go.uber.org/atomic v1.5.0 h1:OI5t8sDa1Or+q8AeE+yKeB/SDYioSHAgcVljj9JIETY=
 go.uber.org/atomic v1.5.0/go.mod h1:sABNBOSYdrvTF6hTgEIbc7YasKWGhgEQZyfxyTvoXHQ=
 go.uber.org/multierr v1.3.0 h1:sFPn2GLc3poCkfrpIXGhBD2X0CMIo4Q/zSULXrj/+uc=
