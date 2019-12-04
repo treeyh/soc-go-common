@@ -6,16 +6,16 @@ import (
 	"github.com/treeyh/soc-go-common/core/utils/json"
 )
 
-func Copy(src interface{}, source interface{}) errors.SystemError {
+func Copy(src interface{}, source interface{}) errors.AppError {
 	jsonStr, err := json.ToJson(src)
 	if err != nil {
 		logger.Logger().Error(err)
-		return errors.NewSystemError(errors.ObjectCopyFail)
+		return errors.NewAppError(errors.ObjectCopyFail)
 	}
 	err = json.FromJson(jsonStr, source)
 	if err != nil {
 		logger.Logger().Error(err)
-		return errors.NewSystemError(errors.ObjectCopyFail)
+		return errors.NewAppError(errors.ObjectCopyFail)
 	}
 	return nil
 }

@@ -50,7 +50,7 @@ func SliceUniqueInt64(s []int64) []int64 {
 	return ret
 }
 
-func Contain(list interface{}, obj interface{}) (bool, errors.SystemError) {
+func Contain(list interface{}, obj interface{}) (bool, errors.AppError) {
 	targetValue := reflect.ValueOf(list)
 	switch reflect.TypeOf(list).Kind() {
 	case reflect.Slice, reflect.Array:
@@ -66,7 +66,7 @@ func Contain(list interface{}, obj interface{}) (bool, errors.SystemError) {
 		}
 		return false, nil
 	}
-	return false, errors.NewSystemError(errors.ObjectNotArray)
+	return false, errors.NewAppError(errors.ObjectNotArray)
 }
 
 func ToSlice(arr interface{}) []interface{} {

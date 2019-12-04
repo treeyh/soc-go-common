@@ -10,19 +10,19 @@ import (
 	"github.com/treeyh/soc-go-common/core/errors"
 )
 
-func AesDecrypt(key string, encrypt string) (string, errors.SystemError) {
+func AesDecrypt(key string, encrypt string) (string, errors.AppError) {
 	kbs := SHA256(key)
 	decode, err := base64.StdEncoding.DecodeString(encrypt)
 	if err != nil {
-		return "", errors.NewSystemErrorExistError(errors.EncryptDecryptFail, err)
+		return "", errors.NewAppErrorExistError(errors.EncryptDecryptFail, err)
 	}
 	if len(decode) < aes.BlockSize {
-		return "", errors.NewSystemErrorExistError(errors.EncryptDecryptFail, errors2.New("密文太短啦"))
+		return "", errors.NewAppErrorExistError(errors.EncryptDecryptFail, errors2.New("密文太短啦"))
 	}
 	iv := decode[:aes.BlockSize]
 	block, err := aes.NewCipher(kbs)
 	if err != nil {
-		return "", errors.NewSystemErrorExistError(errors.EncryptDecryptFail, err)
+		return "", errors.NewAppErrorExistError(errors.EncryptDecryptFail, err)
 	}
 	blockMode := cipher.NewCBCDecrypter(block, iv)
 	plantText := make([]byte, len(decode))

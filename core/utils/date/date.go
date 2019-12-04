@@ -14,18 +14,18 @@ func FormatTime(t types.Time) string {
 	return time.Time(t).Format(consts.AppTimeFormat)
 }
 
-func ParseTime(str string) (types.Time, errors.SystemError) {
+func ParseTime(str string) (types.Time, errors.AppError) {
 	t, err := time.Parse(consts.AppTimeFormat, str)
 	if err != nil {
-		return types.Time0(), errors.NewSystemErrorExistError(errors.ParseTimeFail, err)
+		return types.Time0(), errors.NewAppErrorExistError(errors.ParseTimeFail, err)
 	}
 	return types.Time(t), nil
 }
 
-func Parse(str string) (time.Time, errors.SystemError) {
+func Parse(str string) (time.Time, errors.AppError) {
 	t, err := time.Parse(consts.AppTimeFormat, str)
 	if err != nil {
-		return time.Unix(0, 0), errors.NewSystemErrorExistError(errors.ParseTimeFail, err)
+		return time.Unix(0, 0), errors.NewAppErrorExistError(errors.ParseTimeFail, err)
 	}
 	return t, nil
 }

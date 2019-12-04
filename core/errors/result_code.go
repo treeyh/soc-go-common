@@ -67,21 +67,30 @@ var (
 	// DbOperationFail 数据库操作失败
 	DbOperationFail = NewResultCode(100001, "数据库操作失败")
 
-	// CacheOperationFail 缓存操作失败
-	CacheOperationFail = NewResultCode(100002, "缓存操作失败")
+	// RedisOperationFail redis操作失败
+	RedisOperationFail = NewResultCode(100002, "redis操作失败")
+
+	// RedisConfigNotExist redis配置不存在
+	RedisConfigNotExist = NewResultCode(100003, "redis配置不存在")
+
+	// RedisNotInit redis配置不存在
+	RedisNotInit = NewResultCode(100004, "redis未初始化")
+
+	// RedisConnGetFail 获取redis连接失败
+	RedisConnGetFail = NewResultCode(100005, "获取redis连接失败")
 
 	// ObjectCopyFail 对象转换失败
-	ObjectCopyFail = NewResultCode(100003, "对象转换失败")
+	ObjectCopyFail = NewResultCode(100101, "对象转换失败")
 
 	// ParseTimeFail 转换时间失败
-	ParseTimeFail = NewResultCode(100005, "转换时间失败")
+	ParseTimeFail = NewResultCode(100102, "转换时间失败")
 
 	// TemplateRenderFail 模板解析失败
-	TemplateRenderFail = NewResultCode(100006, "模板解析失败")
+	TemplateRenderFail = NewResultCode(100103, "模板解析失败")
 
 	// EncryptDecryptFail 加解密失败
-	EncryptDecryptFail = NewResultCode(100007, "加解密失败")
+	EncryptDecryptFail = NewResultCode(100104, "加解密失败")
 
 	// ObjectNotArray 对象不是数组
-	ObjectNotArray = NewResultCode(100008, "对象不是数组")
+	ObjectNotArray = NewResultCode(100105, "对象不是数组")
 )

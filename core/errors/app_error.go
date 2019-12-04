@@ -20,8 +20,8 @@ type ResultCode struct {
 	err error
 }
 
-// System Error interface
-type SystemError interface {
+// Application Error interface
+type AppError interface {
 	Error() string
 
 	Code() int
@@ -82,11 +82,16 @@ func NewResultCode(code int, message string) ResultCode {
 	return rci
 }
 
-func NewSystemErrorExistError(rc ResultCode, err error, e ...interface{}) SystemError {
+// NewAppErrorExistError 基于error创建应用错误，如果error为nil，则返回nil
+func NewAppErrorExistError(rc ResultCode, err error, e ...interface{}) AppError {
+	if e == nil {
+		return nil
+	}
+
 	if err != nil {
 		rc.err = err
 	}
-	if e == nil || (e != nil && len(e) == 0) {
+	if e != nil && len(e) == 0 {
 		return &rc
 	}
 
@@ -94,7 +99,7 @@ func NewSystemErrorExistError(rc ResultCode, err error, e ...interface{}) System
 	return &rc
 }
 
-func NewSystemError(rc ResultCode, e ...interface{}) SystemError {
+func NewAppError(rc ResultCode, e ...interface{}) AppError {
 	if e == nil || (e != nil && len(e) == 0) {
 		return &rc
 	}
