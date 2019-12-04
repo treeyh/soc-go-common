@@ -1,7 +1,6 @@
 package redis
 
 import (
-	"fmt"
 	"github.com/gomodule/redigo/redis"
 	"github.com/treeyh/soc-go-common/core/errors"
 	"github.com/treeyh/soc-go-common/core/utils/times"
@@ -97,17 +96,16 @@ func (rp *RedisProxy) MGet(keys ...interface{}) ([]string, errors.AppError) {
 	conn := rp.Connect()
 	defer rp.Close(conn)
 
-	fmt.Println(keys...)
 	rs, err := conn.Do("mget", keys...)
 	if err != nil {
 		return nil, errors.NewAppErrorExistError(errors.RedisOperationFail, err)
 	}
 
-	re, err := redis.Values(rs, err)
 	if rs == nil {
 		return nil, nil
 	}
-	fmt.Println(re)
+	//re, err := redis.Values(rs, err)
+	//fmt.Println(re)
 	list := rs.([]interface{})
 	resultList := make([]string, 0)
 	for _, v := range list {

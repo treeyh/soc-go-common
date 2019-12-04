@@ -69,7 +69,6 @@ func TestMGet(t *testing.T) {
 		err := GetProxy().MSet(kvs)
 		fmt.Println(err)
 
-		convey.ShouldEqual(err, nil)
 		v, e := GetProxy().Get("test:bbb")
 		fmt.Println(v, e)
 		convey.ShouldEqual(v, "bbb")
@@ -77,12 +76,12 @@ func TestMGet(t *testing.T) {
 		fmt.Println(v, e)
 		convey.ShouldEqual(v, "aaa")
 
-		keys := make([]interface{}, len(kvs))
+		keys := make([]interface{}, 3)
 		keys[0] = "test:aaa"
 		keys[1] = "test:bbb"
 		keys[2] = "test:ccc"
 
-		vv, e := GetProxy().MGet(keys)
+		vv, e := GetProxy().MGet(keys...)
 		fmt.Println(vv, e)
 		convey.ShouldEqual(len(vv), 3)
 	})
