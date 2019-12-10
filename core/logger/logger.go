@@ -16,18 +16,18 @@ import (
 
 var (
 	_lock           sync.Mutex
-	_logger         = map[string]*SysLogger{}
+	_logger         = map[string]*AppLogger{}
 	_logTagKey      = "tag"
 	_logDefaultName = "default"
 )
 
 var _defaultLogConfig = config.LogConfig{
-	LogPath:      "",
-	Level:        "debug",
-	FileSize:     0,
-	FileNum:      0,
-	IsConsoleOut: true,
-	Tag:          "default",
+	LogPath:          "",
+	Level:            "info",
+	FileSize:         0,
+	FileNum:          0,
+	IsSyncConsoleOut: true,
+	Tag:              "default",
 }
 
 var levelMap = map[string]zapcore.Level{
@@ -40,14 +40,14 @@ var levelMap = map[string]zapcore.Level{
 	"fatal":  zapcore.FatalLevel,
 }
 
-type SysLogger struct {
+type AppLogger struct {
 	logConfig *config.LogConfig
 
-	log          *zap.Logger
-	name         string
-	path         string
-	level        zapcore.Level
-	isConsoleOut bool
+	log              *zap.Logger
+	name             string
+	path             string
+	level            zapcore.Level
+	isSyncConsoleOut bool
 }
 
 func obj2String(msg interface{}) string {
@@ -58,65 +58,65 @@ func obj2String(msg interface{}) string {
 	return str
 }
 
-func (s *SysLogger) Info(msg interface{}, fields ...zap.Field) {
+func (s *AppLogger) Info(msg interface{}, fields ...zap.Field) {
 	s.log.Info(obj2String(msg), fields...)
 }
 
-func (s *SysLogger) Infof(fmtstr string, args ...interface{}) {
+func (s *AppLogger) Infof(fmtstr string, args ...interface{}) {
 	msg := fmt.Sprintf(fmtstr, args...)
 	s.log.Info(msg)
 }
 
-func (s *SysLogger) Error(msg interface{}, fields ...zap.Field) {
+func (s *AppLogger) Error(msg interface{}, fields ...zap.Field) {
 	s.log.Error(obj2String(msg), fields...)
 }
 
-func (s *SysLogger) Errorf(fmtstr string, args ...interface{}) {
+func (s *AppLogger) Errorf(fmtstr string, args ...interface{}) {
 	msg := fmt.Sprintf(fmtstr, args...)
 	s.log.Error(msg)
 }
 
-func (s *SysLogger) Debug(msg interface{}, fields ...zap.Field) {
+func (s *AppLogger) Debug(msg interface{}, fields ...zap.Field) {
 	s.log.Debug(obj2String(msg), fields...)
 }
 
-func (s *SysLogger) Debugf(fmtstr string, args ...interface{}) {
+func (s *AppLogger) Debugf(fmtstr string, args ...interface{}) {
 	msg := fmt.Sprintf(fmtstr, args...)
 	s.log.Debug(msg)
 }
 
-func (s *SysLogger) Warn(msg interface{}, fields ...zap.Field) {
+func (s *AppLogger) Warn(msg interface{}, fields ...zap.Field) {
 	s.log.Warn(obj2String(msg), fields...)
 }
 
-func (s *SysLogger) Warnf(fmtstr string, args ...interface{}) {
+func (s *AppLogger) Warnf(fmtstr string, args ...interface{}) {
 	msg := fmt.Sprintf(fmtstr, args...)
 	s.log.Warn(msg)
 }
 
-func (s *SysLogger) DPanic(msg interface{}, fields ...zap.Field) {
+func (s *AppLogger) DPanic(msg interface{}, fields ...zap.Field) {
 	s.log.DPanic(obj2String(msg), fields...)
 }
 
-func (s *SysLogger) DPanicf(fmtstr string, args ...interface{}) {
+func (s *AppLogger) DPanicf(fmtstr string, args ...interface{}) {
 	msg := fmt.Sprintf(fmtstr, args...)
 	s.log.DPanic(msg)
 }
 
-func (s *SysLogger) Panic(msg interface{}, fields ...zap.Field) {
+func (s *AppLogger) Panic(msg interface{}, fields ...zap.Field) {
 	s.log.Panic(obj2String(msg), fields...)
 }
 
-func (s *SysLogger) Panicf(fmtstr string, args ...interface{}) {
+func (s *AppLogger) Panicf(fmtstr string, args ...interface{}) {
 	msg := fmt.Sprintf(fmtstr, args...)
 	s.log.Panic(msg)
 }
 
-func (s *SysLogger) Fatal(msg interface{}, fields ...zap.Field) {
+func (s *AppLogger) Fatal(msg interface{}, fields ...zap.Field) {
 	s.log.Fatal(obj2String(msg), fields...)
 }
 
-func (s *SysLogger) Fatalf(fmtstr string, args ...interface{}) {
+func (s *AppLogger) Fatalf(fmtstr string, args ...interface{}) {
 	msg := fmt.Sprintf(fmtstr, args...)
 	s.log.Fatal(msg)
 }
@@ -129,7 +129,7 @@ func getLoggerLevel(lvl string) zapcore.Level {
 }
 
 // GetDefaultLogger 获得默认Logger对象
-func Logger() *SysLogger {
+func Logger() *AppLogger {
 	logger := LoggerByName(_logDefaultName)
 	if logger != nil {
 		return logger
@@ -137,15 +137,15 @@ func Logger() *SysLogger {
 	return InitLogger(_logDefaultName, &_defaultLogConfig)
 }
 
-func LoggerByName(name string) *SysLogger {
+func LoggerByName(name string) *AppLogger {
 	if logger, ok := _logger[name]; ok {
 		return logger
 	}
 	return nil
 }
 
-func InitLogger(name string, logConfig *config.LogConfig) *SysLogger {
-	sysLogger := &SysLogger{
+func InitLogger(name string, logConfig *config.LogConfig) *AppLogger {
+	sysLogger := &AppLogger{
 		name:      name,
 		logConfig: logConfig,
 	}
@@ -156,7 +156,7 @@ func InitLogger(name string, logConfig *config.LogConfig) *SysLogger {
 }
 
 // Init 初始化Logger对象
-func (s *SysLogger) init() {
+func (s *AppLogger) init() {
 	if s.log == nil {
 		_lock.Lock()
 		defer _lock.Unlock()
@@ -166,7 +166,7 @@ func (s *SysLogger) init() {
 	}
 }
 
-func (s *SysLogger) initLogger() *SysLogger {
+func (s *AppLogger) initLogger() *AppLogger {
 	logConfig := s.logConfig
 	if logConfig == nil {
 		panic(s.name + " log config not exist!")
@@ -195,7 +195,7 @@ func (s *SysLogger) initLogger() *SysLogger {
 	var consoleOut zapcore.WriteSyncer
 	consoleType := false
 
-	if logConfig.IsConsoleOut == true {
+	if logConfig.IsSyncConsoleOut == true {
 		// High-priority output should also go to standard error, and low-priority
 		// output should also go to standard out.
 		consoleOut = zapcore.Lock(os.Stdout)
@@ -231,11 +231,11 @@ func (s *SysLogger) initLogger() *SysLogger {
 	s.log = logger
 	s.path = logConfig.LogPath
 	s.level = level
-	s.isConsoleOut = logConfig.IsConsoleOut
+	s.isSyncConsoleOut = logConfig.IsSyncConsoleOut
 	return s
 }
 
-func (s *SysLogger) getFileSizeByConfig(logConfig *config.LogConfig) int {
+func (s *AppLogger) getFileSizeByConfig(logConfig *config.LogConfig) int {
 	if logConfig.FileSize < 1 {
 		return 1024
 	}
@@ -244,7 +244,7 @@ func (s *SysLogger) getFileSizeByConfig(logConfig *config.LogConfig) int {
 	return i
 }
 
-func (s *SysLogger) getFileNumByConfig(logConfig *config.LogConfig) int {
+func (s *AppLogger) getFileNumByConfig(logConfig *config.LogConfig) int {
 	if logConfig.FileNum < 1 {
 		return 20
 	}

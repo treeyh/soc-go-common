@@ -17,7 +17,7 @@ func FormatTime(t types.Time) string {
 func ParseTime(str string) (types.Time, errors.AppError) {
 	t, err := time.Parse(consts.AppTimeFormat, str)
 	if err != nil {
-		return types.Time0(), errors.NewAppErrorExistError(errors.ParseTimeFail, err)
+		return types.Time0(), errors.NewAppErrorByExistError(errors.ParseTimeFail, err)
 	}
 	return types.Time(t), nil
 }
@@ -25,7 +25,7 @@ func ParseTime(str string) (types.Time, errors.AppError) {
 func Parse(str string) (time.Time, errors.AppError) {
 	t, err := time.Parse(consts.AppTimeFormat, str)
 	if err != nil {
-		return time.Unix(0, 0), errors.NewAppErrorExistError(errors.ParseTimeFail, err)
+		return time.Unix(0, 0), errors.NewAppErrorByExistError(errors.ParseTimeFail, err)
 	}
 	return t, nil
 }

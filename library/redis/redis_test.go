@@ -10,17 +10,19 @@ import (
 func getTestRedisConfigMap() *map[string]config.RedisConfig {
 	redisConfigs := &map[string]config.RedisConfig{
 		"Master": config.RedisConfig{
-			Host:     "192.168.1.148",
+			//Host:     "192.168.1.148",
+			Host:     "127.0.0.1",
 			Port:     6379,
 			Password: "",
 			Database: 7,
 		},
-		//"node1" : config.RedisConfig{
-		//	Host:           "192.168.1.148",
-		//	Port:           6379,
-		//	Password:       "",
-		//	Database:       8,
-		//},
+		"node1": config.RedisConfig{
+			//Host:     "192.168.1.148",
+			Host:     "127.0.0.1",
+			Port:     6379,
+			Password: "",
+			Database: 8,
+		},
 	}
 
 	return redisConfigs

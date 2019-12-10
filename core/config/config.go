@@ -1,20 +1,12 @@
 package config
 
 type LogConfig struct {
-	LogPath      string
-	Level        string
-	FileSize     int64
-	FileNum      int
-	IsConsoleOut bool
-	Tag          string
-}
-
-type AppConfig struct {
-	RunMode   int
-	CacheMode string
-	Name      string
-	AppCode   string
-	AppKey    string
+	LogPath          string
+	Level            string
+	FileSize         int64
+	FileNum          int
+	IsSyncConsoleOut bool
+	Tag              string
 }
 
 //redis配置
@@ -31,7 +23,7 @@ type RedisConfig struct {
 	WriteTimeout   int
 }
 
-//mq配置
+//mysql配置
 type MysqlConfig struct {
 	Host     string
 	Port     int

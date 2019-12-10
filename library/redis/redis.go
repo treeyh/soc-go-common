@@ -46,7 +46,7 @@ func (rp *RedisProxy) ZAdd(key string, score float64, value string) errors.AppEr
 	defer rp.Close(conn)
 
 	_, err := conn.Do("zadd", key, score, value)
-	return errors.NewAppErrorExistError(errors.RedisOperationFail, err)
+	return errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 }
 
 func (rp *RedisProxy) SetEx(key string, value string, ex int64) errors.AppError {
@@ -54,7 +54,7 @@ func (rp *RedisProxy) SetEx(key string, value string, ex int64) errors.AppError 
 	defer rp.Close(conn)
 
 	_, err := conn.Do("setex", key, ex, value)
-	return errors.NewAppErrorExistError(errors.RedisOperationFail, err)
+	return errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 }
 
 func (rp *RedisProxy) Set(key string, value string) errors.AppError {
@@ -62,7 +62,7 @@ func (rp *RedisProxy) Set(key string, value string) errors.AppError {
 	defer rp.Close(conn)
 
 	_, err := conn.Do("set", key, value)
-	return errors.NewAppErrorExistError(errors.RedisOperationFail, err)
+	return errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 }
 
 func (rp *RedisProxy) MSet(fieldValue map[string]string) errors.AppError {
@@ -75,7 +75,7 @@ func (rp *RedisProxy) MSet(fieldValue map[string]string) errors.AppError {
 		args = append(append(args, k), v)
 	}
 	_, err := conn.Do("mset", args...)
-	return errors.NewAppErrorExistError(errors.RedisOperationFail, err)
+	return errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 }
 
 func (rp *RedisProxy) Get(key string) (string, errors.AppError) {
@@ -84,7 +84,7 @@ func (rp *RedisProxy) Get(key string) (string, errors.AppError) {
 
 	rs, err := conn.Do("get", key)
 	if err != nil {
-		return "", errors.NewAppErrorExistError(errors.RedisOperationFail, err)
+		return "", errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 	}
 	if rs == nil {
 		return "", nil
@@ -98,7 +98,7 @@ func (rp *RedisProxy) MGet(keys ...interface{}) ([]string, errors.AppError) {
 
 	rs, err := conn.Do("mget", keys...)
 	if err != nil {
-		return nil, errors.NewAppErrorExistError(errors.RedisOperationFail, err)
+		return nil, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 	}
 
 	if rs == nil {
@@ -122,10 +122,10 @@ func (rp *RedisProxy) Del(keys ...interface{}) (int64, errors.AppError) {
 
 	rs, err := conn.Do("Del", keys...)
 	if err != nil {
-		return 0, errors.NewAppErrorExistError(errors.RedisOperationFail, err)
+		return 0, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 	}
 	if rs == nil {
-		return 0, errors.NewAppErrorExistError(errors.RedisOperationFail, err)
+		return 0, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 	}
 	return rs.(int64), nil
 }
@@ -136,12 +136,12 @@ func (rp *RedisProxy) Incrby(key string, v int64) (int64, errors.AppError) {
 
 	rs, err := conn.Do("INCRBY", key, v)
 	if err != nil {
-		return 0, errors.NewAppErrorExistError(errors.RedisOperationFail, err)
+		return 0, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 	}
 	if rs == nil {
-		return 0, errors.NewAppErrorExistError(errors.RedisOperationFail, err)
+		return 0, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 	}
-	return rs.(int64), errors.NewAppErrorExistError(errors.RedisOperationFail, err)
+	return rs.(int64), errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 }
 
 func (rp *RedisProxy) Exist(key string) (bool, errors.AppError) {
@@ -150,7 +150,7 @@ func (rp *RedisProxy) Exist(key string) (bool, errors.AppError) {
 
 	rs, err := conn.Do("EXISTS", key)
 	if err != nil {
-		return false, errors.NewAppErrorExistError(errors.RedisOperationFail, err)
+		return false, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 	}
 	if rs == nil {
 		return false, nil
@@ -164,7 +164,7 @@ func (rp *RedisProxy) Expire(key string, expire int64) (bool, errors.AppError) {
 
 	rs, err := conn.Do("EXPIRE", key, expire)
 	if err != nil {
-		return false, errors.NewAppErrorExistError(errors.RedisOperationFail, err)
+		return false, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 	}
 	if rs == nil {
 		return false, nil
@@ -180,7 +180,7 @@ func (rp *RedisProxy) TryGetDistributedLock(key string, v string) (bool, errors.
 	for times.GetNowMillisecond() <= end {
 		rs, err := _LockDistributedLuaScript.Do(conn, key, v, _DistributedTimeOut)
 		if err != nil {
-			return false, errors.NewAppErrorExistError(errors.RedisOperationFail, err)
+			return false, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 		}
 		if rs.(int64) == _DistributedSuccess {
 			return true, nil
@@ -197,7 +197,7 @@ func (rp *RedisProxy) ReleaseDistributedLock(key string, v string) (bool, errors
 
 	rs, err := _UnLockDistributedLuaScript.Do(conn, key, v)
 	if err != nil {
-		return false, errors.NewAppErrorExistError(errors.RedisOperationFail, err)
+		return false, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 	}
 	if rs.(int64) == _DistributedSuccess {
 		return true, nil
@@ -212,7 +212,7 @@ func (rp *RedisProxy) HGet(key, field string) (string, errors.AppError) {
 
 	rs, err := conn.Do("HGET", key, field)
 	if err != nil {
-		return "", errors.NewAppErrorExistError(errors.RedisOperationFail, err)
+		return "", errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 	}
 	if rs == nil {
 		return "", nil
@@ -225,7 +225,7 @@ func (rp *RedisProxy) HSet(key, field, value string) errors.AppError {
 	defer rp.Close(conn)
 
 	_, err := conn.Do("HSET", key, field, value)
-	return errors.NewAppErrorExistError(errors.RedisOperationFail, err)
+	return errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 }
 
 func (rp *RedisProxy) HDel(key string, fields ...interface{}) (int64, errors.AppError) {
@@ -236,7 +236,7 @@ func (rp *RedisProxy) HDel(key string, fields ...interface{}) (int64, errors.App
 	args = append(append(args, key), fields...)
 	rs, err := conn.Do("HDEL", args)
 	if err != nil {
-		return 0, errors.NewAppErrorExistError(errors.RedisOperationFail, err)
+		return 0, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 	}
 	if rs == nil {
 		return 0, nil
@@ -250,7 +250,7 @@ func (rp *RedisProxy) HExists(key, field string) (bool, errors.AppError) {
 
 	rs, err := conn.Do("HEXISTS", key, field)
 	if err != nil {
-		return false, errors.NewAppErrorExistError(errors.RedisOperationFail, err)
+		return false, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 	}
 	if rs == nil {
 		return false, nil
@@ -266,7 +266,7 @@ func (rp *RedisProxy) HMGet(key string, fields ...interface{}) (map[string]*stri
 	fields = append([]interface{}{key}, fields...)
 	rs, err := conn.Do("HMGET", fields...)
 	if err != nil {
-		return result, errors.NewAppErrorExistError(errors.RedisOperationFail, err)
+		return result, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 	}
 	if rs == nil {
 		return result, nil
@@ -302,7 +302,7 @@ func (rp *RedisProxy) HMSet(key string, fieldValue map[string]string) errors.App
 		args = append(append(args, k), v)
 	}
 	_, err := conn.Do("HMSET", args...)
-	return errors.NewAppErrorExistError(errors.RedisOperationFail, err)
+	return errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 }
 
 func (rp *RedisProxy) Connect() redis.Conn {
@@ -313,7 +313,7 @@ func (rp *RedisProxy) Close(conn redis.Conn) errors.AppError {
 	if conn != nil && conn.Err() == nil {
 		conn.Close()
 		err := conn.Close()
-		return errors.NewAppErrorExistError(errors.RedisOperationFail, err)
+		return errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 	}
 	return nil
 }

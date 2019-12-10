@@ -83,7 +83,7 @@ func NewResultCode(code int, message string) ResultCode {
 }
 
 // NewAppErrorExistError 基于error创建应用错误，如果error为nil，则返回nil
-func NewAppErrorExistError(rc ResultCode, err error, e ...interface{}) AppError {
+func NewAppErrorByExistError(rc ResultCode, err error, e ...interface{}) AppError {
 	if e == nil {
 		return nil
 	}

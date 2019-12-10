@@ -1,6 +1,9 @@
 package consts
 
-import "time"
+import (
+	"os"
+	"time"
+)
 
 //默认空时间
 const BlankTime = "1970-01-01 00:00:00"
@@ -34,3 +37,29 @@ const (
 	// GOOSWindows windows 系统标识
 	GOOSWindows = "windows"
 )
+
+const (
+
+	// EvnRunName 环境变量名
+	EvnRunName = "SOC_BOOT_RUN_ENV"
+
+	// EnvLocal 本地环境
+	EnvLocal = "local"
+	// EnvDev 开发环境
+	EnvDev = "dev"
+	// EnvTest 测试环境
+	EnvTest = "test"
+	// EnvStag 预发布环境
+	EnvStag = "stag"
+	// EnvProd 生产环境
+	EnvProd = "prod"
+)
+
+// GetEnv 获取当前环境值
+func GetNowEnv() string {
+	env := os.Getenv(EvnRunName)
+	if "" == env {
+		env = EnvLocal
+	}
+	return env
+}

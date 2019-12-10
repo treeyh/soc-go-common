@@ -14,15 +14,15 @@ func AesDecrypt(key string, encrypt string) (string, errors.AppError) {
 	kbs := SHA256(key)
 	decode, err := base64.StdEncoding.DecodeString(encrypt)
 	if err != nil {
-		return "", errors.NewAppErrorExistError(errors.EncryptDecryptFail, err)
+		return "", errors.NewAppErrorByExistError(errors.EncryptDecryptFail, err)
 	}
 	if len(decode) < aes.BlockSize {
-		return "", errors.NewAppErrorExistError(errors.EncryptDecryptFail, errors2.New("密文太短啦"))
+		return "", errors.NewAppErrorByExistError(errors.EncryptDecryptFail, errors2.New("密文太短啦"))
 	}
 	iv := decode[:aes.BlockSize]
 	block, err := aes.NewCipher(kbs)
 	if err != nil {
-		return "", errors.NewAppErrorExistError(errors.EncryptDecryptFail, err)
+		return "", errors.NewAppErrorByExistError(errors.EncryptDecryptFail, err)
 	}
 	blockMode := cipher.NewCBCDecrypter(block, iv)
 	plantText := make([]byte, len(decode))

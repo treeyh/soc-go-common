@@ -20,7 +20,7 @@ func TestNewSystemError(t *testing.T) {
 		//fmt.Println("se1:" + se.Message())
 		convey.ShouldEqual(se2.Message(), "test test")
 
-		se3 := NewAppErrorExistError(TestResultCode, errors.New("errors"), "err")
+		se3 := NewAppErrorByExistError(TestResultCode, errors.New("errors"), "err")
 		//fmt.Println("se2:" + se2.Message())
 		//fmt.Println("se1:" + se.Message())
 		//fmt.Println("se3:" + se3.Message())
