@@ -25,9 +25,5 @@ type RedisConfig struct {
 
 //mysql配置
 type MysqlConfig struct {
-	Host     string
-	Port     int
-	Usr      string
-	Pwd      string
-	Database string
+	DBUrl string
 }
