@@ -25,5 +25,6 @@ type RedisConfig struct {
 
 //mysql配置
 type MysqlConfig struct {
+	Type  string
 	DBUrl string
 }

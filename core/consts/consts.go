@@ -40,6 +40,12 @@ const (
 
 const (
 
+	// DBTypeMysql 数据库类型
+	DBTypeMysql = "mysql"
+)
+
+const (
+
 	// EvnRunName 环境变量名
 	EvnRunName = "SOC_BOOT_RUN_ENV"
 
@@ -55,8 +61,8 @@ const (
 	EnvProd = "prod"
 )
 
-// GetEnv 获取当前环境值
-func GetNowEnv() string {
+// GetCurrentEnv 获取当前环境值
+func GetCurrentEnv() string {
 	env := os.Getenv(EvnRunName)
 	if "" == env {
 		env = EnvLocal
