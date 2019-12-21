@@ -18,7 +18,7 @@ var (
 	_lock           sync.Mutex
 	_logger         = map[string]*AppLogger{}
 	_logTagKey      = "tag"
-	_logDefaultName = "default"
+	_logDefaultName = "Default"
 )
 
 var _defaultLogConfig = config.LogConfig{
