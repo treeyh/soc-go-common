@@ -23,8 +23,22 @@ type RedisConfig struct {
 	WriteTimeout   int
 }
 
-//mysql配置
-type MysqlConfig struct {
+//数据库配置
+type DBConfig struct {
 	Type  string
 	DBUrl string
+}
+
+// AppConfig 应用配置
+type AppConfig struct {
+	Name    string
+	Server  *ServerConfig
+	AppCode string
+	AppKey  string
+}
+
+// ServerConfig 服务配置
+type ServerConfig struct {
+	Port        int
+	ContextPath string
 }

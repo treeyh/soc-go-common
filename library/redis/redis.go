@@ -234,7 +234,7 @@ func (rp *RedisProxy) HDel(key string, fields ...interface{}) (int64, errors.App
 
 	args := []interface{}{}
 	args = append(append(args, key), fields...)
-	rs, err := conn.Do("HDEL", args)
+	rs, err := conn.Do("HDEL", args...)
 	if err != nil {
 		return 0, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 	}
