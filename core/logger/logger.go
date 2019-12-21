@@ -134,7 +134,7 @@ func Logger() *AppLogger {
 	if logger != nil {
 		return logger
 	}
-	return InitLogger(_logDefaultName, &_defaultLogConfig)
+	return InitLogger(_logDefaultName, &_defaultLogConfig, false)
 }
 
 func LoggerByName(name string) *AppLogger {
@@ -144,25 +144,36 @@ func LoggerByName(name string) *AppLogger {
 	return nil
 }
 
-func InitLogger(name string, logConfig *config.LogConfig) *AppLogger {
-	sysLogger := &AppLogger{
-		name:      name,
-		logConfig: logConfig,
+// InitLogger 初始化Logger对象
+func InitLogger(name string, logConfig *config.LogConfig, isForce bool) *AppLogger {
+	appLogger := LoggerByName(name)
+	if appLogger != nil && isForce == false {
+		return appLogger
 	}
 
-	sysLogger.init()
-	_logger[name] = sysLogger
-	return sysLogger
+	if appLogger == nil {
+		appLogger = &AppLogger{
+			name:      name,
+			logConfig: logConfig,
+		}
+	} else {
+		appLogger.logConfig = logConfig
+	}
+
+	appLogger.init(isForce)
+	_logger[name] = appLogger
+	return appLogger
 }
 
 // Init 初始化Logger对象
-func (s *AppLogger) init() {
+func (s *AppLogger) init(isForce bool) {
+	if s.log != nil && isForce == false {
+		return
+	}
+	_lock.Lock()
+	defer _lock.Unlock()
 	if s.log == nil {
-		_lock.Lock()
-		defer _lock.Unlock()
-		if s.log == nil {
-			s.initLogger()
-		}
+		s.initLogger()
 	}
 }
 
