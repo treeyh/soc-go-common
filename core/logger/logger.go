@@ -50,7 +50,7 @@ type AppLogger struct {
 	isSyncConsoleOut bool
 }
 
-func obj2String(msg interface{}) string {
+func objToString(msg interface{}) string {
 	str, ok := msg.(string)
 	if !ok {
 		str = strs.ObjectToString(msg)
@@ -59,7 +59,7 @@ func obj2String(msg interface{}) string {
 }
 
 func (s *AppLogger) Info(msg interface{}, fields ...zap.Field) {
-	s.log.Info(obj2String(msg), fields...)
+	s.log.Info(objToString(msg), fields...)
 }
 
 func (s *AppLogger) Infof(fmtstr string, args ...interface{}) {
@@ -68,7 +68,7 @@ func (s *AppLogger) Infof(fmtstr string, args ...interface{}) {
 }
 
 func (s *AppLogger) Error(msg interface{}, fields ...zap.Field) {
-	s.log.Error(obj2String(msg), fields...)
+	s.log.Error(objToString(msg), fields...)
 }
 
 func (s *AppLogger) Errorf(fmtstr string, args ...interface{}) {
@@ -77,7 +77,7 @@ func (s *AppLogger) Errorf(fmtstr string, args ...interface{}) {
 }
 
 func (s *AppLogger) Debug(msg interface{}, fields ...zap.Field) {
-	s.log.Debug(obj2String(msg), fields...)
+	s.log.Debug(objToString(msg), fields...)
 }
 
 func (s *AppLogger) Debugf(fmtstr string, args ...interface{}) {
@@ -86,7 +86,7 @@ func (s *AppLogger) Debugf(fmtstr string, args ...interface{}) {
 }
 
 func (s *AppLogger) Warn(msg interface{}, fields ...zap.Field) {
-	s.log.Warn(obj2String(msg), fields...)
+	s.log.Warn(objToString(msg), fields...)
 }
 
 func (s *AppLogger) Warnf(fmtstr string, args ...interface{}) {
@@ -95,7 +95,7 @@ func (s *AppLogger) Warnf(fmtstr string, args ...interface{}) {
 }
 
 func (s *AppLogger) DPanic(msg interface{}, fields ...zap.Field) {
-	s.log.DPanic(obj2String(msg), fields...)
+	s.log.DPanic(objToString(msg), fields...)
 }
 
 func (s *AppLogger) DPanicf(fmtstr string, args ...interface{}) {
@@ -104,7 +104,7 @@ func (s *AppLogger) DPanicf(fmtstr string, args ...interface{}) {
 }
 
 func (s *AppLogger) Panic(msg interface{}, fields ...zap.Field) {
-	s.log.Panic(obj2String(msg), fields...)
+	s.log.Panic(objToString(msg), fields...)
 }
 
 func (s *AppLogger) Panicf(fmtstr string, args ...interface{}) {
@@ -113,7 +113,7 @@ func (s *AppLogger) Panicf(fmtstr string, args ...interface{}) {
 }
 
 func (s *AppLogger) Fatal(msg interface{}, fields ...zap.Field) {
-	s.log.Fatal(obj2String(msg), fields...)
+	s.log.Fatal(objToString(msg), fields...)
 }
 
 func (s *AppLogger) Fatalf(fmtstr string, args ...interface{}) {
@@ -145,9 +145,9 @@ func LoggerByName(name string) *AppLogger {
 }
 
 // InitLogger 初始化Logger对象
-func InitLogger(name string, logConfig *config.LogConfig, isForce bool) *AppLogger {
+func InitLogger(name string, logConfig *config.LogConfig, isReInit bool) *AppLogger {
 	appLogger := LoggerByName(name)
-	if appLogger != nil && isForce == false {
+	if appLogger != nil && isReInit == false {
 		return appLogger
 	}
 
@@ -160,21 +160,19 @@ func InitLogger(name string, logConfig *config.LogConfig, isForce bool) *AppLogg
 		appLogger.logConfig = logConfig
 	}
 
-	appLogger.init(isForce)
+	appLogger.init(isReInit)
 	_logger[name] = appLogger
 	return appLogger
 }
 
 // Init 初始化Logger对象
-func (s *AppLogger) init(isForce bool) {
-	if s.log != nil && isForce == false {
+func (s *AppLogger) init(isReInit bool) {
+	if s.log != nil && isReInit == false {
 		return
 	}
 	_lock.Lock()
 	defer _lock.Unlock()
-	if s.log == nil {
-		s.initLogger()
-	}
+	s.initLogger()
 }
 
 func (s *AppLogger) initLogger() *AppLogger {
