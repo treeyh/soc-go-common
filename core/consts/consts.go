@@ -44,10 +44,15 @@ const (
 	DBTypeMysql = "mysql"
 )
 
+//const (
+//	ContextTraceKey = "Tracer"
+//	ContextContextKey = "ParentContext"
+//)
+
 const (
 
 	// EvnRunName 环境变量名
-	EvnRunName = "SOC_BOOT_RUN_ENV"
+	EvnSocBootRunName = "SOC_BOOT_RUN_ENV"
 
 	// EnvLocal 本地环境
 	EnvLocal = "local"
@@ -63,7 +68,7 @@ const (
 
 // GetCurrentEnv 获取当前环境值
 func GetCurrentEnv() string {
-	env := os.Getenv(EvnRunName)
+	env := os.Getenv(EvnSocBootRunName)
 	if "" == env {
 		env = EnvLocal
 	}

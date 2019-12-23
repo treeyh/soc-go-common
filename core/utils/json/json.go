@@ -1,6 +1,7 @@
 package json
 
 import (
+	"github.com/treeyh/soc-go-common/core/errors"
 	"time"
 	"unsafe"
 
@@ -57,10 +58,10 @@ func init() {
 	jsoniter.RegisterTypeDecoder("time.Time", &TimeDecoder{})
 }
 
-func ToJson(obj interface{}) (string, error) {
+func ToJson(obj interface{}) (string, errors.AppError) {
 	bs, err := json.Marshal(obj)
 	if err != nil {
-		return "", err
+		return "", errors.NewAppErrorByExistError(errors.JsonEncodeFail, err)
 	}
 	return string(bs), nil
 }
@@ -76,6 +77,10 @@ func ToJsonIgnoreError(obj interface{}) string {
 	return string(bs)
 }
 
-func FromJson(jsonStr string, obj interface{}) error {
-	return json.Unmarshal([]byte(jsonStr), obj)
+func FromJson(jsonStr string, obj interface{}) errors.AppError {
+	err := json.Unmarshal([]byte(jsonStr), obj)
+	if err != nil {
+		return errors.NewAppErrorByExistError(errors.JsonDecodeFail, err)
+	}
+	return nil
 }

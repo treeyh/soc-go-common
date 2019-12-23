@@ -82,6 +82,12 @@ var (
 	// ObjectNotArray 对象不是数组
 	ObjectNotArray = NewResultCode(100030, "对象不是数组")
 
+	// JsonEncodeFail JSON序列化失败
+	JsonEncodeFail = NewResultCode(100040, "JSON序列化失败")
+
+	// JsonDecodeFail JSON反序列化失败
+	JsonDecodeFail = NewResultCode(100041, "JSON反序列化失败")
+
 	// DbOperationFail 数据库操作失败
 	DbOperationFail = NewResultCode(100050, "数据库操作失败")
 
