@@ -66,14 +66,8 @@ func ToJson(obj interface{}) (string, error) {
 }
 
 func ToJsonIgnoreError(obj interface{}) string {
-	if obj == nil {
-		return ""
-	}
-	bs, err := json.Marshal(obj)
-	if err != nil {
-		return ""
-	}
-	return string(bs)
+	jstr, _ := ToJson(obj)
+	return jstr
 }
 
 func FromJson(jsonStr string, obj interface{}) error {
