@@ -91,6 +91,12 @@ var (
 	// DbOperationFail 数据库操作失败
 	DbOperationFail = NewResultCode(100050, "数据库操作失败")
 
+	// HttpRequestFail Http请求失败
+	HttpRequestFail = NewResultCode(100060, "Http请求失败")
+
+	// HttpCreateRequestFail Http创建请求失败
+	HttpCreateRequestFail = NewResultCode(100061, "Http创建请求失败")
+
 	// RedisOperationFail redis操作失败
 	RedisOperationFail = NewResultCode(100101, "redis操作失败")
 
