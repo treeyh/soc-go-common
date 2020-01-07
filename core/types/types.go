@@ -26,7 +26,7 @@ func (t *Time) IsNull() bool {
 	return !t.IsNotNull()
 }
 
-func (t *Time) UnmarshalJSON(data []byte) {
+func (t *Time) UnmarshalJSON(data []byte) (err error) {
 	//fmt.Println("UnmarshalJSON:", string(data))
 	date := strings.ReplaceAll(string(data), "\"", "")
 	if date == "" {
@@ -39,19 +39,20 @@ func (t *Time) UnmarshalJSON(data []byte) {
 			now, err = time.Parse(consts.AppSystemTimeFormat8, date)
 			if err != nil {
 				*t = Time(consts.BlankTimeObject)
-				return
+				return nil
 			}
 		}
 	}
 	*t = Time(now)
+	return nil
 }
 
-func (t Time) MarshalJSON() []byte {
+func (t Time) MarshalJSON() ([]byte, error) {
 	b := make([]byte, 0, len(consts.AppTimeFormat)+2)
 	b = append(b, '"')
 	b = time.Time(t).AppendFormat(b, consts.AppTimeFormat)
 	b = append(b, '"')
-	return b
+	return b, nil
 }
 
 // UnmarshalGQL implements the graphql.Marshaler interface
