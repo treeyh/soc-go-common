@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"strings"
 	"unicode"
+	"unicode/utf8"
 )
 
-func Len(str string) int {
-	return len([]rune(str))
+func LengthUnicode(str string) int {
+	return utf8.RuneCountInString(str)
 }
 
 func ObjectToString(obj interface{}) string {
