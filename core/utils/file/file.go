@@ -1,9 +1,12 @@
 package file
 
 import (
+	"io/ioutil"
 	"os"
 	"path"
+	"path/filepath"
 	"runtime"
+	"time"
 )
 
 // GetCurrentPath 获取调用方当前目录路径
@@ -18,7 +21,7 @@ func GetCurrentPath() string {
 
 // ExistFile 判断文件是否存在
 func ExistFile(filePath string) bool {
-	_, err := os.Lstat(filePath)
+	_, err := os.Stat(filePath)
 	return !os.IsNotExist(err)
 }
 
@@ -31,4 +34,45 @@ func WriteFile(filePath, content string) {
 	defer f.Close()
 
 	f.WriteString(content)
+}
+
+// GetFileModTime 获取文件修改时间
+func GetFileModTime(filePath string) (time.Time, error) {
+	fileInfo, err := os.Stat(filePath)
+	if err != nil {
+		return time.Unix(0, 0), err
+	}
+	return fileInfo.ModTime(), nil
+}
+
+// IsDir 是否是目录
+func IsDir(filePath string) (bool, error) {
+	fileInfo, err := os.Stat("test.log")
+	if err != nil {
+		return false, err
+	}
+
+	//是否是目录
+	return fileInfo.IsDir(), nil
+}
+
+// GetDirSon 返回目录下子文件/目录列表
+func GetDirSon(filePath string) ([]os.FileInfo, error) {
+	return ioutil.ReadDir(filePath)
+}
+
+// GetDirWalk 递归获取路径子文件，目录列表
+func GetDirWalk(filePath string) (map[string]os.FileInfo, error) {
+	files := make(map[string]os.FileInfo)
+
+	err := filepath.Walk(filePath,
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			files[path] = info
+			return nil
+		})
+
+	return files, err
 }
