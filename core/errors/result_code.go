@@ -35,7 +35,7 @@ var (
 	LimitExceed = NewResultCode(509, "超出限制")
 
 	// ParamError 参数错误
-	ParamError = NewResultCode(600, "参数错误")
+	ParamError = NewResultCode(600, "%s 参数错误")
 
 	// FileTooLarge 文件过大
 	FileTooLarge = NewResultCode(610, "文件过大")
