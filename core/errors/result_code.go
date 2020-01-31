@@ -88,8 +88,10 @@ var (
 	// JsonDecodeFail JSON反序列化失败
 	JsonDecodeFail = NewResultCode(100041, "JSON反序列化失败")
 
+	// DbInitConnFail 数据库初始化连接失败
+	DbInitConnFail = NewResultCode(100050, "数据库初始化连接失败")
 	// DbOperationFail 数据库操作失败
-	DbOperationFail = NewResultCode(100050, "数据库操作失败")
+	DbOperationFail = NewResultCode(100051, "数据库操作失败")
 
 	// HttpRequestFail Http请求失败
 	HttpRequestFail = NewResultCode(100060, "Http请求失败")
@@ -108,4 +110,7 @@ var (
 
 	// RedisConnGetFail 获取redis连接失败
 	RedisConnGetFail = NewResultCode(100104, "获取redis连接失败")
+
+	// RedisLockGetFail 获取redis锁失败
+	RedisLockGetFail = NewResultCode(100105, "获取redis锁失败")
 )
