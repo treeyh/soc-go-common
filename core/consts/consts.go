@@ -78,6 +78,10 @@ func GetCurrentEnv() string {
 }
 
 const (
+
+	// TraceIdKey 用于http header
+	TraceIdKey = "SOC-TRACE-ID"
+
 	TracerContextKey = "SOC-Trace"
 
 	TraceParentSpanContextKey = "SOC-ParentSpanContext"

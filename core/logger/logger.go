@@ -1,8 +1,10 @@
 package logger
 
 import (
+	"context"
 	"fmt"
 	"github.com/treeyh/soc-go-common/core/config"
+	"github.com/treeyh/soc-go-common/core/consts"
 	"github.com/treeyh/soc-go-common/core/utils/strs"
 	"os"
 	"strconv"
@@ -19,6 +21,7 @@ var (
 	_logger         = map[string]*AppLogger{}
 	_logTagKey      = "tag"
 	_logDefaultName = "default"
+	_logTraceIdKey  = "traceId"
 )
 
 var _defaultLogConfig = config.LogConfig{
@@ -56,6 +59,17 @@ func objToString(msg interface{}) string {
 		str = strs.ObjectToString(msg)
 	}
 	return str
+}
+
+func GetTraceField(ctx context.Context) zap.Field {
+	if ctx == nil {
+		return zap.String(_logTraceIdKey, "")
+	}
+	val := ctx.Value(consts.TraceIdKey)
+	if val == nil {
+		return zap.String(_logTraceIdKey, "")
+	}
+	return zap.String(_logTraceIdKey, val.(string))
 }
 
 func (s *AppLogger) Info(msg interface{}, fields ...zap.Field) {
