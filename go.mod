@@ -3,9 +3,11 @@ module github.com/treeyh/soc-go-common
 go 1.13
 
 require (
+	github.com/gin-gonic/gin v1.5.0
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/json-iterator/go v1.1.8
 	github.com/mozillazg/go-pinyin v0.15.0
+	github.com/opentracing/opentracing-go v1.1.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/smartystreets/goconvey v1.6.4
 	github.com/stretchr/testify v1.4.0

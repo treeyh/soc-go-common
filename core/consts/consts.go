@@ -76,3 +76,9 @@ func GetCurrentEnv() string {
 	}
 	return _env
 }
+
+const (
+	TracerContextKey = "SOC-Trace"
+
+	TraceParentSpanContextKey = "SOC-ParentSpanContext"
+)

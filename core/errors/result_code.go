@@ -108,4 +108,7 @@ var (
 
 	// RedisConnGetFail 获取redis连接失败
 	RedisConnGetFail = NewResultCode(100104, "获取redis连接失败")
+
+	// WX_OPERATION_ERROR 微信操作错误
+	WX_OPERATION_ERROR = NewResultCode(100201, "%s 微信操作错误")
 )
