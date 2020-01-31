@@ -3,7 +3,6 @@ package http
 import (
 	"context"
 	"crypto/tls"
-	"github.com/gin-gonic/gin"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
 	"github.com/treeyh/soc-go-common/core/config"
@@ -25,23 +24,23 @@ func InitTraceConfig(traceConfig *config.TraceConfig) {
 	tarceConfig = traceConfig
 }
 
-func Get(c *gin.Context, url string, querys map[string]string) (string, int, errors.AppError) {
+func Get(c context.Context, url string, querys map[string]string) (string, int, errors.AppError) {
 	return do(c, "GET", url, querys, nil, nil)
 }
 
-func Post(c *gin.Context, url string, querys map[string]string, body *string) (string, int, errors.AppError) {
+func Post(c context.Context, url string, querys map[string]string, body *string) (string, int, errors.AppError) {
 	return do(c, "POST", url, querys, nil, body)
 }
 
-func Put(c *gin.Context, url string, querys map[string]string, body *string) (string, int, errors.AppError) {
+func Put(c context.Context, url string, querys map[string]string, body *string) (string, int, errors.AppError) {
 	return do(c, "PUT", url, querys, nil, body)
 }
 
-func Delete(c *gin.Context, url string, querys map[string]string, body *string) (string, int, errors.AppError) {
+func Delete(c context.Context, url string, querys map[string]string, body *string) (string, int, errors.AppError) {
 	return do(c, "DELETE", url, querys, nil, body)
 }
 
-func do(c *context.Context, method string, url string, querys map[string]string, headers map[string]string, body *string) (string, int, errors.AppError) {
+func do(ctx context.Context, method string, url string, querys map[string]string, headers map[string]string, body *string) (string, int, errors.AppError) {
 
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -77,8 +76,8 @@ func do(c *context.Context, method string, url string, querys map[string]string,
 
 	if tarceConfig.Enable {
 
-		tracer, _ := c.Get(consts.TracerContextKey)
-		parentSpanContext, _ := c.Get(consts.TraceParentSpanContextKey)
+		tracer := ctx.Value(consts.TracerContextKey)
+		parentSpanContext := ctx.Value(consts.TraceParentSpanContextKey)
 
 		span := opentracing.StartSpan(
 			"call Http "+method,
