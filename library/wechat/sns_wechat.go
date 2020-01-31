@@ -1,9 +1,38 @@
 package wechat
 
-import "github.com/treeyh/soc-go-common/core/utils/http"
+import (
+	"context"
+	"github.com/treeyh/soc-go-common/core/errors"
+	"github.com/treeyh/soc-go-common/core/utils/http_client"
+	"github.com/treeyh/soc-go-common/core/utils/json"
+)
 
-func (wcp *WechatProxy) Jscode2session() {
+func (wcp *WechatProxy) Jscode2session(ctx context.Context, jsCode string) (*WechatCode2SessionResp, errors.AppError) {
 	url := wcp.GetPreUrl() + "/sns/jscode2session"
-	http.Get()
+	params := make(map[string]string)
+	params["appid"] = wcp.wechatConfig.AppId
+	params["secret"] = wcp.wechatConfig.AppSecret
+	params["js_code"] = jsCode
+	params["grant_type"] = "authorization_code"
+
+	result, status, err := http_client.Get(ctx, url, params)
+	resp := &WechatCode2SessionResp{}
+
+	if err != nil {
+		return nil, errors.NewAppErrorByExistError(errors.WechatRequestFail, err)
+	}
+	if status != 200 || result == "" {
+		return &WechatCode2SessionResp{
+			WechatBaseResp: WechatBaseResp{
+				HttpStatus: status,
+			},
+		}, errors.NewAppError(errors.WechatRequestFail)
+	}
+
+	err1 := json.FromJson(result, resp)
+	if err1 != nil {
+
+		return nil, errors.NewAppErrorByExistError(errors.WechatRequestFail, err)
+	}
 
 }

@@ -1,4 +1,4 @@
-package http
+package http_client
 
 import (
 	"context"
@@ -17,7 +17,11 @@ import (
 )
 
 var (
-	tarceConfig *config.TraceConfig
+	tarceConfig = &config.TraceConfig{
+		Enable: false,
+		Server: "",
+	}
+	log = logger.Logger()
 )
 
 func InitTraceConfig(traceConfig *config.TraceConfig) {
@@ -57,12 +61,15 @@ func do(ctx context.Context, method string, url string, querys map[string]string
 		reqUrl += "?" + ConvertToQueryParams(querys)
 	}
 
-	// 构建request
-	var reqBody *strings.Reader
+	var req *http.Request
+	var err error
+
 	if body != nil {
-		reqBody = strings.NewReader(*body)
+		req, err = http.NewRequest(method, reqUrl, strings.NewReader(*body))
+	} else {
+		req, err = http.NewRequest(method, reqUrl, nil)
 	}
-	req, err := http.NewRequest(method, reqUrl, reqBody)
+
 	if err != nil {
 		return "", 0, errors.NewAppErrorByExistError(errors.HttpCreateRequestFail, err)
 	}
@@ -74,23 +81,25 @@ func do(ctx context.Context, method string, url string, querys map[string]string
 		}
 	}
 
-	if tarceConfig.Enable {
+	if tarceConfig.Enable && ctx != nil {
 
 		tracer := ctx.Value(consts.TracerContextKey)
 		parentSpanContext := ctx.Value(consts.TraceParentSpanContextKey)
 
-		span := opentracing.StartSpan(
-			"call Http "+method,
-			opentracing.ChildOf(parentSpanContext.(opentracing.SpanContext)),
-			opentracing.Tag{Key: string(ext.Component), Value: "HTTP"},
-			ext.SpanKindRPCClient,
-		)
+		if tracer != nil && parentSpanContext != nil {
+			span := opentracing.StartSpan(
+				"call Http "+method,
+				opentracing.ChildOf(parentSpanContext.(opentracing.SpanContext)),
+				opentracing.Tag{Key: string(ext.Component), Value: "HTTP"},
+				ext.SpanKindRPCClient,
+			)
 
-		span.Finish()
+			span.Finish()
 
-		injectErr := tracer.(opentracing.Tracer).Inject(span.Context(), opentracing.HTTPHeaders, opentracing.HTTPHeadersCarrier(req.Header))
-		if injectErr != nil {
-			logger.Logger().Fatalf("%s: Couldn't inject headers", err)
+			injectErr := tracer.(opentracing.Tracer).Inject(span.Context(), opentracing.HTTPHeaders, opentracing.HTTPHeadersCarrier(req.Header))
+			if injectErr != nil {
+				log.Fatalf("%s: Couldn't inject headers", err)
+			}
 		}
 	}
 

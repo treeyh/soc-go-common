@@ -5,6 +5,7 @@ import (
 	"crypto/cipher"
 	"encoding/base64"
 	"encoding/json"
+	"github.com/treeyh/soc-go-common/core/logger"
 	"regexp"
 	"sync"
 
@@ -20,6 +21,8 @@ var (
 	_defaultConfigName = "default"
 
 	poolMutex sync.Mutex
+
+	log = logger.Logger()
 )
 
 type WechatProxy struct {
