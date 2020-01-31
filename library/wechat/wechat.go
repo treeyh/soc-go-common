@@ -5,10 +5,11 @@ import (
 	"crypto/cipher"
 	"encoding/base64"
 	"encoding/json"
-	"github.com/treeyh/soc-go-common/core/config"
-	"github.com/treeyh/soc-go-common/core/errors"
 	"regexp"
 	"sync"
+
+	"github.com/treeyh/soc-go-common/core/config"
+	"github.com/treeyh/soc-go-common/core/errors"
 )
 
 const weChatPreUrl = "https://api.weixin.qq.com"
@@ -62,30 +63,30 @@ func GetProxyByName(name string) *WechatProxy {
 // If isJSON is false, Decrypt return map type.
 func Decrypt(appId string, sessionKey string, encryptedData string, iv string, isJSON bool) (interface{}, errors.AppError) {
 	if len(sessionKey) != 24 {
-		return nil, errors.NewAppError(errors.WX_OPERATION_ERROR, "sessionKey length is error")
+		return nil, errors.NewAppError(errors.WechatOperationError, "sessionKey length is error")
 	}
 	aesKey, err := base64.StdEncoding.DecodeString(sessionKey)
 	if err != nil {
-		return nil, errors.NewAppError(errors.WX_OPERATION_ERROR, "decode base64 error")
+		return nil, errors.NewAppError(errors.WechatOperationError, "decode base64 error")
 	}
 
 	if len(iv) != 24 {
-		return nil, errors.NewAppError(errors.WX_OPERATION_ERROR, "iv length is error")
+		return nil, errors.NewAppError(errors.WechatOperationError, "iv length is error")
 	}
 	aesIV, err := base64.StdEncoding.DecodeString(iv)
 	if err != nil {
-		return nil, errors.NewAppErrorByExistError(errors.WX_OPERATION_ERROR, err, "decode base64 error")
+		return nil, errors.NewAppErrorByExistError(errors.WechatOperationError, err, "decode base64 error")
 	}
 
 	aesCipherText, err := base64.StdEncoding.DecodeString(encryptedData)
 	if err != nil {
-		return nil, errors.NewAppErrorByExistError(errors.WX_OPERATION_ERROR, err, "decode base64 error")
+		return nil, errors.NewAppErrorByExistError(errors.WechatOperationError, err, "decode base64 error")
 	}
 	aesPlantText := make([]byte, len(aesCipherText))
 
 	aesBlock, err := aes.NewCipher(aesKey)
 	if err != nil {
-		return nil, errors.NewAppErrorByExistError(errors.WX_OPERATION_ERROR, err, "aes error")
+		return nil, errors.NewAppErrorByExistError(errors.WechatOperationError, err, "aes error")
 	}
 
 	mode := cipher.NewCBCDecrypter(aesBlock, aesIV)
@@ -99,11 +100,11 @@ func Decrypt(appId string, sessionKey string, encryptedData string, iv string, i
 
 	err = json.Unmarshal(aesPlantText, &decrypted)
 	if err != nil {
-		return nil, errors.NewAppErrorByExistError(errors.WX_OPERATION_ERROR, err, "format json error")
+		return nil, errors.NewAppErrorByExistError(errors.WechatOperationError, err, "format json error")
 	}
 
 	if decrypted["watermark"].(map[string]interface{})["appid"] != appId {
-		return nil, errors.NewAppError(errors.WX_OPERATION_ERROR, "appID is not match")
+		return nil, errors.NewAppError(errors.WechatOperationError, "appID is not match")
 	}
 
 	if isJSON == true {
