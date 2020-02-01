@@ -1,6 +1,7 @@
 package wechat
 
 import (
+	"context"
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/base64"
@@ -64,31 +65,36 @@ func GetProxyByName(name string) *WechatProxy {
 // Decrypt Weixin APP's AES Data
 // If isJSON is true, Decrypt return JSON type.
 // If isJSON is false, Decrypt return map type.
-func Decrypt(appId string, sessionKey string, encryptedData string, iv string, isJSON bool) (interface{}, errors.AppError) {
+func (wcp *WechatProxy) DecryptEncryptedData(ctx context.Context, sessionKey string, encryptedData string, iv string, isJSON bool) (interface{}, errors.AppError) {
 	if len(sessionKey) != 24 {
 		return nil, errors.NewAppError(errors.WechatOperationError, "sessionKey length is error")
 	}
 	aesKey, err := base64.StdEncoding.DecodeString(sessionKey)
 	if err != nil {
-		return nil, errors.NewAppError(errors.WechatOperationError, "decode base64 error")
+		log.Error("sessionKey decode base64 error :"+sessionKey+" error:"+err.Error(), logger.GetTraceField(ctx))
+		return nil, errors.NewAppErrorByExistError(errors.WechatOperationError, err, "decode base64 error")
 	}
 
 	if len(iv) != 24 {
+		log.Error("iv length is error :"+iv, logger.GetTraceField(ctx))
 		return nil, errors.NewAppError(errors.WechatOperationError, "iv length is error")
 	}
 	aesIV, err := base64.StdEncoding.DecodeString(iv)
 	if err != nil {
+		log.Error("iv decode base64 error :"+iv+" error:"+err.Error(), logger.GetTraceField(ctx))
 		return nil, errors.NewAppErrorByExistError(errors.WechatOperationError, err, "decode base64 error")
 	}
 
 	aesCipherText, err := base64.StdEncoding.DecodeString(encryptedData)
 	if err != nil {
+		log.Error("encryptedData decode base64 error :"+encryptedData+" error:"+err.Error(), logger.GetTraceField(ctx))
 		return nil, errors.NewAppErrorByExistError(errors.WechatOperationError, err, "decode base64 error")
 	}
 	aesPlantText := make([]byte, len(aesCipherText))
 
 	aesBlock, err := aes.NewCipher(aesKey)
 	if err != nil {
+		log.Error("aesKey aes error:"+err.Error(), logger.GetTraceField(ctx))
 		return nil, errors.NewAppErrorByExistError(errors.WechatOperationError, err, "aes error")
 	}
 
@@ -103,10 +109,12 @@ func Decrypt(appId string, sessionKey string, encryptedData string, iv string, i
 
 	err = json.Unmarshal(aesPlantText, &decrypted)
 	if err != nil {
+		log.Error("format json error:"+string(aesPlantText)+" error:"+err.Error(), logger.GetTraceField(ctx))
 		return nil, errors.NewAppErrorByExistError(errors.WechatOperationError, err, "format json error")
 	}
 
-	if decrypted["watermark"].(map[string]interface{})["appid"] != appId {
+	if decrypted["watermark"].(map[string]interface{})["appid"] != wcp.wechatConfig.AppId {
+		log.Error("appID is not match:", logger.GetTraceField(ctx))
 		return nil, errors.NewAppError(errors.WechatOperationError, "appID is not match")
 	}
 
@@ -125,4 +133,9 @@ func PKCS7UnPadding(plantText []byte) []byte {
 		return plantText[:(length - unPadding)]
 	}
 	return plantText
+}
+
+// CheckErrCodeSucceed 检查接口返回是否成功
+func CheckErrCodeSucceed(errCode int) bool {
+	return errCode == 0
 }

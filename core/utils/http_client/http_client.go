@@ -16,6 +16,8 @@ import (
 	"time"
 )
 
+const timeOutSecond = 3
+
 var (
 	tarceConfig = &config.TraceConfig{
 		Enable: false,
@@ -28,30 +30,30 @@ func InitTraceConfig(traceConfig *config.TraceConfig) {
 	tarceConfig = traceConfig
 }
 
-func Get(c context.Context, url string, querys map[string]string) (string, int, errors.AppError) {
+func Get(c context.Context, url string, querys map[string]string) (*string, int, errors.AppError) {
 	return do(c, "GET", url, querys, nil, nil)
 }
 
-func Post(c context.Context, url string, querys map[string]string, body *string) (string, int, errors.AppError) {
+func Post(c context.Context, url string, querys map[string]string, body *string) (*string, int, errors.AppError) {
 	return do(c, "POST", url, querys, nil, body)
 }
 
-func Put(c context.Context, url string, querys map[string]string, body *string) (string, int, errors.AppError) {
+func Put(c context.Context, url string, querys map[string]string, body *string) (*string, int, errors.AppError) {
 	return do(c, "PUT", url, querys, nil, body)
 }
 
-func Delete(c context.Context, url string, querys map[string]string, body *string) (string, int, errors.AppError) {
+func Delete(c context.Context, url string, querys map[string]string, body *string) (*string, int, errors.AppError) {
 	return do(c, "DELETE", url, querys, nil, body)
 }
 
-func do(ctx context.Context, method string, url string, querys map[string]string, headers map[string]string, body *string) (string, int, errors.AppError) {
+func do(ctx context.Context, method string, url string, querys map[string]string, headers map[string]string, body *string) (*string, int, errors.AppError) {
 
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 
 	client := &http.Client{
-		Timeout:   time.Second * 3, //默认3秒超时时间
+		Timeout:   time.Second * timeOutSecond, //默认3秒超时时间
 		Transport: tr,
 	}
 
@@ -61,24 +63,30 @@ func do(ctx context.Context, method string, url string, querys map[string]string
 		reqUrl += "?" + ConvertToQueryParams(querys)
 	}
 
+	logmsg := method + "  url:" + reqUrl
 	var req *http.Request
 	var err error
 
 	if body != nil {
+		logmsg += "  body:" + *body
 		req, err = http.NewRequest(method, reqUrl, strings.NewReader(*body))
 	} else {
 		req, err = http.NewRequest(method, reqUrl, nil)
 	}
 
 	if err != nil {
-		return "", 0, errors.NewAppErrorByExistError(errors.HttpCreateRequestFail, err)
+		log.Error(logmsg+"  error:"+err.Error(), logger.GetTraceField(ctx))
+		return nil, 0, errors.NewAppErrorByExistError(errors.HttpCreateRequestFail, err)
 	}
 
 	//设置header
 	if headers != nil {
+		header := "  header:"
 		for k, v := range headers {
+			header += k + "=" + v + " "
 			req.Header.Set(k, v)
 		}
+		logmsg += header
 	}
 
 	if tarceConfig.Enable && ctx != nil {
@@ -98,14 +106,16 @@ func do(ctx context.Context, method string, url string, querys map[string]string
 
 			injectErr := tracer.(opentracing.Tracer).Inject(span.Context(), opentracing.HTTPHeaders, opentracing.HTTPHeadersCarrier(req.Header))
 			if injectErr != nil {
-				log.Fatalf("%s: Couldn't inject headers", err)
+				log.Error("error:"+injectErr.Error(), logger.GetTraceField(ctx))
 			}
 		}
 	}
 
+	log.Info(logmsg, logger.GetTraceField(ctx))
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", 0, errors.NewAppErrorByExistError(errors.HttpRequestFail, err)
+		log.Error("error:"+err.Error(), logger.GetTraceField(ctx))
+		return nil, 0, errors.NewAppErrorByExistError(errors.HttpRequestFail, err)
 	}
 
 	b, err := ioutil.ReadAll(resp.Body)
@@ -116,10 +126,13 @@ func do(ctx context.Context, method string, url string, querys map[string]string
 	}()
 
 	if err != nil {
-		logger.Logger().Error(err)
-		return "", resp.StatusCode, errors.NewAppErrorByExistError(errors.HttpRequestFail, err)
+		log.Error("error:"+err.Error(), logger.GetTraceField(ctx))
+		return nil, resp.StatusCode, errors.NewAppErrorByExistError(errors.HttpRequestFail, err)
 	}
-	return string(b), resp.StatusCode, nil
+	content := string(b)
+	log.Info("result:"+content, logger.GetTraceField(ctx))
+
+	return &content, resp.StatusCode, nil
 }
 
 func ConvertToQueryParams(queryParams map[string]string) string {

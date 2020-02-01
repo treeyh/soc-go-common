@@ -1,6 +1,7 @@
 package file
 
 import (
+	"github.com/treeyh/soc-go-common/core/errors"
 	"io/ioutil"
 	"os"
 	"path"
@@ -23,6 +24,16 @@ func GetCurrentPath() string {
 func ExistFile(filePath string) bool {
 	_, err := os.Stat(filePath)
 	return !os.IsNotExist(err)
+}
+
+// ReadSmallFile 读取小文件，一次性读取
+func ReadSmallFile(filePath string) (*string, errors.AppError) {
+	tmpContent, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return nil, errors.NewAppErrorByExistError(errors.FileReadFail, err)
+	}
+	content := string(tmpContent)
+	return &content, nil
 }
 
 // WriteFile 写文件
