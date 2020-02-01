@@ -136,6 +136,6 @@ func PKCS7UnPadding(plantText []byte) []byte {
 }
 
 // CheckErrCodeSucceed 检查接口返回是否成功
-func CheckErrCodeSucceed(errCode int) bool {
-	return errCode == 0
+func CheckErrCodeSucceed(httpStatus int, errCode int64) bool {
+	return httpStatus == 200 && errCode == 0
 }

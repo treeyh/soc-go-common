@@ -32,9 +32,11 @@ func TestDecrypt(t *testing.T) {
 
 		resp, err := GetProxy().JsCode2Session(nil, "011cwx6d2xeheI0Y8Cad2twK6d2cwx66")
 		if err != nil {
-			fmt.Println(err)
+			convey.ShouldBeNil(err)
 			return
 		}
+
+		convey.ShouldBeTrue(CheckErrCodeSucceed(resp.HttpStatus, resp.ErrCode))
 
 		fmt.Println(json.ToJsonIgnoreError(resp))
 
