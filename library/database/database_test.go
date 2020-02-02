@@ -51,7 +51,7 @@ type ObjectIdPo struct {
 	DelFlag int `gorm:"type:tinyint(4);column:del_flag" json:"delFlag"`
 }
 
-func (ObjectIdPo) TableName() string {
+func (*ObjectIdPo) TableName() string {
 	return "sys_object_id"
 }
 
@@ -74,7 +74,7 @@ func TestGetDB(t *testing.T) {
 	convey.Convey("log test", t, tests.TestStartUp(func() {
 
 		objectId := ObjectIdPo{
-			Id:         time.Now().Unix(),
+			Id:         1,
 			OrgId:      1,
 			SysCode:    "syscode",
 			Code:       "user",
@@ -88,7 +88,12 @@ func TestGetDB(t *testing.T) {
 			DelFlag:    2,
 		}
 
-		GetDb().Create(objectId)
+		err := GetDb().Create(&objectId).Error
+		//t := GetDb().NewRecord(&objectId)
+		//fmt.Println(t)
+		fmt.Println(err)
+
+		fmt.Println(json.ToJsonIgnoreError(objectId))
 
 	}, initDb))
 }
@@ -96,10 +101,11 @@ func TestGetDB(t *testing.T) {
 func TestGetDB2(t *testing.T) {
 	convey.Convey("log test", t, tests.TestStartUp(func() {
 
-		var objId []ObjectIdPo
+		var objId ObjectIdPo
 
-		GetDb().Where("org_id = ? AND code = ?", 1, "user").First(&objId)
+		row := GetDb().Where("org_id = ? AND code = ?", 1, "us1er").First(&objId).RowsAffected
 
+		fmt.Println(row)
 		fmt.Println(json.ToJsonIgnoreError(objId))
 
 	}, initDb))
