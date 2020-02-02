@@ -12,6 +12,7 @@ func LengthUnicode(str string) int {
 }
 
 func ObjectToString(obj interface{}) string {
+
 	return fmt.Sprintf("%#v", obj)
 }
 

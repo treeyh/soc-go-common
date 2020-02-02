@@ -2,7 +2,6 @@ package errors
 
 import (
 	"fmt"
-	"github.com/treeyh/soc-go-common/core/utils/json"
 )
 
 var (
@@ -32,8 +31,7 @@ type AppError interface {
 }
 
 func (rc *ResultCode) Error() string {
-	str, _ := json.ToJson(rc)
-	return str
+	return rc.Message()
 }
 
 // Code 返回状态编号
@@ -89,6 +87,7 @@ func NewAppErrorByExistError(rc ResultCode, err error, e ...interface{}) AppErro
 	}
 
 	rc.err = err
+	rc.message += "; err:" + err.Error()
 	if e != nil && len(e) == 0 {
 		return &rc
 	}

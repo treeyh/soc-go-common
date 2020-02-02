@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/smartystreets/goconvey/convey"
 	"github.com/treeyh/soc-go-common/core/config"
+	"github.com/treeyh/soc-go-common/core/errors"
+	"github.com/treeyh/soc-go-common/core/logger"
 	"github.com/treeyh/soc-go-common/core/utils/file"
 	"github.com/treeyh/soc-go-common/core/utils/json"
 	"github.com/treeyh/soc-go-common/tests"
@@ -92,6 +94,7 @@ func TestGetDB(t *testing.T) {
 		//t := GetDb().NewRecord(&objectId)
 		//fmt.Println(t)
 		fmt.Println(err)
+		logger.Logger().Info(errors.NewAppErrorByExistError(errors.DbOperationFail, err))
 
 		fmt.Println(json.ToJsonIgnoreError(objectId))
 
