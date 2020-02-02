@@ -1,11 +1,9 @@
 package database
 
 import (
-	"database/sql"
 	"sync"
 	"time"
 
-	"github.com/gomodule/redigo/redis"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mssql"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -18,6 +16,8 @@ import (
 var (
 	dbPools   = make(map[string]*gorm.DB)
 	poolMutex sync.Mutex
+
+	_MasterConfigName = "master"
 )
 
 // InitDataSource 初始化db
@@ -31,7 +31,7 @@ func InitDataSource(dbConfigs *map[string]config.DBConfig) {
 	}
 }
 
-func initDataSourcePool(name string, config config.DBConfig) {
+func initDataSourcePool(name string, config config.DBConfig) errors.AppError {
 
 	maxIdle := 20
 	if config.MaxIdleConns > 0 {
@@ -50,6 +50,7 @@ func initDataSourcePool(name string, config config.DBConfig) {
 
 	db, err := gorm.Open(config.Type, config.DBUrl)
 	if err != nil {
+		panic(" db init fail. name:" + name + ". err:" + err.Error())
 		return errors.NewAppErrorByExistError(errors.DbInitConnFail, err)
 	}
 	db.LogMode(config.LogMode)
@@ -63,12 +64,18 @@ func initDataSourcePool(name string, config config.DBConfig) {
 	return nil
 }
 
-func GetRedisConn(name string) redis.Conn {
-	if redisPools == nil {
-		panic(errors.NewAppError(errors.RedisNotInit))
+// GetDb 获取默认数据库操作对象
+func GetDb() *gorm.DB {
+	return GetDbByName(_MasterConfigName)
+}
+
+// GetDbByName 获取数据库操作对象
+func GetDbByName(name string) *gorm.DB {
+	if dbPools == nil {
+		panic(errors.NewAppError(errors.DbInitConnFail))
 	}
-	if v, ok := redisPools[name]; ok {
-		return v.Get()
+	if v, ok := dbPools[name]; ok {
+		return v
 	}
-	panic(errors.NewAppError(errors.RedisNotInit))
+	panic(errors.NewAppError(errors.DbInitConnFail))
 }

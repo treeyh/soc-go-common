@@ -26,7 +26,7 @@ const (
 	_DistributedTimeOut = 4
 	_DistributedSuccess = 1
 
-	_MasterConfigName = "Master"
+	_MasterConfigName = "master"
 )
 
 var (
