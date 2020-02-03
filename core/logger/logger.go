@@ -76,6 +76,10 @@ func (s *AppLogger) Info(msg interface{}, fields ...zap.Field) {
 	s.log.Info(objToString(msg), fields...)
 }
 
+func (s *AppLogger) InfoCtx(ctx context.Context, msg interface{}, fields ...zap.Field) {
+	s.log.Info(objToString(msg), append(fields, GetTraceField(ctx))...)
+}
+
 func (s *AppLogger) Infof(fmtstr string, args ...interface{}) {
 	msg := fmt.Sprintf(fmtstr, args...)
 	s.log.Info(msg)
@@ -83,6 +87,10 @@ func (s *AppLogger) Infof(fmtstr string, args ...interface{}) {
 
 func (s *AppLogger) Error(msg interface{}, fields ...zap.Field) {
 	s.log.Error(objToString(msg), fields...)
+}
+
+func (s *AppLogger) ErrorCtx(ctx context.Context, msg interface{}, fields ...zap.Field) {
+	s.log.Error(objToString(msg), append(fields, GetTraceField(ctx))...)
 }
 
 func (s *AppLogger) Errorf(fmtstr string, args ...interface{}) {
@@ -94,6 +102,10 @@ func (s *AppLogger) Debug(msg interface{}, fields ...zap.Field) {
 	s.log.Debug(objToString(msg), fields...)
 }
 
+func (s *AppLogger) DebugCtx(ctx context.Context, msg interface{}, fields ...zap.Field) {
+	s.log.Debug(objToString(msg), append(fields, GetTraceField(ctx))...)
+}
+
 func (s *AppLogger) Debugf(fmtstr string, args ...interface{}) {
 	msg := fmt.Sprintf(fmtstr, args...)
 	s.log.Debug(msg)
@@ -101,6 +113,10 @@ func (s *AppLogger) Debugf(fmtstr string, args ...interface{}) {
 
 func (s *AppLogger) Warn(msg interface{}, fields ...zap.Field) {
 	s.log.Warn(objToString(msg), fields...)
+}
+
+func (s *AppLogger) WarnCtx(ctx context.Context, msg interface{}, fields ...zap.Field) {
+	s.log.Warn(objToString(msg), append(fields, GetTraceField(ctx))...)
 }
 
 func (s *AppLogger) Warnf(fmtstr string, args ...interface{}) {
@@ -112,6 +128,10 @@ func (s *AppLogger) DPanic(msg interface{}, fields ...zap.Field) {
 	s.log.DPanic(objToString(msg), fields...)
 }
 
+func (s *AppLogger) DPanicCtx(ctx context.Context, msg interface{}, fields ...zap.Field) {
+	s.log.DPanic(objToString(msg), append(fields, GetTraceField(ctx))...)
+}
+
 func (s *AppLogger) DPanicf(fmtstr string, args ...interface{}) {
 	msg := fmt.Sprintf(fmtstr, args...)
 	s.log.DPanic(msg)
@@ -121,6 +141,10 @@ func (s *AppLogger) Panic(msg interface{}, fields ...zap.Field) {
 	s.log.Panic(objToString(msg), fields...)
 }
 
+func (s *AppLogger) PanicCtx(ctx context.Context, msg interface{}, fields ...zap.Field) {
+	s.log.Panic(objToString(msg), append(fields, GetTraceField(ctx))...)
+}
+
 func (s *AppLogger) Panicf(fmtstr string, args ...interface{}) {
 	msg := fmt.Sprintf(fmtstr, args...)
 	s.log.Panic(msg)
@@ -128,6 +152,10 @@ func (s *AppLogger) Panicf(fmtstr string, args ...interface{}) {
 
 func (s *AppLogger) Fatal(msg interface{}, fields ...zap.Field) {
 	s.log.Fatal(objToString(msg), fields...)
+}
+
+func (s *AppLogger) FatalCtx(ctx context.Context, msg interface{}, fields ...zap.Field) {
+	s.log.Fatal(objToString(msg), append(fields, GetTraceField(ctx))...)
 }
 
 func (s *AppLogger) Fatalf(fmtstr string, args ...interface{}) {

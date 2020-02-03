@@ -106,7 +106,7 @@ func TestGetDB2(t *testing.T) {
 
 		var objId ObjectIdPo
 
-		row := GetDb().Where("org_id = ? AND code = ?", 1, "us1er").First(&objId).RowsAffected
+		row := GetDb().Where("org_id = ? AND code = ?", 1, "us1er").Where("del_flag = ?", 2).First(&objId).RowsAffected
 
 		fmt.Println(row)
 		fmt.Println(json.ToJsonIgnoreError(objId))
