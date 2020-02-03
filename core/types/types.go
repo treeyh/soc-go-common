@@ -18,6 +18,10 @@ func Time0() Time {
 	return Time(time.Unix(0, 0))
 }
 
+func TTime0() time.Time {
+	return time.Unix(0, 0)
+}
+
 func (t *Time) IsNotNull() bool {
 	return time.Time(*t).After(consts.BlankTimeObject)
 }
