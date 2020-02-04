@@ -50,6 +50,24 @@ func SliceUniqueInt64(s []int64) []int64 {
 	return ret
 }
 
+func ContainString(v string, sl []string) bool {
+	for _, vv := range sl {
+		if vv == v {
+			return true
+		}
+	}
+	return false
+}
+
+func ContainIface(v interface{}, sl []interface{}) bool {
+	for _, vv := range sl {
+		if vv == v {
+			return true
+		}
+	}
+	return false
+}
+
 func Contain(list interface{}, obj interface{}) (bool, errors.AppError) {
 	targetValue := reflect.ValueOf(list)
 	switch reflect.TypeOf(list).Kind() {
