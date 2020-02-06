@@ -102,11 +102,10 @@ func (wcp *WechatProxy) DecryptEncryptedData(ctx context.Context, sessionKey str
 	mode.CryptBlocks(aesPlantText, aesCipherText)
 	aesPlantText = PKCS7UnPadding(aesPlantText)
 
-	var decrypted map[string]interface{}
-
 	re := regexp.MustCompile(`[^\{]*(\{.*\})[^\}]*`)
 	aesPlantText = []byte(re.ReplaceAllString(string(aesPlantText), "$1"))
 
+	var decrypted map[string]interface{}
 	err = json.Unmarshal(aesPlantText, &decrypted)
 	if err != nil {
 		log.Error("format json error:"+string(aesPlantText)+" error:"+err.Error(), logger.GetTraceField(ctx))

@@ -96,3 +96,16 @@ func (t Time) MarshalGQL(w io.Writer) {
 func (t Time) String() string {
 	return time.Time(t).Format(consts.AppTimeFormat)
 }
+
+// ConvertTimes 转换数组列表
+func ConvertTimes(times *[]Time) *[]time.Time {
+	if times == nil {
+		return nil
+	}
+
+	ts := make([]time.Time, len(*times))
+	for k, v := range *times {
+		ts[k] = time.Time(v)
+	}
+	return &ts
+}
