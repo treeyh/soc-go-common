@@ -20,6 +20,11 @@ type Order1 struct {
 	Create_time Time   `json:"CreateTime"`
 }
 
+type Order3 struct {
+	Order_id    string    `json:"OrderId"`
+	Create_time time.Time `json:"CreateTime"`
+}
+
 func TestUnixTime_MarshalJSON(t *testing.T) {
 	order := Order{Order_id: "10001",
 		Create_time: Time(time.Now())}
@@ -51,6 +56,31 @@ func TestTime(t *testing.T) {
 	t.Log(ti)
 	t.Log(time.Time(ti))
 
+}
+
+func TestTime2(t *testing.T) {
+
+	tttt := &Order{
+		Order_id:    "123123",
+		Create_time: Time(time.Now()),
+	}
+
+	fmt.Println(tttt.Create_time)
+	fmt.Println(time.Time(tttt.Create_time))
+
+	j := `{"OrderId":"123123","CreateTime":"2020-02-09 00:38:47"}`
+
+	tt := &Order{}
+	json.FromJson(j, tt)
+	fmt.Println(tt.Create_time)
+	fmt.Println(json.ToJsonIgnoreError(tt))
+
+	ttt := &Order3{
+		Order_id:    tt.Order_id,
+		Create_time: time.Time(tt.Create_time),
+	}
+	fmt.Println(ttt.Create_time)
+	fmt.Println(json.ToJsonIgnoreError(ttt))
 }
 
 func TestTime0(t *testing.T) {
