@@ -1,7 +1,6 @@
 package types
 
 import (
-	"fmt"
 	"github.com/treeyh/soc-go-common/core/consts"
 	"github.com/treeyh/soc-go-common/core/logger"
 	"io"
@@ -33,7 +32,6 @@ func (t *Time) IsNull() bool {
 
 func (t *Time) UnmarshalJSON(data []byte) (err error) {
 	//fmt.Println("UnmarshalJSON:", string(data))
-	fmt.Println("dddd")
 	date := strings.ReplaceAll(string(data), "\"", "")
 	if date == "" {
 		return
