@@ -34,3 +34,13 @@ func TestFormat(t *testing.T) {
 	})
 
 }
+
+func TestGetDateInt(t *testing.T) {
+	fmt.Println(GetDateInt(types.NowTime()))
+
+	fmt.Println(GetDateTimeLong(types.NowTime()))
+
+	fmt.Println(GetDateIntByTime(time.Now()))
+
+	fmt.Println(GetDateTimeLongByTime(time.Now()))
+}

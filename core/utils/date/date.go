@@ -4,6 +4,7 @@ import (
 	"github.com/treeyh/soc-go-common/core/consts"
 	"github.com/treeyh/soc-go-common/core/errors"
 	"github.com/treeyh/soc-go-common/core/types"
+	"strconv"
 	"time"
 )
 
@@ -49,4 +50,23 @@ func GetMonthStart(d time.Time) time.Time {
 // GetZeroTime 获取某一天的0点时间
 func GetZeroTime(d time.Time) time.Time {
 	return time.Date(d.Year(), d.Month(), d.Day(), 0, 0, 0, 0, d.Location())
+}
+
+func GetDateInt(t types.Time) int {
+	i, _ := strconv.Atoi(time.Time(t).Format(consts.AppDateFormat2))
+	return i
+}
+
+func GetDateTimeLong(t types.Time) int64 {
+	i, _ := strconv.ParseInt(time.Time(t).Format(consts.AppTimeFormat2), 10, 64)
+	return i
+}
+func GetDateIntByTime(t time.Time) int {
+	i, _ := strconv.Atoi(t.Format(consts.AppDateFormat2))
+	return i
+}
+
+func GetDateTimeLongByTime(t time.Time) int64 {
+	i, _ := strconv.ParseInt(t.Format(consts.AppTimeFormat2), 10, 64)
+	return i
 }
