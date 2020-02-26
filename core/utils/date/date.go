@@ -8,10 +8,17 @@ import (
 	"time"
 )
 
-func Format(t time.Time) string {
+func FormatDate(t time.Time) string {
+	return t.Format(consts.AppDateFormat)
+}
+func FormatDateByTypes(t types.Time) string {
+	return time.Time(t).Format(consts.AppDateFormat)
+}
+
+func FormatTime(t time.Time) string {
 	return t.Format(consts.AppTimeFormat)
 }
-func FormatTime(t types.Time) string {
+func FormatTimeByTypes(t types.Time) string {
 	return time.Time(t).Format(consts.AppTimeFormat)
 }
 
