@@ -7,8 +7,8 @@ import (
 	"testing"
 )
 
-func getTestRedisConfigMap() *map[string]config.RedisConfig {
-	redisConfigs := &map[string]config.RedisConfig{
+func getTestRedisConfigMap() map[string]config.RedisConfig {
+	redisConfigs := map[string]config.RedisConfig{
 		"master": config.RedisConfig{
 			//Host:     "192.168.1.148",
 			Host:     "127.0.0.1",

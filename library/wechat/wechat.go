@@ -38,12 +38,12 @@ func (wcp *WechatProxy) GetPreUrl() string {
 }
 
 // InitWeChatConfig 初始化微信配置
-func InitWeChatConfig(weChatConfigs *map[string]config.WeChatConfig) {
+func InitWeChatConfig(weChatConfigs map[string]config.WeChatConfig) {
 	poolMutex.Lock()
 	defer poolMutex.Unlock()
 
 	wechatProxys1 := make(map[string]*WechatProxy)
-	for k, v := range *weChatConfigs {
+	for k, v := range weChatConfigs {
 		wechatProxys1[k] = &WechatProxy{wechatConfig: &v}
 	}
 	wechatProxys = wechatProxys1

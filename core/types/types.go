@@ -98,14 +98,14 @@ func (t Time) String() string {
 }
 
 // ConvertTimes 转换数组列表
-func ConvertTimes(times *[]Time) *[]time.Time {
+func ConvertTimes(times []Time) []time.Time {
 	if times == nil {
 		return nil
 	}
 
-	ts := make([]time.Time, len(*times))
-	for k, v := range *times {
+	ts := make([]time.Time, len(times))
+	for k, v := range times {
 		ts[k] = time.Time(v)
 	}
-	return &ts
+	return ts
 }

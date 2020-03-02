@@ -21,12 +21,12 @@ var (
 )
 
 // InitDataSource 初始化db
-func InitDataSource(dbConfigs *map[string]config.DBConfig) {
+func InitDataSource(dbConfigs map[string]config.DBConfig) {
 
 	poolMutex.Lock()
 	defer poolMutex.Unlock()
 
-	for k, v := range *dbConfigs {
+	for k, v := range dbConfigs {
 		initDataSourcePool(k, v)
 	}
 }

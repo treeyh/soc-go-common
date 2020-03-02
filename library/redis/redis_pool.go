@@ -16,12 +16,12 @@ var (
 )
 
 // InitRedisPool 初始化redis
-func InitRedisPool(redisConfigs *map[string]config.RedisConfig) {
+func InitRedisPool(redisConfigs map[string]config.RedisConfig) {
 
 	poolMutex.Lock()
 	defer poolMutex.Unlock()
 
-	for k, v := range *redisConfigs {
+	for k, v := range redisConfigs {
 		initRedisPool(k, v)
 	}
 }
