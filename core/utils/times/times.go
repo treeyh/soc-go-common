@@ -47,15 +47,15 @@ func GetDateTimeStrByMillisecond(ms int64) string {
 }
 
 func GetUnixTime(t types.Time) int64 {
-	loc, _ := time.LoadLocation("Asia/Shanghai")                                 //设置时区
-	tt, _ := time.ParseInLocation(consts.AppTimeFormat, date.FormatTime(t), loc) //2006-01-02 15:04:05是转换的格式如php的"Y-m-d H:i:s"
+	loc, _ := time.LoadLocation("Asia/Shanghai")                                        //设置时区
+	tt, _ := time.ParseInLocation(consts.AppTimeFormat, date.FormatTimeByTypes(t), loc) //2006-01-02 15:04:05是转换的格式如php的"Y-m-d H:i:s"
 	return tt.Unix()
 }
 
 func GetWeeHours() string {
-	timeStr := time.Now().Format(consts.AppDateFormat)
-	t, _ := time.Parse(consts.AppDateFormat, timeStr)
-	return date.Format(t)
+	now := time.Now()
+	t := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
+	return date.FormatTime(t)
 }
 
 //获取当天时间段：2019-08-12 00:00:00 - 2019-08-12 23:59:59
