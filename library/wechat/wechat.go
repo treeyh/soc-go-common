@@ -6,7 +6,6 @@ import (
 	"crypto/cipher"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"github.com/treeyh/soc-go-common/core/logger"
 	"strings"
 	"sync"
@@ -135,39 +134,6 @@ func CheckErrCodeSucceed(httpStatus int, errCode int64) bool {
 	return httpStatus == 200 && errCode == 0
 }
 
-func (wcp *WechatProxy) DecryptWXOpenData(ctx context.Context, sessionKey, encryptData, iv string) (map[string]interface{}, error) {
-	decodeBytes, err := base64.StdEncoding.DecodeString(encryptData)
-	if err != nil {
-		return nil, err
-	}
-	sessionKeyBytes, err := base64.StdEncoding.DecodeString(sessionKey)
-	if err != nil {
-		return nil, err
-	}
-	ivBytes, err := base64.StdEncoding.DecodeString(iv)
-	if err != nil {
-		return nil, err
-	}
-	dataBytes, err := AesDecrypt(ctx, decodeBytes, sessionKeyBytes, ivBytes)
-	fmt.Println(string(dataBytes))
-	m := make(map[string]interface{})
-	err = json.Unmarshal(dataBytes, &m)
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
-	temp := m["watermark"].(map[string]interface{})
-	appid := temp["appid"].(string)
-	if appid != wcp.wechatConfig.AppId {
-		return nil, fmt.Errorf("invalid appid, get !%s!", appid)
-	}
-	if err != nil {
-		return nil, err
-	}
-	return m, nil
-
-}
-
 func AesDecrypt(ctx context.Context, crypted, key, iv []byte) ([]byte, errors.AppError) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
@@ -184,6 +150,5 @@ func AesDecrypt(ctx context.Context, crypted, key, iv []byte) ([]byte, errors.Ap
 			origData[i] = ' '
 		}
 	}
-	//{"phoneNumber":"15082726017","purePhoneNumber":"15082726017","countryCode":"86","watermark":{"timestamp":1539657521,"appid":"wx4c6c3ed14736228c"}}//<nil>
 	return origData, nil
 }
