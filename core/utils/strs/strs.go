@@ -33,20 +33,20 @@ func Substr(str string, start, length int) string {
 		return ""
 	}
 	runeStr := []rune(str)
-	len_str := len(runeStr)
+	lenStr := len(runeStr)
 
 	if start < 0 {
-		start = len_str + start
+		start = lenStr + start
 	}
-	if start > len_str {
-		start = len_str
+	if start > lenStr {
+		start = lenStr
 	}
 	end := start + length
-	if end > len_str {
-		end = len_str
+	if end > lenStr {
+		end = lenStr
 	}
 	if length < 0 {
-		end = len_str + length
+		end = lenStr + length
 	}
 	if start > end {
 		start, end = end, start
