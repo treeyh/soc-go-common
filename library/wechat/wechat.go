@@ -7,7 +7,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"github.com/treeyh/soc-go-common/core/logger"
-	"regexp"
+	"strings"
 	"sync"
 
 	"github.com/treeyh/soc-go-common/core/config"
@@ -69,6 +69,13 @@ func (wcp *WechatProxy) DecryptEncryptedData(ctx context.Context, sessionKey str
 	if len(sessionKey) != 24 {
 		return nil, errors.NewAppError(errors.WechatOperationError, "sessionKey length is error")
 	}
+
+	aesCipherText, err := base64.StdEncoding.DecodeString(encryptedData)
+	if err != nil {
+		log.Error("encryptedData decode base64 error :"+encryptedData+" error:"+err.Error(), logger.GetTraceField(ctx))
+		return nil, errors.NewAppErrorByExistError(errors.WechatOperationError, err, "decode base64 error")
+	}
+
 	aesKey, err := base64.StdEncoding.DecodeString(sessionKey)
 	if err != nil {
 		log.Error("sessionKey decode base64 error :"+sessionKey+" error:"+err.Error(), logger.GetTraceField(ctx))
@@ -84,31 +91,19 @@ func (wcp *WechatProxy) DecryptEncryptedData(ctx context.Context, sessionKey str
 		log.Error("iv decode base64 error :"+iv+" error:"+err.Error(), logger.GetTraceField(ctx))
 		return nil, errors.NewAppErrorByExistError(errors.WechatOperationError, err, "decode base64 error")
 	}
+	//aesPlantText := make([]byte, len(aesCipherText))
 
-	aesCipherText, err := base64.StdEncoding.DecodeString(encryptedData)
-	if err != nil {
-		log.Error("encryptedData decode base64 error :"+encryptedData+" error:"+err.Error(), logger.GetTraceField(ctx))
-		return nil, errors.NewAppErrorByExistError(errors.WechatOperationError, err, "decode base64 error")
+	dataBytes, err1 := AesDecrypt(ctx, aesCipherText, aesKey, aesIV)
+	if err1 != nil {
+		return nil, err1
 	}
-	aesPlantText := make([]byte, len(aesCipherText))
-
-	aesBlock, err := aes.NewCipher(aesKey)
-	if err != nil {
-		log.Error("aesKey aes error:"+err.Error(), logger.GetTraceField(ctx))
-		return nil, errors.NewAppErrorByExistError(errors.WechatOperationError, err, "aes error")
-	}
-
-	mode := cipher.NewCBCDecrypter(aesBlock, aesIV)
-	mode.CryptBlocks(aesPlantText, aesCipherText)
-	aesPlantText = PKCS7UnPadding(aesPlantText)
-
-	re := regexp.MustCompile(`[^\{]*(\{.*\})[^\}]*`)
-	aesPlantText = []byte(re.ReplaceAllString(string(aesPlantText), "$1"))
+	jsonStr := string(dataBytes)
+	log.InfoCtx(ctx, jsonStr)
 
 	var decrypted map[string]interface{}
-	err = json.Unmarshal(aesPlantText, &decrypted)
+	err = json.Unmarshal(dataBytes, &decrypted)
 	if err != nil {
-		log.Error("format json error:"+string(aesPlantText)+" error:"+err.Error(), logger.GetTraceField(ctx))
+		log.Error("format json error:"+jsonStr+" error:"+err.Error(), logger.GetTraceField(ctx))
 		return nil, errors.NewAppErrorByExistError(errors.WechatOperationError, err, "format json error")
 	}
 
@@ -118,7 +113,7 @@ func (wcp *WechatProxy) DecryptEncryptedData(ctx context.Context, sessionKey str
 	}
 
 	if isJSON == true {
-		return string(aesPlantText), nil
+		return strings.TrimSpace(jsonStr), nil
 	}
 
 	return decrypted, nil
@@ -137,4 +132,23 @@ func PKCS7UnPadding(plantText []byte) []byte {
 // CheckErrCodeSucceed 检查接口返回是否成功
 func CheckErrCodeSucceed(httpStatus int, errCode int64) bool {
 	return httpStatus == 200 && errCode == 0
+}
+
+func AesDecrypt(ctx context.Context, crypted, key, iv []byte) ([]byte, errors.AppError) {
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		log.ErrorCtx(ctx, "aesKey aes error:"+err.Error())
+		return nil, errors.NewAppErrorByExistError(errors.WechatOperationError, err, "aes error")
+	}
+	//blockSize := block.BlockSize()
+	blockMode := cipher.NewCBCDecrypter(block, iv)
+	origData := make([]byte, len(crypted))
+	blockMode.CryptBlocks(origData, crypted)
+	//获取的数据尾端有'/x0e'占位符,去除它
+	for i, ch := range origData {
+		if ch == '\x0e' || ch == '\x0f' {
+			origData[i] = ' '
+		}
+	}
+	return origData, nil
 }

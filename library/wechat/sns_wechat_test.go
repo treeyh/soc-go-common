@@ -23,14 +23,14 @@ func initWechatTestConfig() {
 
 	wecmap := make(map[string]config.WeChatConfig)
 	wecmap[_defaultConfigName] = *wechatConfig
-	InitWeChatConfig(&wecmap)
+	InitWeChatConfig(wecmap)
 }
 
 func TestDecrypt(t *testing.T) {
 
 	convey.Convey("log test", t, tests.TestStartUp(func() {
 
-		resp, err := GetProxy().JsCode2Session(nil, "081wqyl81ySIgP1vbcl81qXpl81wqylV")
+		resp, err := GetProxy().JsCode2Session(nil, "081GD5tq0egYKl1FfIrq0deGsq0GD5tm")
 		if err != nil {
 			convey.ShouldBeNil(err)
 			return
@@ -40,10 +40,15 @@ func TestDecrypt(t *testing.T) {
 
 		fmt.Println(json.ToJsonIgnoreError(resp))
 
-		result, err := GetProxy().DecryptEncryptedData(nil, resp.SessionKey,
-			"yWPWP6HKLdkunn9X9CtYL1TTOhQV5u+KyRY6Bc6dISmP7YwSDzb5A7LgLIMEpprC5eD8CzAJapcBApg7gGQYYM6NgCKh6h14NedzPWLhl1k1CYrtm6h+Eu1Icc4J0f8Xbpp5H6RSp2k+H1m+qbOorknGyNWQOC/o9FmjKML5QjMOGZ5FLcB33wtzMMyM2I1BhzCl/4lVwfIvgaPOKTvfETvXny59oAGuFMfMNgQxCj8dR9LctnvQlM+Evv8zRhgDwx9Ls4Ltn1I1Du+kyh4szHBpuCFUGipZdc93NH0dsfHaExY7DCGoTevEg+dEE3iJVmulo+eBN2qVnrdV5xs4qAdgLyplFjkvFAWllq55MvLUOAzV3TyiLFggGqJWRI0AcXoCwgjwWWH2jsvnlFLO+4dUfUdlo0GK9a8SzFTa7v8DB/cdH9lXVhNGrtoxsQuenkJIGmms1OpjT5C4t26ixkmSRVJVSWD0TfCF7XURhn4=",
-			"TUC+krAFPmj+Pf5OuJjn7A==", true)
+		//result, err := GetProxy().DecryptEncryptedData(nil, resp.SessionKey,
+		//	"HydtA2GK6zoPE7K4JN0HWU/uHI3sMkZ4F0dexYrg5pfBfANh42…Q1r9KxXUE8DqtIPEKRdvDShiZcbRF/vXxkRXswrjsWOmHFR0=",
+		//	"SmblgkW2b5fDmZhXSxiukg==", true)
 
+		result, err2 := GetProxy().DecryptEncryptedData(nil, resp.SessionKey,
+			"aTossU7l+VWo7Eaz2+RsW3KecI0OSu4fZ/YyQwlb/SyOE8CK2ifbBXD7qb5GlG790OUbseKmZgF9e/AkXsMfaYY7D0bVjX9Bngh0z8CL+0eQFD7/Tjv6EoYLkk8LQogAiEUFlOMyv//8Xl8iDYVlxyYuYsSJQKNWrLdcJUhSruk14lig5pZdfD76rf12pdXmk66w5ERAP/7LIdTkOyEU3fJGVLhFteUvGdsVwwg1Q1Mczp6mzNSiDP2O6c+8X9lxpPVPk4rx+8gEYUxhZH97Wn1SxiBnfuHZMBPH5JVWZ5QGkO9SNa+AwBlnK5GM/m48SKx28YGDhTBcGqrQAMl0JdHhNqBOAROm09FURHV4eccnkFRMKPV6DbElDsW6cI5QIX9g/lsgnW3Vb4MhLC8RFCqQX6PVIQKDAWNsflIbDYa7ku5uUOQnqf4hYjtD54bJ10YM+c4kOwhPxllMkArnUwehPTknnAw+vtG2bQ37+GE=",
+			"1S60BLqmpZuzljJG2/sPIA==", true)
+
+		fmt.Println(err2)
 		fmt.Println(result)
 		fmt.Println(json.ToJsonIgnoreError(result))
 
