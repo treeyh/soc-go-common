@@ -1,6 +1,8 @@
 package random
 
 import (
+	"github.com/treeyh/soc-go-common/core/utils/times"
+	"github.com/treeyh/soc-go-common/core/utils/uuid"
 	"math/rand"
 	"strconv"
 	"time"
