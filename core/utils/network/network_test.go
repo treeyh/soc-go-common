@@ -7,5 +7,4 @@ import (
 
 func TestGetIntranetIp(t *testing.T) {
 	fmt.Println(GetIntranetIp())
-
 }
