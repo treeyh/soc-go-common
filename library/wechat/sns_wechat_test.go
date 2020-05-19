@@ -12,6 +12,7 @@ import (
 )
 
 func initWechatTestConfig() {
+
 	wechatJson, _ := file.ReadSmallFile(path.Join(file.GetCurrentPath(), "..", "..", "tests", "wechat.log"))
 
 	wechatConfig := &config.WeChatConfig{}
