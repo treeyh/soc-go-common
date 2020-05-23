@@ -7,6 +7,16 @@ import (
 	"time"
 )
 
+const (
+
+	// 一分钟的秒数
+	MinuteSecond = 60
+	// 一小时的秒数
+	HourSecond = MinuteSecond * 60
+	// 一天的秒数
+	DaySecond = HourSecond * 24
+)
+
 func GetNowMillisecond() int64 {
 	return time.Now().UnixNano() / 1e6
 }
