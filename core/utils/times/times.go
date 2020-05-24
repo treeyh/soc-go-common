@@ -163,6 +163,14 @@ func GetLastMonth1Date(t time.Time) time.Time {
 	return monthTime
 }
 
+// GetLastMonth1Date 获取时间当月1号0时0分0秒时间
+func GetNowMonth1Date(t time.Time) time.Time {
+	timestr := t.Format(consts.AppMonthFormat) + "01000000"
+
+	monthTime, _ := time.Parse(consts.AppTimeFormat2, timestr)
+	return monthTime
+}
+
 // GetLastMonthLastDate 获取时间上个月的最后一天0时0分0秒时间
 func GetLastMonthLastDate(t time.Time) time.Time {
 	timestr := t.Format(consts.AppMonthFormat) + "01000000"
