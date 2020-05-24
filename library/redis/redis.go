@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"fmt"
 	"github.com/gomodule/redigo/redis"
 	"github.com/treeyh/soc-go-common/core/errors"
 	"github.com/treeyh/soc-go-common/core/utils/times"
@@ -348,12 +349,17 @@ func (rp *RedisProxy) BitCount(key string) (int, errors.AppError) {
 	}
 }
 
-func (rp *RedisProxy) BitFieldGetU(key string, num int, start int) (int, errors.AppError) {
+func (rp *RedisProxy) BitFieldGetU(key string, num int, start int) ([]int64, errors.AppError) {
 	conn := rp.Connect()
 	defer rp.Close(conn)
 
-	if res, err := redis.Int(conn.Do("BITFIELD", key, "u"+strconv.Itoa(num), start)); err != nil {
-		return 0, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
+	if num > 63 {
+		return nil, errors.NewAppError(errors.ParamError, "num 不能大于63")
+	}
+
+	fmt.Printf("BITFIELD %s GET u%d %d", key, num, start)
+	if res, err := redis.Int64s(conn.Do("BITFIELD", key, "GET", "u"+strconv.Itoa(num), start)); err != nil {
+		return nil, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 	} else {
 		return res, nil
 	}
