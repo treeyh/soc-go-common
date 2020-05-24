@@ -36,3 +36,7 @@ func TestGetTodayTimeQuantum(t *testing.T) {
 func TestGetYesterdayDate(t *testing.T) {
 	t.Log(GetYesterdayDate())
 }
+
+func TestGetLastMonth1Date(t *testing.T) {
+	t.Log(GetLastMonth1Date())
+}
