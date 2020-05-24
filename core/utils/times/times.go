@@ -69,30 +69,6 @@ func GetWeeHours() string {
 	return FormatTime(t)
 }
 
-//获取当天时间段：2019-08-12 00:00:00 - 2019-08-12 23:59:59
-func GetTodayTimeQuantum() []time.Time {
-	timeStr := time.Now().Format(consts.AppDateFormat)
-	b, _ := time.Parse(consts.AppDateFormat, timeStr)
-	a := b.Add(time.Duration(1000*60*60*24-1) * time.Millisecond)
-	return []time.Time{b, a}
-}
-
-//2019-09-03
-func GetYesterdayDate() string {
-	timeStr := time.Now().Format(consts.AppDateFormat)
-	b, _ := time.Parse(consts.AppDateFormat, timeStr)
-	a := b.Add(time.Duration(-1) * time.Millisecond)
-	return a.Format(consts.AppDateFormat)
-}
-
-// GetLastMonth1Date 获取上个月1号0时0分0秒时间
-func GetLastMonth1Date() time.Time {
-	timestr := time.Now().AddDate(0, -1, 0).Format(consts.AppMonthFormat) + "01000000"
-
-	monthTime, _ := time.Parse(consts.AppTimeFormat2, timestr)
-	return monthTime
-}
-
 func FormatDate(t time.Time) string {
 	return t.Format(consts.AppDateFormat)
 }
@@ -161,4 +137,37 @@ func GetDateIntByTime(t time.Time) int {
 func GetDateTimeLongByTime(t time.Time) int64 {
 	i, _ := strconv.ParseInt(t.Format(consts.AppTimeFormat2), 10, 64)
 	return i
+}
+
+//获取当天时间段：2019-08-12 00:00:00 - 2019-08-12 23:59:59
+func GetTodayTimeQuantum() []time.Time {
+	timeStr := time.Now().Format(consts.AppDateFormat)
+	b, _ := time.Parse(consts.AppDateFormat, timeStr)
+	a := b.Add(time.Duration(1000*60*60*24-1) * time.Millisecond)
+	return []time.Time{b, a}
+}
+
+//2019-09-03
+func GetYesterdayDate() string {
+	timeStr := time.Now().Format(consts.AppDateFormat)
+	b, _ := time.Parse(consts.AppDateFormat, timeStr)
+	a := b.Add(time.Duration(-1) * time.Millisecond)
+	return a.Format(consts.AppDateFormat)
+}
+
+// GetLastMonth1Date 获取上个月1号0时0分0秒时间
+func GetLastMonth1Date() time.Time {
+	timestr := time.Now().AddDate(0, -1, 0).Format(consts.AppMonthFormat) + "01000000"
+
+	monthTime, _ := time.Parse(consts.AppTimeFormat2, timestr)
+	return monthTime
+}
+
+// GetLastMonthLastDate 获取上个月的最后一天0时0分0秒时间
+func GetLastMonthLastDate() time.Time {
+	timestr := time.Now().Format(consts.AppMonthFormat) + "01000000"
+
+	monthTime, _ := time.Parse(consts.AppTimeFormat2, timestr)
+	return monthTime.AddDate(0, 0, -1)
+
 }

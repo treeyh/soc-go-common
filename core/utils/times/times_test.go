@@ -39,4 +39,5 @@ func TestGetYesterdayDate(t *testing.T) {
 
 func TestGetLastMonth1Date(t *testing.T) {
 	t.Log(GetLastMonth1Date())
+	t.Log(GetLastMonthLastDate())
 }
