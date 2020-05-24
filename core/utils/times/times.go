@@ -155,19 +155,25 @@ func GetYesterdayDate() string {
 	return a.Format(consts.AppDateFormat)
 }
 
-// GetLastMonth1Date 获取上个月1号0时0分0秒时间
-func GetLastMonth1Date() time.Time {
-	timestr := time.Now().AddDate(0, -1, 0).Format(consts.AppMonthFormat) + "01000000"
+// GetLastMonth1Date 获取时间上个月1号0时0分0秒时间
+func GetLastMonth1Date(t time.Time) time.Time {
+	timestr := t.AddDate(0, -1, 0).Format(consts.AppMonthFormat) + "01000000"
 
 	monthTime, _ := time.Parse(consts.AppTimeFormat2, timestr)
 	return monthTime
 }
 
-// GetLastMonthLastDate 获取上个月的最后一天0时0分0秒时间
-func GetLastMonthLastDate() time.Time {
-	timestr := time.Now().Format(consts.AppMonthFormat) + "01000000"
+// GetLastMonthLastDate 获取时间上个月的最后一天0时0分0秒时间
+func GetLastMonthLastDate(t time.Time) time.Time {
+	timestr := t.Format(consts.AppMonthFormat) + "01000000"
 
 	monthTime, _ := time.Parse(consts.AppTimeFormat2, timestr)
 	return monthTime.AddDate(0, 0, -1)
+}
 
+// getLastMonthDayCount 获取时间上个月的天数
+func GetLastMonthDayCount(t time.Time) int64 {
+	begin := GetLastMonth1Date(t)
+	end := GetLastMonthLastDate(t)
+	return ((end.Unix() - begin.Unix()) / DaySecond) + 1
 }
