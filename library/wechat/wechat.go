@@ -146,7 +146,7 @@ func AesDecrypt(ctx context.Context, crypted, key, iv []byte) ([]byte, errors.Ap
 	blockMode.CryptBlocks(origData, crypted)
 	//获取的数据尾端有'/x0e'占位符,去除它
 	for i, ch := range origData {
-		if ch == '\x0e' || ch == '\x0f' {
+		if ch == '\x0e' || ch == '\x0f' || ch == '\x06' {
 			origData[i] = ' '
 		}
 	}
