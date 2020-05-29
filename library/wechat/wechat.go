@@ -5,13 +5,13 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/base64"
-	"encoding/json"
 	"github.com/treeyh/soc-go-common/core/logger"
 	"strings"
 	"sync"
 
 	"github.com/treeyh/soc-go-common/core/config"
 	"github.com/treeyh/soc-go-common/core/errors"
+	"github.com/treeyh/soc-go-common/core/utils/json"
 )
 
 const weChatPreUrl = "https://api.weixin.qq.com"
@@ -99,9 +99,11 @@ func (wcp *WechatProxy) DecryptEncryptedData(ctx context.Context, sessionKey str
 	}
 	jsonStr := string(dataBytes)
 	log.InfoCtx(ctx, jsonStr)
+	jsonStr = jsonStr[:strings.LastIndex(jsonStr, "}")+1]
 
 	var decrypted map[string]interface{}
-	err = json.Unmarshal(dataBytes, &decrypted)
+	//err = json.Unmarshal(dataBytes, &decrypted)
+	err = json.FromJson(jsonStr, &decrypted)
 	if err != nil {
 		log.Error("format json error:"+jsonStr+" error:"+err.Error(), logger.GetTraceField(ctx))
 		return nil, errors.NewAppErrorByExistError(errors.WechatOperationError, err, "format json error")
@@ -145,10 +147,11 @@ func AesDecrypt(ctx context.Context, crypted, key, iv []byte) ([]byte, errors.Ap
 	origData := make([]byte, len(crypted))
 	blockMode.CryptBlocks(origData, crypted)
 	//获取的数据尾端有'/x0e'占位符,去除它
-	for i, ch := range origData {
-		if ch == '\x0e' || ch == '\x0f' || ch == '\x06' {
-			origData[i] = ' '
-		}
-	}
+
+	//for i, ch := range origData {
+	//	if ch == '\x0e' || ch == '\x0f' || ch == '\x06' {
+	//		origData[i] = ' '
+	//	}
+	//}
 	return origData, nil
 }
