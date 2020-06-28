@@ -204,19 +204,14 @@ func LoggerByName(name string) *AppLogger {
 
 // InitLogger 初始化Logger对象
 func InitLogger(name string, logConfig *config.LogConfig, isReInit bool) *AppLogger {
-	appLogger := LoggerByName(name)
-	if appLogger != nil && isReInit == false {
-		return appLogger
+	appLogger := &AppLogger{
+		name: name,
+	}
+	if isReInit {
+		appLogger = LoggerByName(name)
 	}
 
-	if appLogger == nil {
-		appLogger = &AppLogger{
-			name:      name,
-			logConfig: logConfig,
-		}
-	} else {
-		appLogger.logConfig = logConfig
-	}
+	appLogger.logConfig = logConfig
 
 	appLogger.init(isReInit)
 	_logger[name] = appLogger
