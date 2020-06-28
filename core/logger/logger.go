@@ -199,7 +199,7 @@ func LoggerByName(name string) *AppLogger {
 	if logger, ok := _logger[name]; ok {
 		return logger
 	}
-	return nil
+	return InitLogger(name, &_defaultLogConfig, false)
 }
 
 // InitLogger 初始化Logger对象
