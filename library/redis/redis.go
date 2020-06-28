@@ -6,6 +6,7 @@ import (
 	"github.com/treeyh/soc-go-common/core/utils/times"
 	"math/rand"
 	"reflect"
+	"strconv"
 )
 
 const (
@@ -303,6 +304,63 @@ func (rp *RedisProxy) HMSet(key string, fieldValue map[string]string) errors.App
 	}
 	_, err := conn.Do("HMSET", args...)
 	return errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
+}
+
+func (rp *RedisProxy) SetBit(key string, offset int, value int, ex int64) errors.AppError {
+	conn := rp.Connect()
+	defer rp.Close(conn)
+
+	if err := conn.Send("SETBIT", key, offset, value); err != nil {
+		return errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
+	}
+
+	if ex > 0 {
+		if err := conn.Send("EXPIRE", key, ex); err != nil {
+			return errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
+		}
+	}
+
+	if err := conn.Flush(); err != nil {
+		return errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
+	}
+	return nil
+}
+
+func (rp *RedisProxy) GetBit(key string, offset int) (int, errors.AppError) {
+	conn := rp.Connect()
+	defer rp.Close(conn)
+
+	if res, err := redis.Int(conn.Do("GETBIT", key, offset)); err != nil {
+		return 0, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
+	} else {
+		return res, nil
+	}
+}
+
+func (rp *RedisProxy) BitCount(key string) (int, errors.AppError) {
+	conn := rp.Connect()
+	defer rp.Close(conn)
+
+	if res, err := redis.Int(conn.Do("BITCOUNT", key)); err != nil {
+		return 0, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
+	} else {
+		return res, nil
+	}
+}
+
+func (rp *RedisProxy) BitFieldGetU(key string, num int, start int) (int64, errors.AppError) {
+	conn := rp.Connect()
+	defer rp.Close(conn)
+
+	if num > 63 {
+		return 0, errors.NewAppError(errors.ParamError, "num 不能大于63")
+	}
+
+	if res, err := redis.Int64s(conn.Do("BITFIELD", key, "GET", "u"+strconv.Itoa(num), start)); err != nil {
+		return 0, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
+	} else {
+		return res[0], nil
+	}
 }
 
 func (rp *RedisProxy) Connect() redis.Conn {

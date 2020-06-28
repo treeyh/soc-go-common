@@ -11,17 +11,17 @@ func getTestRedisConfigMap() map[string]config.RedisConfig {
 	redisConfigs := map[string]config.RedisConfig{
 		"master": config.RedisConfig{
 			//Host:     "192.168.1.148",
-			Host:     "127.0.0.1",
+			Host:     "192.168.1.101",
 			Port:     6379,
 			Password: "",
-			Database: 7,
+			Database: 0,
 		},
 		"node1": config.RedisConfig{
 			//Host:     "192.168.1.148",
-			Host:     "127.0.0.1",
+			Host:     "192.168.1.101",
 			Port:     6379,
 			Password: "",
-			Database: 8,
+			Database: 1,
 		},
 	}
 
@@ -86,5 +86,22 @@ func TestMGet(t *testing.T) {
 		vv, e := GetProxy().MGet(keys...)
 		fmt.Println(vv, e)
 		convey.ShouldEqual(len(vv), 3)
+	})
+}
+
+func TestRedisProxy_SetBit(t *testing.T) {
+	convey.Convey("Test SetBit", t, func() {
+		redisConfigs := getTestRedisConfigMap()
+		InitRedisPool(redisConfigs)
+
+		key := "testbit"
+		err := GetProxy().SetBit(key, 3, 1, 3600)
+		fmt.Println(err)
+
+		v, e := GetProxy().BitFieldGetU(key, 31, 0)
+
+		fmt.Println(v)
+		fmt.Println(e)
+
 	})
 }

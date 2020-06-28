@@ -12,6 +12,7 @@ const BlankDate = "1970-01-01"
 //全局日期格式
 const AppDateFormat = "2006-01-02"
 const AppDateFormat2 = "20060102"
+const AppMonthFormat = "200601"
 const AppTimeFormat = "2006-01-02 15:04:05"
 const AppTimeFormat2 = "20060102150405"
 const AppSystemTimeFormat = "2006-01-02T15:04:05Z"
