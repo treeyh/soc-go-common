@@ -21,7 +21,8 @@ var (
 	_logger         = map[string]*AppLogger{}
 	_logTagKey      = "tag"
 	_logDefaultName = "default"
-	_logTraceIdKey  = "traceId"
+	_logTraceIdKey  = "socTraceId"
+	_logErrorKey    = "socError"
 )
 
 var _defaultLogConfig = config.LogConfig{
@@ -72,6 +73,13 @@ func GetTraceField(ctx context.Context) zap.Field {
 	return zap.String(_logTraceIdKey, val.(string))
 }
 
+func GetErrorField(err error) zap.Field {
+	if err == nil {
+		return zap.String(_logErrorKey, "")
+	}
+	return zap.String(_logErrorKey, objToString(err))
+}
+
 func (s *AppLogger) Info(msg interface{}, fields ...zap.Field) {
 	s.log.Info(objToString(msg), fields...)
 }
@@ -91,6 +99,14 @@ func (s *AppLogger) Error(msg interface{}, fields ...zap.Field) {
 
 func (s *AppLogger) ErrorCtx(ctx context.Context, msg interface{}, fields ...zap.Field) {
 	s.log.Error(objToString(msg), append(fields, GetTraceField(ctx))...)
+}
+
+func (s *AppLogger) Error2(err error, msg interface{}, fields ...zap.Field) {
+	s.log.Error(objToString(msg), append(fields, GetErrorField(err))...)
+}
+
+func (s *AppLogger) ErrorCtx2(ctx context.Context, err error, msg interface{}, fields ...zap.Field) {
+	s.log.Error(objToString(msg), append(fields, GetTraceField(ctx), GetErrorField(err))...)
 }
 
 func (s *AppLogger) Errorf(fmtstr string, args ...interface{}) {
