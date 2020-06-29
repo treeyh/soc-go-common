@@ -159,7 +159,7 @@ func (rp *RedisProxy) Exist(key string) (bool, errors.AppError) {
 	return rs.(int64) == 1, nil
 }
 
-func (rp *RedisProxy) Scan(index int, match string, count int) (int64, []string, errors.AppError) {
+func (rp *RedisProxy) Scan(index int64, match string, count int) (int64, []string, errors.AppError) {
 	conn := rp.Connect()
 	defer rp.Close(conn)
 
