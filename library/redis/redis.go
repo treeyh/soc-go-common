@@ -159,6 +159,43 @@ func (rp *RedisProxy) Exist(key string) (bool, errors.AppError) {
 	return rs.(int64) == 1, nil
 }
 
+func (rp *RedisProxy) Scan(index int64, match string, count int) (int64, []string, errors.AppError) {
+	conn := rp.Connect()
+	defer rp.Close(conn)
+
+	if match == "" {
+		match = "*"
+	}
+	if count <= 0 || count > 200 {
+		count = 30
+	}
+
+	rs, err := conn.Do("SCAN", index, "MATCH", match, "COUNT", count)
+	if err != nil {
+		return 0, nil, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
+	}
+	if rs == nil {
+		return 0, nil, nil
+	}
+	reInts := rs.([]interface{})
+	if len(reInts) != 2 {
+		return 0, nil, nil
+	}
+
+	nextIndex, err := strconv.ParseInt(string(reInts[0].([]byte)), 10, 64)
+	if err != nil {
+		return 0, nil, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
+	}
+
+	keyInts := reInts[1].([]interface{})
+	keys := make([]string, 0)
+	for _, v := range keyInts {
+		keys = append(keys, string(v.([]byte)))
+	}
+
+	return nextIndex, keys, nil
+}
+
 func (rp *RedisProxy) Expire(key string, expire int64) (bool, errors.AppError) {
 	conn := rp.Connect()
 	defer rp.Close(conn)

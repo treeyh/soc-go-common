@@ -185,3 +185,9 @@ func GetLastMonthDayCount(t time.Time) int64 {
 	end := GetLastMonthLastDate(t)
 	return ((end.Unix() - begin.Unix()) / DaySecond) + 1
 }
+
+// GetMonthLastDay 获取传入日期月的最后一天
+func GetMonthLastDay(t time.Time) time.Time {
+	day1 := time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.Local)
+	return day1.AddDate(0, 1, -1)
+}
