@@ -1,7 +1,7 @@
 package network
 
 import (
-	"fmt"
+	"github.com/treeyh/soc-go-common/core/logger"
 	"net"
 	"os"
 	"sync"
@@ -10,6 +10,7 @@ import (
 var (
 	_lock    sync.Mutex
 	_localIp = ""
+	log      = logger.Logger()
 )
 
 func GetIntranetIp() string {
@@ -25,7 +26,7 @@ func GetIntranetIp() string {
 	addrs, err := net.InterfaceAddrs()
 
 	if err != nil {
-		fmt.Println(err)
+		log.Error(err)
 		os.Exit(1)
 	}
 
