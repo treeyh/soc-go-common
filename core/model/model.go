@@ -11,6 +11,7 @@ type HttpContext struct {
 	TraceId       string
 	Ip            string
 	Status        int
+	App           string
 	AuthToken     string
 	ClientVersion string
 	Platform      string
