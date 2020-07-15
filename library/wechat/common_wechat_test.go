@@ -13,7 +13,7 @@ func TestWechatProxy_GetAccessToken(t *testing.T) {
 
 		ctx := tests.GetNewContext()
 
-		resp, err := GetProxy().GetAccessToken(ctx)
+		resp, err := GetProxy().getAccessToken(ctx)
 		if err != nil {
 			convey.So(err, convey.ShouldBeNil)
 			return
@@ -25,7 +25,7 @@ func TestWechatProxy_GetAccessToken(t *testing.T) {
 
 		GetProxy().wechatConfig.AppId = GetProxy().wechatConfig.AppId + "_"
 
-		resp, err = GetProxy().GetAccessToken(ctx)
+		resp, err = GetProxy().getAccessToken(ctx)
 		log.Info(err.Message())
 		log.Info(json.ToJsonIgnoreError(resp))
 		convey.So(err, convey.ShouldNotBeNil)
