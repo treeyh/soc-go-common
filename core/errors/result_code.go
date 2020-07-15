@@ -119,4 +119,7 @@ var (
 
 	// WechatRequestFail 请求微信接口失败
 	WechatRequestFail = NewResultCode(100202, "请求微信接口失败")
+
+	// WechatRequestError 请求微信接口错误
+	WechatRequestError = NewResultCode(100203, "请求微信接口失败 code:%d, msg:%s")
 )

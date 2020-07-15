@@ -1,5 +1,9 @@
 package tests
 
+import (
+	"context"
+)
+
 func TestStartUp(testFunc func(), initFunc func()) func() {
 
 	return func() {
@@ -11,4 +15,10 @@ func TestStartUp(testFunc func(), initFunc func()) func() {
 		//丢进来的方法立刻执行
 		testFunc()
 	}
+}
+
+// GetNewContext 获取一个新的ctx
+func GetNewContext() context.Context {
+	ctx := context.Background()
+	return ctx
 }

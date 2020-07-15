@@ -19,3 +19,10 @@ type WechatCode2SessionResp struct {
 
 	UnionId string `json:"unionid"`
 }
+
+type WechatAccessTokenResp struct {
+	WechatBaseResp
+
+	AccessToken string `json:"access_token"`
+	ExpiresIn   int    `json:"expires_in"`
+}

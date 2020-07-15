@@ -8,6 +8,7 @@ import (
 	"github.com/treeyh/soc-go-common/core/logger"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/treeyh/soc-go-common/core/config"
 	"github.com/treeyh/soc-go-common/core/errors"
@@ -24,7 +25,15 @@ var (
 	poolMutex sync.Mutex
 
 	log = logger.Logger()
+
+	accessToken *WechatAccessToken
 )
+
+type WechatAccessToken struct {
+	AccessToken string
+	ExpiresIn   int
+	ExpiresTime time.Time
+}
 
 type WechatProxy struct {
 	wechatConfig *config.WeChatConfig

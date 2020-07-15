@@ -55,4 +55,8 @@ type WeChatConfig struct {
 	Host string
 	// Type 类型，weapp：微信小程序
 	Type string
+	// EncodingAESKey 消息加密密钥由 43 位字符组成，可随机修改，字符范围为 A-Z，a-z，0-9。
+	EncodingAESKey string
+	// 	MessageEncodingType 消息加解密方式 1 明文模式, 2 安全模式 ,3 兼容模式
+	MessageEncodingType int
 }
