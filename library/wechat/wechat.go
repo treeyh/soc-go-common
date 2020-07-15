@@ -5,14 +5,12 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/base64"
-	"github.com/treeyh/soc-go-common/core/logger"
-	"strings"
-	"sync"
-	"time"
-
 	"github.com/treeyh/soc-go-common/core/config"
 	"github.com/treeyh/soc-go-common/core/errors"
+	"github.com/treeyh/soc-go-common/core/logger"
 	"github.com/treeyh/soc-go-common/core/utils/json"
+	"strings"
+	"sync"
 )
 
 const weChatPreUrl = "https://api.weixin.qq.com"
@@ -25,15 +23,7 @@ var (
 	poolMutex sync.Mutex
 
 	log = logger.Logger()
-
-	accessToken *WechatAccessToken
 )
-
-type WechatAccessToken struct {
-	AccessToken string
-	ExpiresIn   int
-	ExpiresTime time.Time
-}
 
 type WechatProxy struct {
 	wechatConfig *config.WeChatConfig

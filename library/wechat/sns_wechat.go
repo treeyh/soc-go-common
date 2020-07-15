@@ -33,6 +33,10 @@ func (wcp *WechatProxy) JsCode2Session(ctx context.Context, jsCode string) (*Wec
 	if err1 != nil {
 		return nil, errors.NewAppErrorByExistError(errors.WechatRequestFail, err)
 	}
+	if resp.ErrCode > 0 {
+		return nil, errors.NewAppError(errors.WechatRequestError, resp.ErrCode, resp.ErrMsg)
+	}
+	resp.HttpStatus = status
 
 	return resp, nil
 
