@@ -20,23 +20,20 @@ func (wcp *WechatProxy) JsCode2Session(ctx context.Context, jsCode string) (*Wec
 		return nil, errors.NewAppErrorByExistError(errors.WechatRequestFail, err)
 	}
 
-	if status != 200 || *result == "" {
+	if status != 200 || result == "" {
 		return &WechatCode2SessionResp{
-			WechatBaseResp: WechatBaseResp{
-				HttpStatus: status,
-			},
+			WechatErrorResp: WechatErrorResp{},
 		}, errors.NewAppError(errors.WechatRequestFail)
 	}
 
 	resp := &WechatCode2SessionResp{}
-	err1 := json.FromJson(*result, resp)
+	err1 := json.FromJson(result, resp)
 	if err1 != nil {
 		return nil, errors.NewAppErrorByExistError(errors.WechatRequestFail, err)
 	}
 	if resp.ErrCode > 0 {
 		return nil, errors.NewAppError(errors.WechatRequestError, resp.ErrCode, resp.ErrMsg)
 	}
-	resp.HttpStatus = status
 
 	return resp, nil
 

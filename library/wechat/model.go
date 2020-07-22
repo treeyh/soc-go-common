@@ -26,18 +26,16 @@ const (
 	EVENT_CLICK       EventType = "click"
 )
 
-// WechatBaseResp 微信基础返回
-type WechatBaseResp struct {
+// WechatErrorResp 微信基础返回
+type WechatErrorResp struct {
 	ErrCode int64 `json:"errcode"`
 
 	ErrMsg string `json:"errmsg"`
-
-	HttpStatus int `json:"httpstatus"`
 }
 
 // WechatCode2SessionResp 微信code2Session返回
 type WechatCode2SessionResp struct {
-	WechatBaseResp
+	WechatErrorResp
 
 	OpenId string `json:"openid"`
 
@@ -47,7 +45,7 @@ type WechatCode2SessionResp struct {
 }
 
 type WechatAccessTokenResp struct {
-	WechatBaseResp
+	WechatErrorResp
 
 	AccessToken string `json:"access_token"`
 	ExpiresIn   int    `json:"expires_in"`
