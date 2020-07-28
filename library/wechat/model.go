@@ -114,6 +114,30 @@ type WechatOpenidsResp struct {
 	NextOpenid string `json:"next_openid"`
 }
 
+type WechatTemplateMessageParamReq struct {
+	Value string `json:"value,omitempty"`
+
+	Color string `json:"color,omitempty"`
+}
+
+type WechatTemplateMessageReq struct {
+	ToUser string `json:"touser,omitempty"`
+
+	TemplateId string `json:"template_id,omitempty"`
+
+	Url string `json:"url,omitempty"`
+
+	TopColor string `json:"topcolor,omitempty"`
+
+	Data map[string]WechatTemplateMessageParamReq `json:"data,omitempty"`
+}
+
+type WechatMessageResp struct {
+	WechatErrorResp
+
+	MsgId int64 `json:"msgid"`
+}
+
 // WechatMenu 微信公众号菜单对象
 type WechatMenu struct {
 	Button []WechatMenuButton `json:"button"`
@@ -190,6 +214,7 @@ type WechatReqestMsg struct {
 
 	Precision float64 `xml:"Precision,omitempty"    json:"precision,omitempty"` // request
 
+	Status string `json:"status,omitempty" xml:"Status,omitempty"`
 }
 
 type WechatArticle struct {

@@ -49,6 +49,9 @@ const (
 	EVENT_SCAN        WechatEventType = "scan"
 	EVENT_LOCATION    WechatEventType = "location"
 	EVENT_CLICK       WechatEventType = "click"
+
+	EVENT_TEMPLATESENDJOBFINISH WechatEventType = "TEMPLATESENDJOBFINISH" // 模板消息完成
+
 )
 
 // 语言
