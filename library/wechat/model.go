@@ -146,48 +146,101 @@ type WechatReqestMsg struct {
 	CreateTime int64 `json:"createTime" xml:"CreateTime"`
 
 	// MsgType 消息类型，event
-	MsgType WechatMsgType `json:"msgType" xml:"MsgType"`
+	MsgType WechatMsgType `json:"msgType,omitempty" xml:"MsgType,omitempty"`
 
-	Event WechatEventType `json:"event" xml:"Event"`
+	Event WechatEventType `json:"event,omitempty" xml:"Event,omitempty"`
 
-	EventKey string `json:"eventKey" xml:"EventKey"`
+	EventKey string `json:"eventKey,omitempty" xml:"EventKey,omitempty"`
 
-	MenuID string `json:"menuID" xml:"MenuID"`
+	MenuID string `json:"menuID,omitempty" xml:"MenuID,omitempty"`
 
 	MsgId int64 `xml:"MsgId"        json:"msgId"` // request
 
-	Content string `xml:"Content"      json:"content"` // request
+	Content string `xml:"Content,omitempty"      json:"content,omitempty"` // request
 
-	MediaId string `xml:"MediaId"      json:"mediaId"` // request
+	MediaId string `xml:"MediaId,omitempty"      json:"mediaId,omitempty"` // request
 
-	PicURL string `xml:"PicUrl"       json:"picUrl"` // request
+	PicURL string `xml:"PicUrl,omitempty"       json:"picUrl,omitempty"` // request
 
-	Format string `xml:"Format"       json:"format"` // request
+	Format string `xml:"Format,omitempty"       json:"format,omitempty"` // request
 
-	Recognition string `xml:"Recognition"  json:"recognition"` // request
+	Recognition string `xml:"Recognition,omitempty"  json:"recognition,omitempty"` // request
 
-	ThumbMediaId string `xml:"ThumbMediaId" json:"thumbMediaId"` // request
+	ThumbMediaId string `xml:"ThumbMediaId,omitempty" json:"thumbMediaId,omitempty"` // request
 
-	LocationX float64 `xml:"Location_X"   json:"locationX"` // request
+	LocationX float64 `xml:"Location_X,omitempty"   json:"locationX,omitempty"` // request
 
-	LocationY float64 `xml:"Location_Y"   json:"locationY"` // request
+	LocationY float64 `xml:"Location_Y,omitempty"   json:"locationY,omitempty"` // request
 
-	Scale int `xml:"Scale"        json:"scale"` // request
+	Scale int `xml:"Scale,omitempty"        json:"scale,omitempty"` // request
 
-	Label string `xml:"Label"        json:"label"` // request
+	Label string `xml:"Label,omitempty"        json:"label,omitempty"` // request
 
-	Title string `xml:"Title"        json:"title"` // request
+	Title string `xml:"Title,omitempty"        json:"title,omitempty"` // request
 
-	Description string `xml:"Description"  json:"description"` // request
+	Description string `xml:"Description,omitempty"  json:"description,omitempty"` // request
 
-	URL string `xml:"Url"          json:"url"` // request
+	URL string `xml:"Url,omitempty"          json:"url,omitempty"` // request
 
-	Ticket string `xml:"Ticket"       json:"ticket"` // request
+	Ticket string `xml:"Ticket,omitempty"       json:"ticket,omitempty"` // request
 
-	Latitude float64 `xml:"Latitude"     json:"latitude"` // request
+	Latitude float64 `xml:"Latitude,omitempty"     json:"latitude,omitempty"` // request
 
-	Longitude float64 `xml:"Longitude"    json:"longitude"` // request
+	Longitude float64 `xml:"Longitude,omitempty"    json:"longitude,omitempty"` // request
 
-	Precision float64 `xml:"Precision"    json:"precision"` // request
+	Precision float64 `xml:"Precision,omitempty"    json:"precision,omitempty"` // request
 
+}
+
+type WechatArticle struct {
+	Title       string `xml:"Title,omitempty"       json:"title,omitempty"`       // 图文消息标题
+	Description string `xml:"Description,omitempty" json:"description,omitempty"` // 图文消息描述
+	PicURL      string `xml:"PicUrl,omitempty"      json:"picUrl,omitempty"`      // 图片链接, 支持JPG, PNG格式, 较好的效果为大图360*200, 小图200*200
+	URL         string `xml:"Url,omitempty"         json:"url,omitempty"`         // 点击图文消息跳转链接
+}
+
+// WechatResponseMsg 微信回复消息
+type WechatResponseMsg struct {
+	XMLName struct{} `xml:"xml" json:"-"`
+
+	// ToUserName 开发者 微信号
+	ToUserName string `json:"toUserName" xml:"ToUserName"`
+
+	// FromUserName 发送方帐号（一个 OpenID）
+	FromUserName string `json:"fromUserName" xml:"FromUserName"`
+
+	// CreateTime 消息创建时间 （整型）
+	CreateTime int64 `json:"createTime" xml:"CreateTime"`
+
+	// MsgType 消息类型，event
+	MsgType WechatMsgType `json:"msgType" xml:"MsgType"`
+
+	// Content 回复的消息内容（换行：在 content 中能够换行，微信客户端就支持换行显示）
+	Content string `json:"content,omitempty" xml:"Content,omitempty"`
+
+	// Image 图片消息
+	Image struct {
+		MediaId string `json:"mediaId,omitempty" xml:"MediaId,omitempty"`
+	} `json:"image,omitempty" xml:"Image,omitempty"`
+
+	Voice struct {
+		MediaId string `json:"mediaId,omitempty" xml:"MediaId,omitempty"`
+	} `json:"voice,omitempty" xml:"Voice,omitempty"`
+
+	Video struct {
+		MediaId     string `json:"mediaId,omitempty" xml:"MediaId,omitempty"`
+		Title       string `json:"title,omitempty" xml:"Title,omitempty"`
+		Description string `json:"description,omitempty" xml:"Description,omitempty"`
+	} `json:"video,omitempty" xml:"Video,omitempty"`
+
+	Music struct {
+		MusicUrl    string `json:"musicUrl,omitempty" xml:"MusicUrl,omitempty"`
+		HQMusicUrl  string `json:"hQMusicUrl,omitempty" xml:"HQMusicUrl,omitempty"`
+		Title       string `json:"title,omitempty" xml:"Title,omitempty"`
+		Description string `json:"description,omitempty" xml:"Description,omitempty"`
+
+		ThumbMediaId string `json:"thumbMediaId,omitempty" xml:"ThumbMediaId,omitempty"`
+	} `json:"music,omitempty" xml:"Music,omitempty"`
+
+	Articles []WechatArticle `xml:"Articles>item,omitempty" json:"Articles,omitempty"` // 多条图文消息信息, 默认第一个item为大图, 注意, 如果图文数超过10, 则将会无响应
 }

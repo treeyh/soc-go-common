@@ -32,6 +32,8 @@ const (
 	MSGTYPE_IMAGE      WechatMsgType = "image"
 	MSGTYPE_VOICE      WechatMsgType = "voice"
 	MSGTYPE_VIDEO      WechatMsgType = "video"
+	MSGTYPE_MUSIC      WechatMsgType = "music"
+	MSGTYPE_NEWS       WechatMsgType = "news"
 	MSGTYPE_SHORTVIDEO WechatMsgType = "shortvideo"
 	MSGTYPE_LOCATION   WechatMsgType = "location"
 	MSGTYPE_LINK       WechatMsgType = "link"
