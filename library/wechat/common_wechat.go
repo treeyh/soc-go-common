@@ -14,7 +14,7 @@ import (
 
 var (
 	_lock        sync.Mutex
-	_accessToken *WechatAccessToken
+	_accessToken WechatAccessToken
 )
 
 type WechatAccessToken struct {
@@ -26,17 +26,18 @@ type WechatAccessToken struct {
 // GetAccessToken 获取accesstoken，isForce是否强制获取
 func (wcp *WechatProxy) GetAccessToken(ctx context.Context, isForce bool) (string, errors.AppError) {
 
-	if _accessToken == nil || isForce || _accessToken.ExpiresIn <= 0 || time.Now().Unix() > _accessToken.ExpiresTime.Unix() {
+	at := _accessToken.AccessToken
+	if isForce || _accessToken.ExpiresIn <= 0 || time.Now().Unix() > _accessToken.ExpiresTime.Unix() {
 		_lock.Lock()
 		defer _lock.Unlock()
 		// 重复判断，防止请求两次
 		// TODO 由于是单服务，未考虑分布式使用缓存
-		if _accessToken == nil || _accessToken.ExpiresIn <= 0 || time.Now().Unix() > _accessToken.ExpiresTime.Unix() {
+		if at == _accessToken.AccessToken {
 			resp, err := wcp.getAccessToken(ctx)
 			if err != nil {
 				return "", err
 			}
-			_accessToken = &WechatAccessToken{
+			_accessToken = WechatAccessToken{
 				AccessToken: resp.AccessToken,
 				ExpiresIn:   resp.ExpiresIn,
 				// 提前10分钟到期

@@ -33,5 +33,12 @@ func TestWechatProxy_GetOpenids(t *testing.T) {
 		convey.So(len(resp2.UserInfoList) > 0, convey.ShouldBeTrue)
 		log.InfoCtx(ctx, json.ToJsonIgnoreError(resp2))
 
+		_accessToken.AccessToken = _accessToken.AccessToken + "a"
+		resp2, err = GetProxy().GetUserInfoBatch(ctx, userInfoReqs)
+		convey.So(err, convey.ShouldBeNil)
+		convey.So(resp2, convey.ShouldNotBeNil)
+		convey.So(len(resp2.UserInfoList) > 0, convey.ShouldBeTrue)
+		log.InfoCtx(ctx, json.ToJsonIgnoreError(resp2))
+
 	}, initWechatTestConfig))
 }
