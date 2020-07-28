@@ -16,6 +16,7 @@ type RedisConfig struct {
 	Password       string `json:"password"`
 	Database       int    `json:"database"`
 	MaxIdle        int    `json:"maxIdle"`
+	MaxActive      int    `json:"maxActive"`
 	MaxIdleTimeout int    `json:"maxIdleTimeout"`
 	ConnectTimeout int    `json:"connectTimeout"`
 	ReadTimeout    int    `json:"readTimeout"`

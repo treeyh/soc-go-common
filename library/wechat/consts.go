@@ -4,6 +4,8 @@ import "reflect"
 
 const accessTokenKey = "access_token"
 
+const ResponseSuccess = "success"
+
 const (
 	ErrCodeOK                 = 0
 	ErrCodeInvalidCredential  = 40001 // access_token 过期错误码
