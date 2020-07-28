@@ -47,7 +47,7 @@ func TestModel(t *testing.T) {
   </Articles>
 </xml>`
 
-		vv := &WechatResponseMsg{}
+		vv := &WechatResponseArticlesMsg{}
 		err = xml.Unmarshal([]byte(xmlStr), &vv)
 		convey.So(err, convey.ShouldBeNil)
 		log.InfoCtx(ctx, json.ToJsonIgnoreError(vv))

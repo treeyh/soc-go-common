@@ -199,8 +199,7 @@ type WechatArticle struct {
 	URL         string `xml:"Url,omitempty"         json:"url,omitempty"`         // 点击图文消息跳转链接
 }
 
-// WechatResponseMsg 微信回复消息
-type WechatResponseMsg struct {
+type WechatResponseBaseMsg struct {
 	XMLName struct{} `xml:"xml" json:"-"`
 
 	// ToUserName 开发者 微信号
@@ -214,26 +213,51 @@ type WechatResponseMsg struct {
 
 	// MsgType 消息类型，event
 	MsgType WechatMsgType `json:"msgType" xml:"MsgType"`
+}
+
+// WechatResponseTextMsg 微信回复文本消息
+type WechatResponseTextMsg struct {
+	WechatResponseBaseMsg
 
 	// Content 回复的消息内容（换行：在 content 中能够换行，微信客户端就支持换行显示）
 	Content string `json:"content,omitempty" xml:"Content,omitempty"`
+}
+
+// WechatResponseImageMsg 微信回复图片消息
+type WechatResponseImageMsg struct {
+	WechatResponseBaseMsg
 
 	// Image 图片消息
 	Image struct {
 		MediaId string `json:"mediaId,omitempty" xml:"MediaId,omitempty"`
 	} `json:"image,omitempty" xml:"Image,omitempty"`
+}
+
+// WechatResponseVoiceMsg 微信回复音频消息
+type WechatResponseVoiceMsg struct {
+	WechatResponseBaseMsg
 
 	Voice struct {
 		MediaId string `json:"mediaId,omitempty" xml:"MediaId,omitempty"`
 	} `json:"voice,omitempty" xml:"Voice,omitempty"`
+}
 
-	Video struct {
+// WechatResponseVideoMsg 微信回复视频消息
+type WechatResponseVideoMsg struct {
+	WechatResponseBaseMsg
+
+	Video *struct {
 		MediaId     string `json:"mediaId,omitempty" xml:"MediaId,omitempty"`
 		Title       string `json:"title,omitempty" xml:"Title,omitempty"`
 		Description string `json:"description,omitempty" xml:"Description,omitempty"`
 	} `json:"video,omitempty" xml:"Video,omitempty"`
+}
 
-	Music struct {
+// WechatResponseMusicMsg 微信回复图片消息
+type WechatResponseMusicMsg struct {
+	WechatResponseBaseMsg
+
+	Music *struct {
 		MusicUrl    string `json:"musicUrl,omitempty" xml:"MusicUrl,omitempty"`
 		HQMusicUrl  string `json:"hQMusicUrl,omitempty" xml:"HQMusicUrl,omitempty"`
 		Title       string `json:"title,omitempty" xml:"Title,omitempty"`
@@ -241,6 +265,11 @@ type WechatResponseMsg struct {
 
 		ThumbMediaId string `json:"thumbMediaId,omitempty" xml:"ThumbMediaId,omitempty"`
 	} `json:"music,omitempty" xml:"Music,omitempty"`
+}
+
+// WechatResponseArticlesMsg 微信回复图片图文消息
+type WechatResponseArticlesMsg struct {
+	WechatResponseBaseMsg
 
 	Articles []WechatArticle `xml:"Articles>item,omitempty" json:"Articles,omitempty"` // 多条图文消息信息, 默认第一个item为大图, 注意, 如果图文数超过10, 则将会无响应
 }
