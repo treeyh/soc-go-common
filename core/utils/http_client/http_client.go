@@ -111,7 +111,7 @@ func do(ctx context.Context, method string, url string, querys map[string]string
 		}
 	}
 
-	log.Info(logmsg, logger.GetTraceField(ctx))
+	log.InfoCtx(ctx, logmsg, logger.GetTraceField(ctx))
 	resp, err := client.Do(req)
 	if err != nil {
 		log.ErrorCtx(ctx, "error:"+err.Error(), logger.GetTraceField(ctx))

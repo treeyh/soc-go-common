@@ -9,7 +9,7 @@ import (
 
 func TestWechatProxy_GetAccessToken(t *testing.T) {
 
-	convey.Convey("log test", t, tests.TestStartUp(func() {
+	convey.Convey("TestWechatProxy_GetAccessToken test", t, tests.TestStartUp(func() {
 
 		ctx := tests.GetNewContext()
 

@@ -79,12 +79,12 @@ func (wcp *WechatProxy) getAccessToken(ctx context.Context) (*WechatAccessTokenR
 	return resp, nil
 }
 
-// getJson 请求微信接口获取json返回
-func (wcp *WechatProxy) getJson(ctx context.Context, url string, params map[string]string, resp interface{}) errors.AppError {
+// getJson 请求微信接口获取json返回 isAccessToken 是否携带accesstoken
+func (wcp *WechatProxy) getJson(ctx context.Context, url string, params map[string]string, resp interface{}, isAccessToken bool) errors.AppError {
 
 	ErrorStructValue, ErrorErrCodeValue := checkResponse(resp)
 
-	token, err := wcp.GetAccessToken(ctx, false)
+	err := wcp.buildAccessTokenParams(ctx, params, isAccessToken, false)
 	if err != nil {
 		return err
 	}
@@ -109,15 +109,16 @@ RETRY:
 		return nil
 	case ErrCodeInvalidCredential, ErrCodeAccessTokenExpired:
 		errMsg := ErrorStructValue.Field(errorErrMsgIndex).String()
-		log.ErrorCtx(ctx, "code:"+strconv.FormatInt(errCode, 10)+";msg:"+errMsg+";token:"+token)
+		log.ErrorCtx(ctx, "code:"+strconv.FormatInt(errCode, 10)+";msg:"+errMsg+";params:"+json.ToJsonIgnoreError(params))
 		if !hasRetried {
 			hasRetried = true
 			ErrorStructValue.Set(errorZeroValue)
 
-			token, err = wcp.GetAccessToken(ctx, true)
+			err := wcp.buildAccessTokenParams(ctx, params, isAccessToken, true)
 			if err != nil {
 				return err
 			}
+
 			goto RETRY
 		}
 		fallthrough
@@ -127,11 +128,11 @@ RETRY:
 }
 
 // postJson 请求微信接口获取json返回
-func (wcp *WechatProxy) postJson(ctx context.Context, url string, params map[string]string, data interface{}, resp interface{}) errors.AppError {
+func (wcp *WechatProxy) postJson(ctx context.Context, url string, params map[string]string, data interface{}, resp interface{}, isAccessToken bool) errors.AppError {
 
 	ErrorStructValue, ErrorErrCodeValue := checkResponse(resp)
 
-	token, err := wcp.GetAccessToken(ctx, false)
+	err := wcp.buildAccessTokenParams(ctx, params, isAccessToken, false)
 	if err != nil {
 		return err
 	}
@@ -161,12 +162,12 @@ RETRY:
 		return nil
 	case ErrCodeInvalidCredential, ErrCodeAccessTokenExpired:
 		errMsg := ErrorStructValue.Field(errorErrMsgIndex).String()
-		log.ErrorCtx(ctx, "code:"+strconv.FormatInt(errCode, 10)+";msg:"+errMsg+";token:"+token)
+		log.ErrorCtx(ctx, "code:"+strconv.FormatInt(errCode, 10)+";msg:"+errMsg)
 		if !hasRetried {
 			hasRetried = true
 			ErrorStructValue.Set(errorZeroValue)
 
-			token, err = wcp.GetAccessToken(ctx, true)
+			err := wcp.buildAccessTokenParams(ctx, params, isAccessToken, true)
 			if err != nil {
 				return err
 			}
@@ -176,6 +177,20 @@ RETRY:
 	default:
 		return nil
 	}
+}
+
+// buildAccessTokenParams 构造params的access_token参数 isAccessToken：是否需要携带access_token , isForce 是否强制
+func (wcp *WechatProxy) buildAccessTokenParams(ctx context.Context, params map[string]string, isAccessToken bool, isForce bool) errors.AppError {
+	if !isAccessToken {
+		return nil
+	}
+
+	token, err := wcp.GetAccessToken(ctx, isForce)
+	if err != nil {
+		return err
+	}
+	params[accessTokenKey] = token
+	return nil
 }
 
 // checkResponse 检查 response 参数是否满足特定的结构要求, 如果不满足要求则会 panic, 否则返回相应的 reflect.Value.
