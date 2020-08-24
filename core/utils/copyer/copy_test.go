@@ -15,7 +15,7 @@ type Destination struct {
 
 func TestCopy(t *testing.T) {
 
-	convey.Convey("Test TestNewSystemError", t, func() {
+	convey.Convey("Test TestCopy", t, func() {
 		s := &Source{
 			Name: "test",
 		}

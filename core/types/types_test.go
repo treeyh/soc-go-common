@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"github.com/smartystreets/goconvey/convey"
 	"github.com/treeyh/soc-go-common/core/utils/copyer"
 	"testing"
 	"time"
@@ -11,40 +12,52 @@ import (
 )
 
 type Order struct {
-	Order_id    string `json:"OrderId"`
-	Create_time Time   `json:"CreateTime"`
+	OrderId    string `json:"orderId"`
+	CreateTime Time   `json:"createTime"`
+	Int64      Int64  `json:"int64"`
 }
 
 type Order1 struct {
-	Order_id    string `json:"OrderId"`
-	Create_time Time   `json:"CreateTime"`
+	OrderId    string `json:"orderId"`
+	CreateTime Time   `json:"createTime"`
+	Int64      Int64  `json:"int64"`
 }
 
 type Order3 struct {
-	Order_id    string    `json:"OrderId"`
-	Create_time time.Time `json:"CreateTime"`
+	OrderId    string    `json:"orderId"`
+	CreateTime time.Time `json:"createTime"`
+	Int64      int64     `json:"int64"`
 }
 
 func TestUnixTime_MarshalJSON(t *testing.T) {
-	order := Order{Order_id: "10001",
-		Create_time: Time(time.Now())}
 
-	orderBytes, err := json.ToJson(order)
-	if err != nil {
-		fmt.Print(err)
-	} else {
-		fmt.Println(string(orderBytes))
-	}
+	convey.Convey("Test TestCopy", t, func() {
+		order := Order{
+			OrderId:    "10001",
+			CreateTime: Time(time.Now()),
+			Int64:      Int64(64),
+		}
 
-	order1 := &Order{}
+		orderBytes, err := json.ToJson(order)
+		convey.So(err, convey.ShouldBeNil)
 
-	json.FromJson(orderBytes, order1)
-	fmt.Println(order1.Create_time)
+		t.Log(orderBytes)
 
-	order2 := &Order1{}
-	copyer.Copy(&order, order2)
-	//
-	fmt.Println(order2.Create_time)
+		order1 := &Order{}
+		json.FromJson(orderBytes, order1)
+		t.Log(order1.CreateTime)
+		convey.So(order1.Int64, convey.ShouldEqual, 64)
+
+		t.Log(order1.Int64)
+
+		order2 := &Order1{}
+		copyer.Copy(&order, order2)
+		//
+		t.Log(order2.CreateTime)
+		convey.So(order2.Int64, convey.ShouldEqual, 64)
+		t.Log(order2.Int64)
+	})
+
 }
 
 func TestTime(t *testing.T) {
@@ -60,27 +73,48 @@ func TestTime(t *testing.T) {
 
 func TestTime2(t *testing.T) {
 
-	tttt := &Order{
-		Order_id:    "123123",
-		Create_time: Time(time.Now()),
-	}
+	convey.Convey("Test TestCopy", t, func() {
+		tttt := &Order{
+			OrderId:    "123123",
+			CreateTime: Time(time.Now()),
+			Int64:      Int64(64),
+		}
 
-	fmt.Println(tttt.Create_time)
-	fmt.Println(time.Time(tttt.Create_time))
+		t.Log(tttt.CreateTime)
+		t.Log(time.Time(tttt.CreateTime))
+		t.Log(tttt.Int64)
+		t.Log(int64(tttt.Int64))
 
-	j := `{"OrderId":"123123","CreateTime":"2020-02-09 00:38:47"}`
+		j := `{"OrderId":"123123","CreateTime":"2020-02-09 00:38:47","Int64":64}`
 
-	tt := &Order{}
-	json.FromJson(j, tt)
-	fmt.Println(tt.Create_time)
-	fmt.Println(json.ToJsonIgnoreError(tt))
+		tt := &Order{}
+		json.FromJson(j, tt)
+		t.Log(tt.CreateTime)
+		t.Log(tt.Int64)
 
-	ttt := &Order3{
-		Order_id:    tt.Order_id,
-		Create_time: time.Time(tt.Create_time),
-	}
-	fmt.Println(ttt.Create_time)
-	fmt.Println(json.ToJsonIgnoreError(ttt))
+		convey.So(tt.Int64, convey.ShouldEqual, 64)
+
+		t.Log(json.ToJsonIgnoreError(tt))
+
+		ttt := &Order3{
+			OrderId:    tt.OrderId,
+			CreateTime: time.Time(tt.CreateTime),
+			Int64:      64,
+		}
+		str := json.ToJsonIgnoreError(ttt)
+		t.Log(str)
+		tt2 := &Order{}
+		json.FromJson(str, tt2)
+		t.Log(tt2.Int64)
+		str2 := json.ToJsonIgnoreError(tt2)
+		t.Log(str2)
+
+		tt3 := &Order3{}
+		json.FromJson(j, tt3)
+		t.Log(tt3.Int64)
+
+	})
+
 }
 
 func TestTime0(t *testing.T) {
