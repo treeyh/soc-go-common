@@ -9,7 +9,7 @@ import (
 
 type Int64 int64
 
-func (t *Int64) toInt64() int64 {
+func (t *Int64) ToInt64() int64 {
 	return int64(*t)
 }
 
