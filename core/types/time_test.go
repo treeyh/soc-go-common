@@ -85,7 +85,7 @@ func TestTime2(t *testing.T) {
 		t.Log(tttt.Int64)
 		t.Log(int64(tttt.Int64))
 
-		j := `{"OrderId":"123123","CreateTime":"2020-02-09 00:38:47","Int64":64}`
+		j := `{"OrderId":"123123","CreateTime":"2020-02-09 00:38:47","Int64":"64"}`
 
 		tt := &Order{}
 		json.FromJson(j, tt)
@@ -111,6 +111,7 @@ func TestTime2(t *testing.T) {
 
 		tt3 := &Order3{}
 		json.FromJson(j, tt3)
+		t.Log(tt3.CreateTime)
 		t.Log(tt3.Int64)
 
 	})
@@ -142,4 +143,33 @@ func TestTime_IsNull(t *testing.T) {
 
 	t.Log(st.TimeField)
 	t.Log(st.TimeField.IsNotNull())
+}
+
+func TestInt64(t *testing.T) {
+
+	convey.Convey("Test TestInt64", t, func() {
+		j := `{"OrderId":"123123","Int64": 64,"CreateTime":"2020-02-09 00:38:47"}`
+		tt3 := &Order3{}
+		json.FromJson(j, tt3)
+		t.Log(tt3.CreateTime)
+		t.Log(tt3.Int64)
+
+		order11 := &Order1{}
+		json.FromJson(j, order11)
+		t.Log(order11.CreateTime)
+		t.Log(order11.Int64)
+
+		jj := `{"OrderId":"123123","CreateTime":"2020-02-09 00:38:47","Int64":"64"}`
+		ttt3 := &Order3{}
+		json.FromJson(jj, ttt3)
+		t.Log(ttt3.CreateTime)
+		t.Log(ttt3.Int64)
+
+		order12 := &Order1{}
+		json.FromJson(jj, order12)
+		t.Log(order12.CreateTime)
+		t.Log(order12.Int64)
+
+	})
+
 }

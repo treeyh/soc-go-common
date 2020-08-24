@@ -5,11 +5,11 @@ import (
 	"unsafe"
 
 	jsoniter "github.com/json-iterator/go"
+	jsonextra "github.com/json-iterator/go/extra"
 	"github.com/treeyh/soc-go-common/core/consts"
 )
 
-type TimeDecoder struct {
-}
+type TimeDecoder struct{}
 type TimeEncoder struct {
 	precision time.Duration
 }
@@ -47,7 +47,6 @@ func (codec *TimeEncoder) Encode(ptr unsafe.Pointer, stream *jsoniter.Stream) {
 		mayBlank, _ := time.Parse(consts.AppTimeFormat, consts.BlankString)
 		stream.WriteString(mayBlank.Format(consts.AppTimeFormat))
 	}
-
 }
 
 var json = jsoniter.ConfigFastest
@@ -55,6 +54,9 @@ var json = jsoniter.ConfigFastest
 func init() {
 	jsoniter.RegisterTypeEncoder("time.Time", &TimeEncoder{})
 	jsoniter.RegisterTypeDecoder("time.Time", &TimeDecoder{})
+
+	// 容忍字符串和数字互转
+	jsonextra.RegisterFuzzyDecoders()
 }
 
 func ToJson(obj interface{}) (string, error) {
