@@ -37,7 +37,7 @@ func TestDecrypt(t *testing.T) {
 			return
 		}
 
-		convey.ShouldBeTrue(CheckErrCodeSucceed(resp.HttpStatus, resp.ErrCode))
+		convey.ShouldBeTrue(CheckErrCodeSucceed(200, resp.ErrCode))
 
 		fmt.Println(json.ToJsonIgnoreError(resp))
 
