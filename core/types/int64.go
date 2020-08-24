@@ -9,6 +9,10 @@ import (
 
 type Int64 int64
 
+func (t *Int64) toInt64() int64 {
+	return int64(*t)
+}
+
 func (t *Int64) UnmarshalJSON(data []byte) (err error) {
 	num := strings.ReplaceAll(string(data), "\"", "")
 	if num == "" {
