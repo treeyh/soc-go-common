@@ -5,6 +5,7 @@ import (
 	"crypto/cipher"
 	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	errors2 "errors"
 
 	"github.com/treeyh/soc-go-common/core/errors"
@@ -42,4 +43,10 @@ func SHA256(source string) []byte {
 	mac := sha256.New()
 	mac.Write([]byte(source))
 	return mac.Sum(nil)
+}
+
+func SHA256String(source string) string {
+	mac := sha256.New()
+	mac.Write([]byte(source))
+	return hex.EncodeToString(mac.Sum(nil))
 }
