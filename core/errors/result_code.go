@@ -122,4 +122,10 @@ var (
 
 	// WechatRequestError 请求微信接口错误
 	WechatRequestError = NewResultCode(100203, "请求微信接口失败 code:%d, msg:%s")
+
+	// ALiYunOperationError 阿里云操作错误
+	ALiYunOperationError = NewResultCode(100301, "%s 阿里云操作错误")
+
+	// ALiYunSendMailError 阿里云发送邮件错误
+	ALiYunSendMailError = NewResultCode(100302, "%s 阿里云发送邮件错误")
 )

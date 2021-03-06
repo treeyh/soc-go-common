@@ -19,6 +19,7 @@ type ResultCode struct {
 	err error
 }
 
+// https://github.com/pkg/errors/blob/master/errors.go
 // Application Error interface
 type AppError interface {
 	Error() string
@@ -28,6 +29,21 @@ type AppError interface {
 	Message() string
 
 	GetError() error
+}
+
+
+
+
+func Wrap(err AppError, resultCode ResultCode) AppError {
+	if err == nil {
+		return NewAppError(resultCode)
+	}
+
+	return nil
+}
+
+func UnWrap() AppError {
+	return nil
 }
 
 func (rc *ResultCode) Error() string {

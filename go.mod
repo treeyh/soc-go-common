@@ -1,11 +1,12 @@
 module github.com/treeyh/soc-go-common
 
-go 1.14
+go 1.16
 
 require (
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/jinzhu/gorm v1.9.12
 	github.com/json-iterator/go v1.1.10
+	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/mozillazg/go-pinyin v0.15.0
 	github.com/opentracing/opentracing-go v1.1.0
 	github.com/satori/go.uuid v1.2.0
@@ -14,4 +15,5 @@ require (
 	github.com/tealeg/xlsx/v2 v2.0.1
 	go.uber.org/zap v1.13.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
+	github.com/aliyun/alibaba-cloud-sdk-go v1.61.973 // indirect
 )

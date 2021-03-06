@@ -63,3 +63,15 @@ type WeChatConfig struct {
 	// 	MessageEncodingType 消息加解密方式 1 明文模式, 2 安全模式 ,3 兼容模式
 	MessageEncodingType int `json:"messageEncodingType"`
 }
+
+
+// ALiYunConfig 阿里云配置
+type ALiYunConfig struct {
+	// AccessKey 阿里云访问key
+	AccessKey string `json:"accessKey"`
+	// AccessKeySecret 阿里云访问key密钥
+	AccessKeySecret string `json:"accessKeySecret"`
+	// RegionId 阿里云访问区域
+	RegionId string `json:"regionId"`
+}
+
