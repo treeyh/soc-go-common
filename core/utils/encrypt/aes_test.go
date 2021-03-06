@@ -14,11 +14,11 @@ func TestAesDecrypt(t *testing.T) {
 	t.Log(e)
 	t.Log(d)
 
-	str := "abcdefg12345"
+	str := "cr@ejyi.com014e1bdefc7e42f3894511f48133d278"
 	str1 := SHA256String(str)
 	t.Log(str1)
 
-	assert.Equal(t, str1, "d7115b844d0dabb68b1d7510df9a098cb9185bf4167a48bba3e1c73adf19757b")
+	assert.Equal(t, str1, "9f6e9086119fc86b31d14128055625030c1d887d5c09cea62592382c3bedb590")
 
 	assert.Equal(t, d, "hello world")
 }
