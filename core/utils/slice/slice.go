@@ -3,6 +3,7 @@ package slice
 import (
 	"github.com/treeyh/soc-go-common/core/errors"
 	"reflect"
+	"strings"
 )
 
 //通过map去重slice
@@ -50,9 +51,18 @@ func SliceUniqueInt64(s []int64) []int64 {
 	return ret
 }
 
-func ContainString(v string, sl []string) bool {
+func EqualString(v string, sl []string) bool {
 	for _, vv := range sl {
 		if vv == v {
+			return true
+		}
+	}
+	return false
+}
+
+func ContainString(v string, sl []string) bool {
+	for _, vv := range sl {
+		if strings.Contains(v, vv) {
 			return true
 		}
 	}
