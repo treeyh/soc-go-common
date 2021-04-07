@@ -69,7 +69,7 @@ func initDb() {
 
 	wecmap := make(map[string]config.DBConfig)
 	wecmap[_MasterConfigName] = *dbConfig
-	InitDataSource(&wecmap)
+	InitDataSource(wecmap)
 }
 
 func TestGetDB(t *testing.T) {
