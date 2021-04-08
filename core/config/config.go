@@ -13,10 +13,10 @@ type LogConfig struct {
 type RedisConfig struct {
 	Host           string `json:"host"`
 	Port           int    `json:"port"`
+	User           string `json:"user"`
 	Password       string `json:"password"`
 	Database       int    `json:"database"`
-	MaxIdle        int    `json:"maxIdle"`
-	MaxActive      int    `json:"maxActive"`
+	PoolSize       int    `json:"poolSize"`
 	MaxIdleTimeout int    `json:"maxIdleTimeout"`
 	ConnectTimeout int    `json:"connectTimeout"`
 	ReadTimeout    int    `json:"readTimeout"`

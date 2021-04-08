@@ -1,17 +1,19 @@
 package redis
 
 import (
+	"fmt"
+	"github.com/mediocregopher/radix/v3"
 	"github.com/treeyh/soc-go-common/core/errors"
 	"strconv"
 	"sync"
 	"time"
 
-	"github.com/gomodule/redigo/redis"
 	"github.com/treeyh/soc-go-common/core/config"
 )
 
+
 var (
-	redisPools = make(map[string]*redis.Pool)
+	redisPools = make(map[string]*radix.Pool)
 	poolMutex  sync.Mutex
 )
 
@@ -28,63 +30,63 @@ func InitRedisPool(redisConfigs map[string]config.RedisConfig) {
 
 func initRedisPool(name string, config config.RedisConfig) {
 
-	maxIdle := 20
-	if config.MaxIdle > 0 {
-		maxIdle = config.MaxIdle
+	poolSize := 15
+	if config.PoolSize > 0 {
+		poolSize = config.PoolSize
 	}
 
-	maxActive := 10
-	if config.MaxActive > 0 {
-		maxActive = config.MaxActive
-	}
-
-	maxIdleTimeout := 15
+	maxIdleTimeout := 10 * time.Second
 	if config.MaxIdleTimeout > 0 {
-		maxIdleTimeout = config.MaxIdleTimeout
+		maxIdleTimeout = time.Duration(config.MaxIdleTimeout) * time.Second
 	}
 
-	connectTimeout := time.Duration(3)
+	connectTimeout := 3 * time.Second
 	if config.ConnectTimeout > 0 {
-		connectTimeout = time.Duration(config.ConnectTimeout)
+		connectTimeout = time.Duration(config.ConnectTimeout) * time.Second
 	}
 
-	readTimeout := time.Duration(3)
+	readTimeout := 3 * time.Second
 	if config.ReadTimeout > 0 {
-		readTimeout = time.Duration(config.ReadTimeout)
+		readTimeout = time.Duration(config.ReadTimeout) * time.Second
 	}
 
-	writeTimeout := time.Duration(3)
+	writeTimeout := 3 * time.Second
 	if config.WriteTimeout > 0 {
-		writeTimeout = time.Duration(config.WriteTimeout)
+		writeTimeout = time.Duration(config.WriteTimeout) * time.Second
 	}
+
+	opts := make([]radix.DialOpt, 0)
+	if config.User != "" && config.Password != "" {
+		opts = append(opts, radix.DialAuthUser(config.User, config.Password))
+	} else if config.Password != "" {
+		opts = append(opts, radix.DialAuthPass( config.Password))
+	}
+	opts = append(opts, radix.DialSelectDB(config.Database), radix.DialConnectTimeout(connectTimeout),
+		radix.DialReadTimeout(readTimeout), radix.DialWriteTimeout(writeTimeout), radix.DialTimeout(maxIdleTimeout))
+
+	// DefaultConnFunc is a ConnFunc which will return a Conn for a redis instance
+	// using sane defaults.
+	connFunc := func(network, addr string) (radix.Conn, error) {
+		return radix.Dial(network, addr, opts...)
+	}
+
+	poolOpts := make([]radix.PoolOpt, 0)
+	poolOpts = append(poolOpts, radix.PoolConnFunc(connFunc))
 
 	// 建立连接池
-	redisPools[name] = &redis.Pool{
-		MaxIdle:     maxIdle,
-		MaxActive:   maxActive,
-		IdleTimeout: time.Duration(maxIdleTimeout) * time.Second,
-		Wait:        true,
-		Dial: func() (redis.Conn, error) {
-			con, err := redis.Dial("tcp", config.Host+":"+strconv.Itoa(config.Port),
-				redis.DialPassword(config.Password),
-				redis.DialDatabase(config.Database),
-				redis.DialConnectTimeout(connectTimeout*time.Second),
-				redis.DialReadTimeout(readTimeout*time.Second),
-				redis.DialWriteTimeout(writeTimeout*time.Second))
-			if err != nil {
-				return nil, err
-			}
-			return con, nil
-		},
+	redisPool, err1 := radix.NewPool("tcp", config.Host+":"+strconv.Itoa(config.Port), poolSize, poolOpts...)
+	if err1 != nil {
+		panic(fmt.Sprintf("init redis pool fail. %+v", err1))
 	}
+	redisPools[name] = redisPool
 }
 
-func GetRedisConn(name string) redis.Conn {
+func GetRedisPool(name string) *radix.Pool {
 	if redisPools == nil {
 		panic(errors.NewAppError(errors.RedisNotInit))
 	}
 	if v, ok := redisPools[name]; ok {
-		return v.Get()
+		return v
 	}
-	panic(errors.NewAppError(errors.RedisNotInit))
+	panic(fmt.Sprintf("init redis poll fail. %+v", errors.NewAppError(errors.RedisNotInit)))
 }

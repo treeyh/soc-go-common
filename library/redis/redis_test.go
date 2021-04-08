@@ -2,25 +2,31 @@ package redis
 
 import (
 	"fmt"
-	"github.com/smartystreets/goconvey/convey"
+	"github.com/stretchr/testify/assert"
 	"github.com/treeyh/soc-go-common/core/config"
+	"github.com/treeyh/soc-go-common/core/utils/json"
+	"strconv"
 	"testing"
+	"time"
+)
+
+const (
+	_master = "master"
+	_node1 = "node1"
 )
 
 func getTestRedisConfigMap() map[string]config.RedisConfig {
 	redisConfigs := map[string]config.RedisConfig{
-		"master": config.RedisConfig{
-			//Host:     "192.168.1.148",
-			Host:     "127.0.0.1",
-			Port:     6379,
-			Password: "",
+		_master: config.RedisConfig{
+			Host:     "10.0.42.170",
+			Port:     10201,
+			Password: "tree",
 			Database: 0,
 		},
-		"node1": config.RedisConfig{
-			//Host:     "192.168.1.148",
-			Host:     "192.168.1.101",
-			Port:     6379,
-			Password: "",
+		_node1: config.RedisConfig{
+			Host:     "10.0.42.170",
+			Port:     10201,
+			Password: "tree",
 			Database: 1,
 		},
 	}
@@ -30,92 +36,272 @@ func getTestRedisConfigMap() map[string]config.RedisConfig {
 
 func TestGetProxy(t *testing.T) {
 
-	convey.Convey("Test TestRedisGetProxy", t, func() {
-		redisConfigs := getTestRedisConfigMap()
-		InitRedisPool(redisConfigs)
+	InitRedisPool(getTestRedisConfigMap())
 
-		key := "test:cache"
-		val := "2222"
-		err := GetProxy().SetEx(key, val, 60)
-		fmt.Println(err)
+	key := "test:cache"
+	val := "2222"
+	err := GetProxy().SetEx(key, val, 60)
+	assert.NoError(t, err, "redis SetEx error not nil %+v", err)
+	v, e := GetProxy().Get(key)
+	fmt.Println(v, e)
+	assert.Equal(t, v, val, "redis Get not equal %s  %s.", v, val)
 
-		convey.ShouldEqual(err, nil)
-		v, e := GetProxy().Get(key)
-		fmt.Println(v, e)
-		convey.ShouldEqual(v, val)
+	val = "333"
+	err = GetProxyByName(_node1).SetEx(key, val, 60)
 
-		val = "333"
-		err = GetProxyByName("node1").SetEx(key, val, 60)
-		fmt.Println(err)
+	assert.NoError(t, err, "redis SetEx error not nil")
 
-		convey.ShouldEqual(err, nil)
+	v, e = GetProxyByName(_node1).Get(key)
+	fmt.Println(v, e)
 
-		v, e = GetProxyByName("node1").Get(key)
-		fmt.Println(v, e)
-
-		convey.ShouldEqual(v, val)
-	})
+	assert.Equal(t, v, val, "redis Get not equal %s  %s.", v, val)
 }
 
-func TestMGet(t *testing.T) {
+func TestRedisProxy_SetEx(t *testing.T) {
 
-	convey.Convey("Test TestMGet", t, func() {
-		redisConfigs := getTestRedisConfigMap()
-		InitRedisPool(redisConfigs)
+	InitRedisPool(getTestRedisConfigMap())
 
-		kvs := map[string]string{
-			"test:aaa": "aaa",
-			"test:bbb": "bbb",
-			"test:ccc": "ccc",
-		}
-		err := GetProxy().MSet(kvs)
-		fmt.Println(err)
+	key := "test:SetEx"
+	val := "a"
+	sleep := 2
 
-		v, e := GetProxy().Get("test:bbb")
-		fmt.Println(v, e)
-		convey.ShouldEqual(v, "bbb")
-		v, e = GetProxy().Get("test:aaa")
-		fmt.Println(v, e)
-		convey.ShouldEqual(v, "aaa")
+	err := GetProxy().SetEx(key, val, sleep)
+	assert.NoError(t, err)
 
-		keys := make([]interface{}, 3)
-		keys[0] = "test:aaa"
-		keys[1] = "test:bbb"
-		keys[2] = "test:ccc"
+	v, err := GetProxy().Get(key)
+	assert.NoError(t, err)
+	assert.Equal(t, val, v)
 
-		vv, e := GetProxy().MGet(keys...)
-		fmt.Println(vv, e)
-		convey.ShouldEqual(len(vv), 3)
-	})
+	time.Sleep(time.Duration(sleep+1) * time.Second)
+
+	v2, err := GetProxy().Get(key)
+	assert.NoError(t, err)
+	assert.Equal(t, v2, "")
+
+
+	err = GetProxy().SetEx(key, val, sleep)
+	assert.NoError(t, err)
+
+	v1, err := GetProxy().Get(key)
+	assert.NoError(t, err)
+	assert.Equal(t, val, v1)
+
+	GetProxy().Expire(key, 3 + sleep)
+
+	time.Sleep(time.Duration(sleep+1) * time.Second)
+
+	v4, err := GetProxy().Get(key)
+	assert.NoError(t, err)
+	assert.Equal(t, v4, val)
 }
 
-func TestRedisProxy_SetBit(t *testing.T) {
-	convey.Convey("Test SetBit", t, func() {
-		redisConfigs := getTestRedisConfigMap()
-		InitRedisPool(redisConfigs)
 
-		key := "testbit"
-		err := GetProxy().SetBit(key, 3, 1, 3600)
-		fmt.Println(err)
+func TestRedisProxy_Del(t *testing.T) {
 
-		v, e := GetProxy().BitFieldGetU(key, 31, 0)
+	InitRedisPool(getTestRedisConfigMap())
 
-		fmt.Println(v)
-		fmt.Println(e)
+	for i := 0; i < 10; i++ {
 
-	})
+		key := fmt.Sprintf("test:TestRedisProxy_Del_%d", i)
+		val := "a"
+
+		err := GetProxy().Set(key, val)
+		assert.NoError(t, err)
+
+		v, err := GetProxy().Get(key)
+		assert.NoError(t, err)
+		assert.Equal(t, val, v)
+
+		count, err := GetProxy().Del(key)
+		assert.NoError(t, err)
+		assert.Equal(t, count, 1)
+
+		v2, err := GetProxy().Get(key)
+		assert.NoError(t, err)
+		assert.Equal(t, v2, "")
+	}
+}
+
+func TestRedisProxy_Incrby(t *testing.T) {
+
+	InitRedisPool(getTestRedisConfigMap())
+
+	key := "test:TestRedisProxy_Incrby"
+
+	count := int64(100)
+
+	c1, err := GetProxy().Incrby(key, count)
+	assert.NoError(t, err)
+	assert.Equal(t, c1, count)
+
+	c2, err := GetProxy().Incrby(key, count)
+	assert.NoError(t, err)
+	assert.Equal(t, c2, count+c1)
+
+	c3, err := GetProxy().Decrby(key, count)
+	assert.NoError(t, err)
+	assert.Equal(t, c3, c2 - count)
+
+	c4, err := GetProxy().Get(key)
+	assert.NoError(t, err)
+	assert.Equal(t, c4, strconv.FormatInt(c3, 10))
+
+	c5, err := GetProxy().Exist(key)
+	assert.NoError(t, err)
+	assert.True(t, c5)
+
+	c, err := GetProxy().Del(key)
+	assert.NoError(t, err)
+	assert.Equal(t, c, 1)
 }
 
 func TestRedisProxy_Scan(t *testing.T) {
-	convey.Convey("Test Scan", t, func() {
-		redisConfigs := getTestRedisConfigMap()
-		InitRedisPool(redisConfigs)
 
-		nextIndex, v, e := GetProxy().Scan(0, "a*", 10)
+	InitRedisPool(getTestRedisConfigMap())
 
-		fmt.Println(nextIndex)
-		fmt.Println(v)
-		fmt.Println(e)
+	for i := 0; i < 53; i++ {
 
-	})
+		key := fmt.Sprintf("test:TestRedisProxy_Scan_%d", i)
+		val := "a"
+
+		err := GetProxy().Set(key, val)
+		assert.NoError(t, err)
+	}
+
+	index := int64(0)
+	for i := 0; i< 100; i++ {
+		ii, ss, err := GetProxy().Scan(index, "", 10)
+		assert.NoError(t, err)
+		t.Log("index:", ii, ";ss:", ss)
+		index = ii
+		if ii == 0 {
+			break
+		}
+	}
+
+	for i := 0; i < 53; i++ {
+
+		key := fmt.Sprintf("test:TestRedisProxy_Scan_%d", i)
+		val := "a"
+
+		err := GetProxy().Set(key, val)
+		assert.NoError(t, err)
+	}
 }
+
+func TestRedisProxy_TryGetDistributedLock(t *testing.T) {
+
+	InitRedisPool(getTestRedisConfigMap())
+
+	key := "test:TestRedisProxy_TryGetDistributedLock"
+	val := "a"
+	rs, err := GetProxy().TryGetDistributedLock(key, val)
+	assert.NoError(t, err)
+	assert.True(t, rs)
+
+	rs2, err := GetProxy().ReleaseDistributedLock(key, val)
+	assert.NoError(t, err)
+	assert.True(t, rs2)
+
+
+	rs3, err := GetProxy().TryGetDistributedLock(key, val)
+	assert.NoError(t, err)
+	assert.True(t, rs3)
+
+	err = GetProxy().SetEx(key, "b", 10)
+	assert.NoError(t, err)
+
+	rs4, err := GetProxy().ReleaseDistributedLock(key, val)
+	assert.NoError(t, err)
+	assert.False(t, rs4)
+
+}
+
+func TestRedisProxy_HMGet(t *testing.T) {
+	InitRedisPool(getTestRedisConfigMap())
+
+	key := "test:TestRedisProxy_HMGet"
+
+	sm := map[string]string{
+		"a": "1",
+		"b": "2",
+		"c": "3",
+	}
+
+	err := GetProxy().HMSet(key, sm)
+	assert.NoError(t, err)
+
+	sm2, err := GetProxy().HMGet(key, "a", "b", "c")
+	assert.NoError(t, err)
+	assert.Equal(t, sm["a"], sm2["a"])
+	assert.Equal(t, sm["b"], sm2["b"])
+	assert.Equal(t, sm["c"], sm2["c"])
+
+	GetProxy().Del(key)
+}
+
+func TestRedisProxy_SetBit(t *testing.T) {
+
+	InitRedisPool(getTestRedisConfigMap())
+
+	key := "test:TestRedisProxy_SetBit"
+
+	err := GetProxy().SetBit(key, 0, 1, 10)
+	assert.NoError(t, err)
+
+	c, err := GetProxy().GetBit(key, 0)
+	assert.NoError(t, err)
+	assert.Equal(t, c, 1)
+
+	c2, err := GetProxy().GetBit(key, 4)
+	assert.NoError(t, err)
+	assert.Equal(t, c2, 0)
+
+	c3, err := GetProxy().BitCount(key)
+	assert.NoError(t, err)
+	assert.Equal(t, c3, 1)
+
+	c4, err := GetProxy().BitFieldGetU(key, 1, 0)
+	assert.NoError(t, err)
+	assert.Equal(t, c4, int64(1))
+
+
+
+	GetProxy().Del(key)
+}
+
+
+func TestMGet(t *testing.T) {
+
+	InitRedisPool(getTestRedisConfigMap())
+
+	kvs := map[string]string{
+		"test:aaa": "aaa",
+		"test:bbb": "bbb",
+		"test:ccc": "ccc",
+	}
+	err := GetProxy().MSet(kvs)
+	fmt.Println(err)
+
+	v, e := GetProxy().Get("test:bbb")
+	fmt.Println(v, e)
+
+	assert.Equal(t, v, "bbb", "redis Get not equal %s  %s.", v, "bbb")
+	v, e = GetProxy().Get("test:aaa")
+	fmt.Println(v, e)
+	assert.Equal(t, v, "aaa", "redis Get not equal %s  %s.", v, "aaa")
+
+	keys := make([]string, 4)
+	keys[0] = "test:aaa"
+	keys[1] = "test:ddd"
+	keys[2] = "test:bbb"
+	keys[3] = "test:ccc"
+
+	vv, e := GetProxy().MGet(keys...)
+	fmt.Println(json.ToJsonIgnoreError(vv), e)
+	assert.Equal(t, len(vv), len(keys), "redis Get not equal %d  %d.",len(vv), len(keys))
+
+	GetProxy().Del(keys...)
+}
+
+

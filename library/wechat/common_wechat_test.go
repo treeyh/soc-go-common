@@ -1,7 +1,7 @@
 package wechat
 
 import (
-	"github.com/smartystreets/goconvey/convey"
+	"github.com/stretchr/testify/assert"
 	"github.com/treeyh/soc-go-common/core/utils/json"
 	"github.com/treeyh/soc-go-common/tests"
 	"testing"
@@ -9,29 +9,24 @@ import (
 
 func TestWechatProxy_GetAccessToken(t *testing.T) {
 
-	convey.Convey("TestWechatProxy_GetAccessToken test", t, tests.TestStartUp(func() {
+	initWechatTestConfig()
 
-		ctx := tests.GetNewContext()
+	ctx := tests.GetNewContext()
 
-		resp, err := GetProxy().getAccessToken(ctx)
-		if err != nil {
-			convey.So(err, convey.ShouldBeNil)
-			return
-		}
+	resp, err := GetProxy().getAccessToken(ctx)
+	if err != nil {
+		assert.NoError(t, err, "getAccessToken error. %+v.", err)
+		return
+	}
 
-		log.Info(json.ToJsonIgnoreError(resp))
-		//convey.So(CheckErrCodeSucceed(resp.HttpStatus, resp.ErrCode), convey.ShouldBeTrue)
-		convey.So(resp.ExpiresIn, convey.ShouldEqual, 7200)
+	respstr := json.ToJsonIgnoreError(resp)
+	assert.Equal(t, resp.ExpiresIn, 7200 , "wechat getAccessToken error. %s", respstr)
 
-		GetProxy().wechatConfig.AppId = GetProxy().wechatConfig.AppId + "_"
+	GetProxy().wechatConfig.AppId = GetProxy().wechatConfig.AppId + "_"
 
-		resp, err = GetProxy().getAccessToken(ctx)
-		log.Info(err.Message())
-		log.Info(json.ToJsonIgnoreError(resp))
-		convey.So(err, convey.ShouldNotBeNil)
+	resp, err = GetProxy().getAccessToken(ctx)
+	log.Info(err.Message())
+	log.Info(json.ToJsonIgnoreError(resp))
 
-		convey.So(resp, convey.ShouldBeNil)
-
-	}, initWechatTestConfig))
-
+	assert.NoError(t, err , "getAccessToken error. %+v.", err)
 }

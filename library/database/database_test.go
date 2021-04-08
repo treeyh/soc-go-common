@@ -2,13 +2,11 @@ package database
 
 import (
 	"fmt"
-	"github.com/smartystreets/goconvey/convey"
 	"github.com/treeyh/soc-go-common/core/config"
 	"github.com/treeyh/soc-go-common/core/errors"
 	"github.com/treeyh/soc-go-common/core/logger"
 	"github.com/treeyh/soc-go-common/core/utils/file"
 	"github.com/treeyh/soc-go-common/core/utils/json"
-	"github.com/treeyh/soc-go-common/tests"
 	"path"
 	"testing"
 	"time"
@@ -73,43 +71,39 @@ func initDb() {
 }
 
 func TestGetDB(t *testing.T) {
-	convey.Convey("log test", t, tests.TestStartUp(func() {
+	initDb()
 
-		objectId := ObjectIdPo{
-			Id:         1,
-			OrgId:      1,
-			SysCode:    "syscode",
-			Code:       "user",
-			MaxId:      1000,
-			Step:       200,
-			Creator:    23,
-			CreateTime: time.Now(),
-			Updator:    45,
-			UpdateTime: time.Now(),
-			Version:    1,
-			DelFlag:    2,
-		}
+	objectId := ObjectIdPo{
+		Id:         1,
+		OrgId:      1,
+		SysCode:    "syscode",
+		Code:       "user",
+		MaxId:      1000,
+		Step:       200,
+		Creator:    23,
+		CreateTime: time.Now(),
+		Updator:    45,
+		UpdateTime: time.Now(),
+		Version:    1,
+		DelFlag:    2,
+	}
 
-		err := GetDb().Create(&objectId).Error
-		//t := GetDb().NewRecord(&objectId)
-		//fmt.Println(t)
-		fmt.Println(err)
-		logger.Logger().Info(errors.NewAppErrorByExistError(errors.DbOperationFail, err))
+	err := GetDb().Create(&objectId).Error
+	//t := GetDb().NewRecord(&objectId)
+	//fmt.Println(t)
+	fmt.Println(err)
+	logger.Logger().Info(errors.NewAppErrorByExistError(errors.DbOperationFail, err))
 
-		fmt.Println(json.ToJsonIgnoreError(objectId))
-
-	}, initDb))
+	fmt.Println(json.ToJsonIgnoreError(objectId))
 }
 
 func TestGetDB2(t *testing.T) {
-	convey.Convey("log test", t, tests.TestStartUp(func() {
+	initDb()
 
-		var objId ObjectIdPo
+	var objId ObjectIdPo
 
-		row := GetDb().Where("org_id = ? AND code = ?", 1, "us1er").Where("del_flag = ?", 2).First(&objId).RowsAffected
+	row := GetDb().Where("org_id = ? AND code = ?", 1, "us1er").Where("del_flag = ?", 2).First(&objId).RowsAffected
 
-		fmt.Println(row)
-		fmt.Println(json.ToJsonIgnoreError(objId))
-
-	}, initDb))
+	fmt.Println(row)
+	fmt.Println(json.ToJsonIgnoreError(objId))
 }

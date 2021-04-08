@@ -1,7 +1,7 @@
 package redis
 
 import (
-	"github.com/gomodule/redigo/redis"
+	"github.com/mediocregopher/radix/v3"
 	"github.com/treeyh/soc-go-common/core/errors"
 	"github.com/treeyh/soc-go-common/core/utils/times"
 	"math/rand"
@@ -31,137 +31,112 @@ const (
 )
 
 var (
-	_LockDistributedLuaScript   = redis.NewScript(1, _LockDistributedLua)
-	_UnLockDistributedLuaScript = redis.NewScript(1, _UnLockDistributedLua)
+	_LockDistributedLuaScript   = radix.NewEvalScript(1, _LockDistributedLua)
+	_UnLockDistributedLuaScript = radix.NewEvalScript(1, _UnLockDistributedLua)
 
 	_redisCaches = make(map[string]*RedisProxy)
 )
 
 type RedisProxy struct {
 	name string
-	conn redis.Conn
 }
 
 func (rp *RedisProxy) ZAdd(key string, score float64, value string) errors.AppError {
-	conn := rp.Connect()
-	defer rp.Close(conn)
+	pool := rp.Pool()
+	err := pool.Do(radix.Cmd(nil,"zadd", key, strconv.FormatFloat(score, 'f', 10, 64), value))
 
-	_, err := conn.Do("zadd", key, score, value)
 	return errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 }
 
-func (rp *RedisProxy) SetEx(key string, value string, ex int64) errors.AppError {
-	conn := rp.Connect()
-	defer rp.Close(conn)
+func (rp *RedisProxy) SetEx(key string, value string, ex int) errors.AppError {
+	pool := rp.Pool()
 
-	_, err := conn.Do("setex", key, ex, value)
+	err := pool.Do(radix.Cmd(nil,"setex", key, strconv.Itoa(ex), value))
+
 	return errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 }
 
 func (rp *RedisProxy) Set(key string, value string) errors.AppError {
-	conn := rp.Connect()
-	defer rp.Close(conn)
+	pool := rp.Pool()
 
-	_, err := conn.Do("set", key, value)
+	err := pool.Do(radix.Cmd(nil,"set", key, value))
 	return errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 }
 
 func (rp *RedisProxy) MSet(fieldValue map[string]string) errors.AppError {
-	conn := rp.Connect()
-	defer rp.Close(conn)
+	pool := rp.Pool()
 
-	args := []interface{}{}
+	args := make([]string, 0)
 	args = append(args)
 	for k, v := range fieldValue {
 		args = append(append(args, k), v)
 	}
-	_, err := conn.Do("mset", args...)
+
+	err := pool.Do(radix.Cmd(nil,"mset", args...))
 	return errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 }
 
 func (rp *RedisProxy) Get(key string) (string, errors.AppError) {
-	conn := rp.Connect()
-	defer rp.Close(conn)
+	pool := rp.Pool()
 
-	rs, err := conn.Do("get", key)
+	var result string
+	err := pool.Do(radix.Cmd(&result,"get", key))
+
 	if err != nil {
 		return "", errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 	}
-	if rs == nil {
-		return "", nil
-	}
-	return string(rs.([]byte)), nil
+	return result, nil
 }
 
-func (rp *RedisProxy) MGet(keys ...interface{}) ([]string, errors.AppError) {
-	conn := rp.Connect()
-	defer rp.Close(conn)
+func (rp *RedisProxy) MGet(keys ...string) ([]string, errors.AppError) {
+	pool := rp.Pool()
 
-	rs, err := conn.Do("mget", keys...)
+	ls := make([]string, len(keys))
+	err := pool.Do(radix.Cmd(&ls,"mget", keys...))
+
 	if err != nil {
 		return nil, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 	}
-
-	if rs == nil {
-		return nil, nil
-	}
-	//re, err := redis.Values(rs, err)
-	//fmt.Println(re)
-	list := rs.([]interface{})
-	resultList := make([]string, 0)
-	for _, v := range list {
-		if bytes, ok := v.([]byte); ok {
-			resultList = append(resultList, string(bytes))
-		}
-	}
-	return resultList, nil
+	return ls, nil
 }
 
-func (rp *RedisProxy) Del(keys ...interface{}) (int64, errors.AppError) {
-	conn := rp.Connect()
-	defer rp.Close(conn)
+func (rp *RedisProxy) Del(keys ...string) (int, errors.AppError) {
+	pool := rp.Pool()
 
-	rs, err := conn.Do("Del", keys...)
-	if err != nil {
-		return 0, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
-	}
-	if rs == nil {
-		return 0, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
-	}
-	return rs.(int64), nil
+	var result int
+	err := pool.Do(radix.Cmd(&result,"Del", keys...))
+	return result, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 }
 
 func (rp *RedisProxy) Incrby(key string, v int64) (int64, errors.AppError) {
-	conn := rp.Connect()
-	defer rp.Close(conn)
 
-	rs, err := conn.Do("INCRBY", key, v)
-	if err != nil {
-		return 0, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
-	}
-	if rs == nil {
-		return 0, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
-	}
-	return rs.(int64), errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
+	pool := rp.Pool()
+
+	var result int64
+	err := pool.Do(radix.Cmd(&result,"INCRBY", key, strconv.FormatInt(v, 10)))
+	return result, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
+}
+
+func (rp *RedisProxy) Decrby(key string, v int64) (int64, errors.AppError) {
+
+	pool := rp.Pool()
+
+	var result int64
+	err := pool.Do(radix.Cmd(&result,"DECRBY", key, strconv.FormatInt(v, 10)))
+	return result, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 }
 
 func (rp *RedisProxy) Exist(key string) (bool, errors.AppError) {
-	conn := rp.Connect()
-	defer rp.Close(conn)
 
-	rs, err := conn.Do("EXISTS", key)
-	if err != nil {
-		return false, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
-	}
-	if rs == nil {
-		return false, nil
-	}
-	return rs.(int64) == 1, nil
+	pool := rp.Pool()
+
+	var result int64
+	err := pool.Do(radix.Cmd(&result,"EXISTS", key))
+	return result == 1, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 }
 
 func (rp *RedisProxy) Scan(index int64, match string, count int) (int64, []string, errors.AppError) {
-	conn := rp.Connect()
-	defer rp.Close(conn)
+	pool := rp.Pool()
 
 	if match == "" {
 		match = "*"
@@ -169,25 +144,22 @@ func (rp *RedisProxy) Scan(index int64, match string, count int) (int64, []strin
 	if count <= 0 || count > 200 {
 		count = 30
 	}
+	var result []interface{}
+	err := pool.Do(radix.Cmd(&result,"SCAN", strconv.FormatInt(index, 10), "MATCH", match, "COUNT", strconv.Itoa(count)))
 
-	rs, err := conn.Do("SCAN", index, "MATCH", match, "COUNT", count)
 	if err != nil {
 		return 0, nil, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 	}
-	if rs == nil {
-		return 0, nil, nil
-	}
-	reInts := rs.([]interface{})
-	if len(reInts) != 2 {
+	if len(result) != 2 {
 		return 0, nil, nil
 	}
 
-	nextIndex, err := strconv.ParseInt(string(reInts[0].([]byte)), 10, 64)
+	nextIndex, err := strconv.ParseInt(string(result[0].([]byte)), 10, 64)
 	if err != nil {
 		return 0, nil, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 	}
 
-	keyInts := reInts[1].([]interface{})
+	keyInts := result[1].([]interface{})
 	keys := make([]string, 0)
 	for _, v := range keyInts {
 		keys = append(keys, string(v.([]byte)))
@@ -196,31 +168,25 @@ func (rp *RedisProxy) Scan(index int64, match string, count int) (int64, []strin
 	return nextIndex, keys, nil
 }
 
-func (rp *RedisProxy) Expire(key string, expire int64) (bool, errors.AppError) {
-	conn := rp.Connect()
-	defer rp.Close(conn)
+func (rp *RedisProxy) Expire(key string, expire int) (bool, errors.AppError) {
+	pool := rp.Pool()
 
-	rs, err := conn.Do("EXPIRE", key, expire)
-	if err != nil {
-		return false, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
-	}
-	if rs == nil {
-		return false, nil
-	}
-	return rs.(int64) == 1, nil
+	var result int64
+	err := pool.Do(radix.Cmd(&result,"EXPIRE", key, strconv.Itoa(expire)))
+	return result == 1, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 }
 
 func (rp *RedisProxy) TryGetDistributedLock(key string, v string) (bool, errors.AppError) {
-	conn := rp.Connect()
-	defer rp.Close(conn)
+	pool := rp.Pool()
 
 	end := times.GetNowMillisecond() + _DistributedTimeOut*1000
 	for times.GetNowMillisecond() <= end {
-		rs, err := _LockDistributedLuaScript.Do(conn, key, v, _DistributedTimeOut)
+		var result int64
+		err := pool.Do(_LockDistributedLuaScript.Cmd(&result, key, v, strconv.Itoa(_DistributedTimeOut)))
 		if err != nil {
 			return false, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 		}
-		if rs.(int64) == _DistributedSuccess {
+		if result == _DistributedSuccess {
 			return true, nil
 		}
 		times.SleepMillisecond(80 + int64(rand.Int31n(30)))
@@ -230,187 +196,149 @@ func (rp *RedisProxy) TryGetDistributedLock(key string, v string) (bool, errors.
 }
 
 func (rp *RedisProxy) ReleaseDistributedLock(key string, v string) (bool, errors.AppError) {
-	conn := rp.Connect()
-	defer rp.Close(conn)
+	pool := rp.Pool()
 
-	rs, err := _UnLockDistributedLuaScript.Do(conn, key, v)
+	var result int64
+	err := pool.Do(_UnLockDistributedLuaScript.Cmd(&result, key, v))
+
 	if err != nil {
 		return false, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 	}
-	if rs.(int64) == _DistributedSuccess {
-		return true, nil
-	}
-
-	return false, nil
+	return result == _DistributedSuccess, nil
 }
 
 func (rp *RedisProxy) HGet(key, field string) (string, errors.AppError) {
-	conn := rp.Connect()
-	defer rp.Close(conn)
+	pool := rp.Pool()
 
-	rs, err := conn.Do("HGET", key, field)
+	var result string
+	err := pool.Do(radix.FlatCmd(&result,"HGET", key, field))
+
 	if err != nil {
 		return "", errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 	}
-	if rs == nil {
-		return "", nil
-	}
-	return string(rs.([]byte)), nil
+	return result, nil
 }
 
 func (rp *RedisProxy) HSet(key, field, value string) errors.AppError {
-	conn := rp.Connect()
-	defer rp.Close(conn)
+	pool := rp.Pool()
 
-	_, err := conn.Do("HSET", key, field, value)
+	var result string
+	err := pool.Do(radix.FlatCmd(&result,"HSET", key, field, value))
 	return errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 }
 
 func (rp *RedisProxy) HDel(key string, fields ...interface{}) (int64, errors.AppError) {
-	conn := rp.Connect()
-	defer rp.Close(conn)
+	pool := rp.Pool()
 
-	args := []interface{}{}
-	args = append(append(args, key), fields...)
-	rs, err := conn.Do("HDEL", args...)
+	var result int64
+	err := pool.Do(radix.FlatCmd(&result,"HDEL", key, fields...))
+
 	if err != nil {
 		return 0, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 	}
-	if rs == nil {
-		return 0, nil
-	}
-	return rs.(int64), nil
+
+	return result, nil
 }
 
 func (rp *RedisProxy) HExists(key, field string) (bool, errors.AppError) {
-	conn := rp.Connect()
-	defer rp.Close(conn)
+	pool := rp.Pool()
 
-	rs, err := conn.Do("HEXISTS", key, field)
+	var result int64
+	err := pool.Do(radix.FlatCmd(&result,"HEXISTS", key, field))
+
 	if err != nil {
 		return false, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 	}
-	if rs == nil {
-		return false, nil
-	}
-	return rs.(int64) == 1, nil
+	return result == 1, nil
 }
 
-func (rp *RedisProxy) HMGet(key string, fields ...interface{}) (map[string]*string, errors.AppError) {
-	result := map[string]*string{}
-	conn := rp.Connect()
-	defer rp.Close(conn)
+func (rp *RedisProxy) HMGet(key string, fields ...interface{}) (map[string]string, errors.AppError) {
+	result := map[string]string{}
+	pool := rp.Pool()
 
-	fields = append([]interface{}{key}, fields...)
-	rs, err := conn.Do("HMGET", fields...)
+	var rs []string
+	err := pool.Do(radix.FlatCmd(&rs,"HMGET", key, fields...))
+
 	if err != nil {
 		return result, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 	}
 	if rs == nil {
 		return result, nil
 	}
-	keys := make([]string, len(fields)-1)
+	keys := make([]string, len(fields))
 	for i, k := range fields {
-		if i == 0 {
-			continue
-		}
-		keys[i-1] = k.(string)
+		keys[i] = k.(string)
 	}
 
-	if datas, ok := rs.([]interface{}); ok {
-		for i, data := range datas {
-			if data == nil {
-				result[keys[i]] = nil
-			} else {
-				dataStr := string(data.([]byte))
-				result[keys[i]] = &dataStr
-			}
-		}
+	for i, data := range rs {
+		result[keys[i]] = data
 	}
 	return result, nil
 }
 
 func (rp *RedisProxy) HMSet(key string, fieldValue map[string]string) errors.AppError {
-	conn := rp.Connect()
-	defer rp.Close(conn)
+	pool := rp.Pool()
 
 	args := []interface{}{}
-	args = append(args, key)
 	for k, v := range fieldValue {
 		args = append(append(args, k), v)
 	}
-	_, err := conn.Do("HMSET", args...)
+
+	err := pool.Do(radix.FlatCmd(nil,"HMSET", key, args...))
 	return errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 }
 
-func (rp *RedisProxy) SetBit(key string, offset int, value int, ex int64) errors.AppError {
-	conn := rp.Connect()
-	defer rp.Close(conn)
+func (rp *RedisProxy) SetBit(key string, offset int, value int, ex int) errors.AppError {
+	pool := rp.Pool()
 
-	if err := conn.Send("SETBIT", key, offset, value); err != nil {
+	if err := pool.Do(radix.Cmd(nil,"SETBIT", key, strconv.Itoa(offset), strconv.Itoa(value))); err != nil {
 		return errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 	}
 
 	if ex > 0 {
-		if err := conn.Send("EXPIRE", key, ex); err != nil {
+		if err := pool.Do(radix.Cmd(nil,"EXPIRE", key, strconv.Itoa(ex))); err != nil {
 			return errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 		}
-	}
-
-	if err := conn.Flush(); err != nil {
-		return errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 	}
 	return nil
 }
 
 func (rp *RedisProxy) GetBit(key string, offset int) (int, errors.AppError) {
-	conn := rp.Connect()
-	defer rp.Close(conn)
+	pool := rp.Pool()
 
-	if res, err := redis.Int(conn.Do("GETBIT", key, offset)); err != nil {
-		return 0, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
-	} else {
-		return res, nil
-	}
+	var result int
+	err := pool.Do(radix.Cmd(&result, "GETBIT", key, strconv.Itoa(offset)))
+
+	return result, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 }
 
 func (rp *RedisProxy) BitCount(key string) (int, errors.AppError) {
-	conn := rp.Connect()
-	defer rp.Close(conn)
+	pool := rp.Pool()
 
-	if res, err := redis.Int(conn.Do("BITCOUNT", key)); err != nil {
-		return 0, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
-	} else {
-		return res, nil
-	}
+	var result int
+	err := pool.Do(radix.Cmd(&result, "BITCOUNT", key))
+
+	return result, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 }
 
 func (rp *RedisProxy) BitFieldGetU(key string, num int, start int) (int64, errors.AppError) {
-	conn := rp.Connect()
-	defer rp.Close(conn)
-
 	if num > 63 {
 		return 0, errors.NewAppError(errors.ParamError, "num 不能大于63")
 	}
 
-	if res, err := redis.Int64s(conn.Do("BITFIELD", key, "GET", "u"+strconv.Itoa(num), start)); err != nil {
+	pool := rp.Pool()
+
+	var result []int64
+	err := pool.Do(radix.FlatCmd(&result, "BITFIELD", key, "GET", "u"+strconv.Itoa(num), start))
+
+	if err != nil {
 		return 0, errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
-	} else {
-		return res[0], nil
 	}
+	return result[0], nil
 }
 
-func (rp *RedisProxy) Connect() redis.Conn {
-	return GetRedisConn(rp.name)
-}
-
-func (rp *RedisProxy) Close(conn redis.Conn) errors.AppError {
-	if conn != nil && conn.Err() == nil {
-		conn.Close()
-		err := conn.Close()
-		return errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
-	}
-	return nil
+func (rp *RedisProxy) Pool() *radix.Pool {
+	return GetRedisPool(rp.name)
 }
 
 func (rp RedisProxy) IsEmpty() bool {

@@ -2,7 +2,7 @@ package wechat
 
 import (
 	"encoding/xml"
-	"github.com/smartystreets/goconvey/convey"
+	"github.com/stretchr/testify/assert"
 	"github.com/treeyh/soc-go-common/core/utils/json"
 	"github.com/treeyh/soc-go-common/tests"
 	"testing"
@@ -10,11 +10,11 @@ import (
 
 func TestModel(t *testing.T) {
 
-	convey.Convey("TestModel test", t, tests.TestStartUp(func() {
+	initWechatTestConfig()
 
-		ctx := tests.GetNewContext()
+	ctx := tests.GetNewContext()
 
-		xmlStr := `<xml>
+	xmlStr := `<xml>
   <ToUserName><![CDATA[toUser]]></ToUserName>
   <FromUserName><![CDATA[fromUser]]></FromUserName>
   <CreateTime>123456789</CreateTime>
@@ -25,13 +25,13 @@ func TestModel(t *testing.T) {
   <Precision>119.385040</Precision>
 </xml>`
 
-		v := &WechatReqestMsg{}
+	v := &WechatReqestMsg{}
 
-		err := xml.Unmarshal([]byte(xmlStr), &v)
-		convey.So(err, convey.ShouldBeNil)
-		log.InfoCtx(ctx, json.ToJsonIgnoreError(v))
+	err := xml.Unmarshal([]byte(xmlStr), &v)
+	assert.NoError(t, err)
+	log.InfoCtx(ctx, json.ToJsonIgnoreError(v))
 
-		xmlStr = `<xml>
+	xmlStr = `<xml>
   <ToUserName><![CDATA[toUser]]></ToUserName>
   <FromUserName><![CDATA[fromUser]]></FromUserName>
   <CreateTime>12345678</CreateTime>
@@ -47,15 +47,13 @@ func TestModel(t *testing.T) {
   </Articles>
 </xml>`
 
-		vv := &WechatResponseArticlesMsg{}
-		err = xml.Unmarshal([]byte(xmlStr), &vv)
-		convey.So(err, convey.ShouldBeNil)
-		log.InfoCtx(ctx, json.ToJsonIgnoreError(vv))
+	vv := &WechatResponseArticlesMsg{}
+	err = xml.Unmarshal([]byte(xmlStr), &vv)
+	assert.NoError(t, err)
+	log.InfoCtx(ctx, json.ToJsonIgnoreError(vv))
 
-		bys, err1 := xml.Marshal(vv)
-		log.InfoCtx(ctx, string(bys))
-		convey.So(err1, convey.ShouldBeNil)
-
-	}, initWechatTestConfig))
+	bys, err1 := xml.Marshal(vv)
+	log.InfoCtx(ctx, string(bys))
+	assert.NoError(t, err1)
 
 }

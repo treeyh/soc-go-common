@@ -2,7 +2,7 @@ package types
 
 import (
 	"fmt"
-	"github.com/smartystreets/goconvey/convey"
+	"github.com/stretchr/testify/assert"
 	"github.com/treeyh/soc-go-common/core/utils/copyer"
 	"testing"
 	"time"
@@ -31,32 +31,30 @@ type Order3 struct {
 
 func TestUnixTime_MarshalJSON(t *testing.T) {
 
-	convey.Convey("Test TestCopy", t, func() {
-		order := Order{
-			OrderId:    "10001",
-			CreateTime: Time(time.Now()),
-			Int64:      Int64(64),
-		}
+	order := Order{
+		OrderId:    "10001",
+		CreateTime: Time(time.Now()),
+		Int64:      Int64(64),
+	}
 
-		orderBytes, err := json.ToJson(order)
-		convey.So(err, convey.ShouldBeNil)
+	orderBytes, err := json.ToJson(order)
+	assert.NoError(t, err)
 
-		t.Log(orderBytes)
+	t.Log(orderBytes)
 
-		order1 := &Order{}
-		json.FromJson(orderBytes, order1)
-		t.Log(order1.CreateTime)
-		convey.So(order1.Int64, convey.ShouldEqual, 64)
+	order1 := &Order{}
+	json.FromJson(orderBytes, order1)
+	t.Log(order1.CreateTime)
+	assert.Equal(t, order1.Int64.ToInt64(), int64(64))
 
-		t.Log(order1.Int64)
+	t.Log(order1.Int64)
 
-		order2 := &Order1{}
-		copyer.Copy(&order, order2)
-		//
-		t.Log(order2.CreateTime)
-		convey.So(order2.Int64, convey.ShouldEqual, 64)
-		t.Log(order2.Int64)
-	})
+	order2 := &Order1{}
+	copyer.Copy(&order, order2)
+	//
+	t.Log(order2.CreateTime)
+	assert.Equal(t, order2.Int64.ToInt64(), int64(64))
+	t.Log(order2.Int64)
 
 }
 
@@ -73,48 +71,45 @@ func TestTime(t *testing.T) {
 
 func TestTime2(t *testing.T) {
 
-	convey.Convey("Test TestCopy", t, func() {
-		tttt := &Order{
-			OrderId:    "123123",
-			CreateTime: Time(time.Now()),
-			Int64:      Int64(64),
-		}
+	tttt := &Order{
+		OrderId:    "123123",
+		CreateTime: Time(time.Now()),
+		Int64:      Int64(64),
+	}
 
-		t.Log(tttt.CreateTime)
-		t.Log(time.Time(tttt.CreateTime))
-		t.Log(tttt.Int64)
-		t.Log(int64(tttt.Int64))
+	t.Log(tttt.CreateTime)
+	t.Log(time.Time(tttt.CreateTime))
+	t.Log(tttt.Int64)
+	t.Log(int64(tttt.Int64))
 
-		j := `{"OrderId":"123123","CreateTime":"2020-02-09 00:38:47","Int64":"64"}`
+	j := `{"OrderId":"123123","CreateTime":"2020-02-09 00:38:47","Int64":"64"}`
 
-		tt := &Order{}
-		json.FromJson(j, tt)
-		t.Log(tt.CreateTime)
-		t.Log(tt.Int64)
+	tt := &Order{}
+	json.FromJson(j, tt)
+	t.Log(tt.CreateTime)
+	t.Log(tt.Int64)
 
-		convey.So(tt.Int64, convey.ShouldEqual, 64)
+	assert.Equal(t, tt.Int64.ToInt64(), int64(64))
 
-		t.Log(json.ToJsonIgnoreError(tt))
+	t.Log(json.ToJsonIgnoreError(tt))
 
-		ttt := &Order3{
-			OrderId:    tt.OrderId,
-			CreateTime: time.Time(tt.CreateTime),
-			Int64:      64,
-		}
-		str := json.ToJsonIgnoreError(ttt)
-		t.Log(str)
-		tt2 := &Order{}
-		json.FromJson(str, tt2)
-		t.Log(tt2.Int64)
-		str2 := json.ToJsonIgnoreError(tt2)
-		t.Log(str2)
+	ttt := &Order3{
+		OrderId:    tt.OrderId,
+		CreateTime: time.Time(tt.CreateTime),
+		Int64:      64,
+	}
+	str := json.ToJsonIgnoreError(ttt)
+	t.Log(str)
+	tt2 := &Order{}
+	json.FromJson(str, tt2)
+	t.Log(tt2.Int64)
+	str2 := json.ToJsonIgnoreError(tt2)
+	t.Log(str2)
 
-		tt3 := &Order3{}
-		json.FromJson(j, tt3)
-		t.Log(tt3.CreateTime)
-		t.Log(tt3.Int64)
-
-	})
+	tt3 := &Order3{}
+	json.FromJson(j, tt3)
+	t.Log(tt3.CreateTime)
+	t.Log(tt3.Int64)
 
 }
 
@@ -147,29 +142,26 @@ func TestTime_IsNull(t *testing.T) {
 
 func TestInt64(t *testing.T) {
 
-	convey.Convey("Test TestInt64", t, func() {
-		j := `{"OrderId":"123123","Int64": 64,"CreateTime":"2020-02-09 00:38:47"}`
-		tt3 := &Order3{}
-		json.FromJson(j, tt3)
-		t.Log(tt3.CreateTime)
-		t.Log(tt3.Int64)
+	j := `{"OrderId":"123123","Int64": 64,"CreateTime":"2020-02-09 00:38:47"}`
+	tt3 := &Order3{}
+	json.FromJson(j, tt3)
+	t.Log(tt3.CreateTime)
+	t.Log(tt3.Int64)
 
-		order11 := &Order1{}
-		json.FromJson(j, order11)
-		t.Log(order11.CreateTime)
-		t.Log(order11.Int64)
+	order11 := &Order1{}
+	json.FromJson(j, order11)
+	t.Log(order11.CreateTime)
+	t.Log(order11.Int64)
 
-		jj := `{"OrderId":"123123","CreateTime":"2020-02-09 00:38:47","Int64":"64"}`
-		ttt3 := &Order3{}
-		json.FromJson(jj, ttt3)
-		t.Log(ttt3.CreateTime)
-		t.Log(ttt3.Int64)
+	jj := `{"OrderId":"123123","CreateTime":"2020-02-09 00:38:47","Int64":"64"}`
+	ttt3 := &Order3{}
+	json.FromJson(jj, ttt3)
+	t.Log(ttt3.CreateTime)
+	t.Log(ttt3.Int64)
 
-		order12 := &Order1{}
-		json.FromJson(jj, order12)
-		t.Log(order12.CreateTime)
-		t.Log(order12.Int64)
-
-	})
+	order12 := &Order1{}
+	json.FromJson(jj, order12)
+	t.Log(order12.CreateTime)
+	t.Log(order12.Int64)
 
 }

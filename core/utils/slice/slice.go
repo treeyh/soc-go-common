@@ -6,7 +6,9 @@ import (
 	"strings"
 )
 
-//通过map去重slice
+
+
+/// SliceUniqueString 通过map去重slice
 func SliceUniqueString(s []string) []string {
 	size := len(s)
 	if size == 0 {
@@ -29,6 +31,7 @@ func SliceUniqueString(s []string) []string {
 	return ret
 }
 
+/// SliceUniqueInt64 通过map去重slice
 func SliceUniqueInt64(s []int64) []int64 {
 	size := len(s)
 	if size == 0 {
@@ -51,6 +54,7 @@ func SliceUniqueInt64(s []int64) []int64 {
 	return ret
 }
 
+/// EqualString 判断string是否存在数组中
 func EqualString(v string, sl []string) bool {
 	for _, vv := range sl {
 		if vv == v {
@@ -60,6 +64,7 @@ func EqualString(v string, sl []string) bool {
 	return false
 }
 
+/// ContainString 判断string是否包含在数组的string中
 func ContainString(v string, sl []string) bool {
 	for _, vv := range sl {
 		if strings.Contains(v, vv) {
@@ -69,6 +74,7 @@ func ContainString(v string, sl []string) bool {
 	return false
 }
 
+/// ContainIface 判断对象是否存在数组中
 func ContainIface(v interface{}, sl []interface{}) bool {
 	for _, vv := range sl {
 		if vv == v {
@@ -78,6 +84,7 @@ func ContainIface(v interface{}, sl []interface{}) bool {
 	return false
 }
 
+/// Contain 判断对象是否包含在数组的string中
 func Contain(list interface{}, obj interface{}) (bool, errors.AppError) {
 	targetValue := reflect.ValueOf(list)
 	switch reflect.TypeOf(list).Kind() {
@@ -95,8 +102,10 @@ func Contain(list interface{}, obj interface{}) (bool, errors.AppError) {
 		return false, nil
 	}
 	return false, errors.NewAppError(errors.ObjectNotArray)
+
 }
 
+/// ToSlice 对象转list
 func ToSlice(arr interface{}) []interface{} {
 	v := reflect.ValueOf(arr)
 	if v.Kind() == reflect.Ptr {

@@ -1,18 +1,13 @@
 package strs
 
 import (
-	"fmt"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestStr2Bytes(t *testing.T) {
-	str := "abc阳阳1天天23"
-	fmt.Println(Str2Bytes(str))
-	fmt.Println([]byte(str))
+	str := "abcdefg"
 
-	bts := Str2Bytes(str)
-
-	fmt.Println(Bytes2Str(bts))
-	fmt.Println(string(bts))
-
+	assert.Equal(t, Str2Bytes(str), []byte(str), "strs Str2Bytes error.")
+	assert.Equal(t, Bytes2Str(Str2Bytes(str)), str, "strs Bytes2Str error.")
 }

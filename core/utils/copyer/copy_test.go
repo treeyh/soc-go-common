@@ -1,7 +1,7 @@
 package copyer
 
 import (
-	"github.com/smartystreets/goconvey/convey"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -15,15 +15,14 @@ type Destination struct {
 
 func TestCopy(t *testing.T) {
 
-	convey.Convey("Test TestCopy", t, func() {
-		s := &Source{
-			Name: "test",
-		}
-		d := &Destination{}
+	s := &Source{
+		Name: "test",
+	}
+	d := &Destination{}
 
-		ss := &[]*Source{s}
-		dd := &[]*Destination{d}
-		Copy(ss, dd)
-		convey.ShouldEqual("test", (*dd)[0].Name)
-	})
+	ss := &[]*Source{s}
+	dd := &[]*Destination{d}
+	Copy(ss, dd)
+
+	assert.Equal(t,"test", (*dd)[0].Name )
 }

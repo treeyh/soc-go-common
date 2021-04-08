@@ -1,26 +1,22 @@
 package slice
 
 import (
-	"fmt"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestSliceUniqueString(t *testing.T) {
 
-	ss := []string{"aaa", "bbb", "aacc"}
+	ss := []string{"aaa", "bbb", "aacc", "bbb", "ccc"}
 	ss = SliceUniqueString(ss)
-	t.Log(ss)
+	assert.Equal(t, ss, []string{"aaa", "bbb", "aacc", "ccc"}, "SliceUniqueString error.")
 
 	ii := []int64{1, 2, 3, 1}
 	ii = SliceUniqueInt64(ii)
-	t.Log(ii)
+	assert.Equal(t, ii, []int64{1, 2, 3}, "SliceUniqueString error.")
 
-	r := ContainString("aaaaa", ss)
+	r := ContainString("aaaabbbb", ss)
 
-	fmt.Println(r)
-
-	r = ContainString("aaaabbbb", ss)
-
-	fmt.Println(r)
+	assert.True(t, r, "ContainString error.")
 
 }
