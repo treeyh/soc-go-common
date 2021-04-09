@@ -18,15 +18,15 @@ const (
 func getTestRedisConfigMap() map[string]config.RedisConfig {
 	redisConfigs := map[string]config.RedisConfig{
 		_master: config.RedisConfig{
-			Host:     "10.0.42.170",
-			Port:     10201,
-			Password: "tree",
+			Host:     "192.168.1.101",
+			Port:     6379,
+			Password: "",
 			Database: 0,
 		},
 		_node1: config.RedisConfig{
-			Host:     "10.0.42.170",
-			Port:     10201,
-			Password: "tree",
+			Host:     "192.168.1.101",
+			Port:     6379,
+			Password: "",
 			Database: 1,
 		},
 	}
