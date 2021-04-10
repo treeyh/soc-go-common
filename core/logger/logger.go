@@ -31,7 +31,6 @@ var _defaultLogConfig = config.LogConfig{
 	FileSize:         0,
 	FileNum:          0,
 	IsSyncConsoleOut: true,
-	Tag:              "default",
 }
 
 var levelMap = map[string]zapcore.Level{
@@ -80,12 +79,21 @@ func GetErrorField(err error) zap.Field {
 	return zap.String(_logErrorKey, objToString(err))
 }
 
+func (s *AppLogger) addTagField(fields []zap.Field) []zap.Field {
+	for _, field := range fields {
+		if field.Key == _logTagKey {
+			return fields
+		}
+	}
+	return append(fields, zap.String(_logTagKey, s.name))
+}
+
 func (s *AppLogger) Info(msg interface{}, fields ...zap.Field) {
-	s.log.Info(objToString(msg), fields...)
+	s.log.Info(objToString(msg), s.addTagField(fields)...)
 }
 
 func (s *AppLogger) InfoCtx(ctx context.Context, msg interface{}, fields ...zap.Field) {
-	s.log.Info(objToString(msg), append(fields, GetTraceField(ctx))...)
+	s.log.Info(objToString(msg), s.addTagField(append(fields, GetTraceField(ctx)))...)
 }
 
 func (s *AppLogger) Infof(fmtstr string, args ...interface{}) {
@@ -94,19 +102,19 @@ func (s *AppLogger) Infof(fmtstr string, args ...interface{}) {
 }
 
 func (s *AppLogger) Error(msg interface{}, fields ...zap.Field) {
-	s.log.Error(objToString(msg), fields...)
+	s.log.Error(objToString(msg), s.addTagField(fields)...)
 }
 
 func (s *AppLogger) ErrorCtx(ctx context.Context, msg interface{}, fields ...zap.Field) {
-	s.log.Error(objToString(msg), append(fields, GetTraceField(ctx))...)
+	s.log.Error(objToString(msg), s.addTagField(append(fields, GetTraceField(ctx)))...)
 }
 
 func (s *AppLogger) Error2(err error, msg interface{}, fields ...zap.Field) {
-	s.log.Error(objToString(msg), append(fields, GetErrorField(err))...)
+	s.log.Error(objToString(msg), s.addTagField(append(fields, GetErrorField(err)))...)
 }
 
 func (s *AppLogger) ErrorCtx2(ctx context.Context, err error, msg interface{}, fields ...zap.Field) {
-	s.log.Error(objToString(msg), append(fields, GetTraceField(ctx), GetErrorField(err))...)
+	s.log.Error(objToString(msg), s.addTagField(append(fields, GetTraceField(ctx), GetErrorField(err)))...)
 }
 
 func (s *AppLogger) Errorf(fmtstr string, args ...interface{}) {
@@ -115,11 +123,11 @@ func (s *AppLogger) Errorf(fmtstr string, args ...interface{}) {
 }
 
 func (s *AppLogger) Debug(msg interface{}, fields ...zap.Field) {
-	s.log.Debug(objToString(msg), fields...)
+	s.log.Debug(objToString(msg), s.addTagField(fields)...)
 }
 
 func (s *AppLogger) DebugCtx(ctx context.Context, msg interface{}, fields ...zap.Field) {
-	s.log.Debug(objToString(msg), append(fields, GetTraceField(ctx))...)
+	s.log.Debug(objToString(msg), s.addTagField(append(fields, GetTraceField(ctx)))...)
 }
 
 func (s *AppLogger) Debugf(fmtstr string, args ...interface{}) {
@@ -128,11 +136,11 @@ func (s *AppLogger) Debugf(fmtstr string, args ...interface{}) {
 }
 
 func (s *AppLogger) Warn(msg interface{}, fields ...zap.Field) {
-	s.log.Warn(objToString(msg), fields...)
+	s.log.Warn(objToString(msg), s.addTagField(fields)...)
 }
 
 func (s *AppLogger) WarnCtx(ctx context.Context, msg interface{}, fields ...zap.Field) {
-	s.log.Warn(objToString(msg), append(fields, GetTraceField(ctx))...)
+	s.log.Warn(objToString(msg), s.addTagField(append(fields, GetTraceField(ctx)))...)
 }
 
 func (s *AppLogger) Warnf(fmtstr string, args ...interface{}) {
@@ -141,11 +149,11 @@ func (s *AppLogger) Warnf(fmtstr string, args ...interface{}) {
 }
 
 func (s *AppLogger) DPanic(msg interface{}, fields ...zap.Field) {
-	s.log.DPanic(objToString(msg), fields...)
+	s.log.DPanic(objToString(msg), s.addTagField(fields)...)
 }
 
 func (s *AppLogger) DPanicCtx(ctx context.Context, msg interface{}, fields ...zap.Field) {
-	s.log.DPanic(objToString(msg), append(fields, GetTraceField(ctx))...)
+	s.log.DPanic(objToString(msg), s.addTagField(append(fields, GetTraceField(ctx)))...)
 }
 
 func (s *AppLogger) DPanicf(fmtstr string, args ...interface{}) {
@@ -154,11 +162,11 @@ func (s *AppLogger) DPanicf(fmtstr string, args ...interface{}) {
 }
 
 func (s *AppLogger) Panic(msg interface{}, fields ...zap.Field) {
-	s.log.Panic(objToString(msg), fields...)
+	s.log.Panic(objToString(msg), s.addTagField(fields)...)
 }
 
 func (s *AppLogger) PanicCtx(ctx context.Context, msg interface{}, fields ...zap.Field) {
-	s.log.Panic(objToString(msg), append(fields, GetTraceField(ctx))...)
+	s.log.Panic(objToString(msg), s.addTagField(append(fields, GetTraceField(ctx)))...)
 }
 
 func (s *AppLogger) Panicf(fmtstr string, args ...interface{}) {
@@ -167,11 +175,11 @@ func (s *AppLogger) Panicf(fmtstr string, args ...interface{}) {
 }
 
 func (s *AppLogger) Fatal(msg interface{}, fields ...zap.Field) {
-	s.log.Fatal(objToString(msg), fields...)
+	s.log.Fatal(objToString(msg), s.addTagField(fields)...)
 }
 
 func (s *AppLogger) FatalCtx(ctx context.Context, msg interface{}, fields ...zap.Field) {
-	s.log.Fatal(objToString(msg), append(fields, GetTraceField(ctx))...)
+	s.log.Fatal(objToString(msg), s.addTagField(append(fields, GetTraceField(ctx)))...)
 }
 
 func (s *AppLogger) Fatalf(fmtstr string, args ...interface{}) {
@@ -281,13 +289,7 @@ func (s *AppLogger) initLogger() *AppLogger {
 	}
 
 	// 设置初始化字段
-	var logger *zap.Logger
-	if "" != logConfig.Tag {
-		filed := zap.Fields(zap.String(_logTagKey, logConfig.Tag))
-		logger = zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1), filed)
-	} else {
-		logger = zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
-	}
+	var logger = zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
 
 	//s.log = logger.Sugar()
 	s.log = logger
