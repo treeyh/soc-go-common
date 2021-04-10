@@ -4,11 +4,11 @@ go 1.16
 
 require (
 	github.com/aliyun/alibaba-cloud-sdk-go v1.61.973
-	github.com/mediocregopher/radix/v3 v3.7.0 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20210202160940-bed99a852dfe // indirect
 	github.com/jinzhu/gorm v1.9.16
 	github.com/json-iterator/go v1.1.10
 	github.com/mattn/go-sqlite3 v2.0.1+incompatible // indirect
+	github.com/mediocregopher/radix/v3 v3.7.0
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/mozillazg/go-pinyin v0.18.0
 	github.com/opentracing/opentracing-go v1.1.0
