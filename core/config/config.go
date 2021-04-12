@@ -6,7 +6,6 @@ type LogConfig struct {
 	FileSize         int64  `json:"fileSize"`
 	FileNum          int    `json:"fileNum"`
 	IsSyncConsoleOut bool   `json:"isSyncConsoleOut"`
-	Tag              string `json:"tag"`
 }
 
 //redis配置
@@ -64,7 +63,6 @@ type WeChatConfig struct {
 	MessageEncodingType int `json:"messageEncodingType"`
 }
 
-
 // ALiYunConfig 阿里云配置
 type ALiYunConfig struct {
 	// AccessKey 阿里云访问key
@@ -74,4 +72,3 @@ type ALiYunConfig struct {
 	// RegionId 阿里云访问区域
 	RegionId string `json:"regionId"`
 }
-

@@ -12,7 +12,7 @@ import (
 
 const (
 	_master = "master"
-	_node1 = "node1"
+	_node1  = "node1"
 )
 
 func getTestRedisConfigMap() map[string]config.RedisConfig {
@@ -78,7 +78,6 @@ func TestRedisProxy_SetEx(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, v2, "")
 
-
 	err = GetProxy().SetEx(key, val, sleep)
 	assert.NoError(t, err)
 
@@ -86,7 +85,7 @@ func TestRedisProxy_SetEx(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, val, v1)
 
-	GetProxy().Expire(key, 3 + sleep)
+	GetProxy().Expire(key, 3+sleep)
 
 	time.Sleep(time.Duration(sleep+1) * time.Second)
 
@@ -94,7 +93,6 @@ func TestRedisProxy_SetEx(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, v4, val)
 }
-
 
 func TestRedisProxy_Del(t *testing.T) {
 
@@ -140,7 +138,7 @@ func TestRedisProxy_Incrby(t *testing.T) {
 
 	c3, err := GetProxy().Decrby(key, count)
 	assert.NoError(t, err)
-	assert.Equal(t, c3, c2 - count)
+	assert.Equal(t, c3, c2-count)
 
 	c4, err := GetProxy().Get(key)
 	assert.NoError(t, err)
@@ -169,7 +167,7 @@ func TestRedisProxy_Scan(t *testing.T) {
 	}
 
 	index := int64(0)
-	for i := 0; i< 100; i++ {
+	for i := 0; i < 100; i++ {
 		ii, ss, err := GetProxy().Scan(index, "", 10)
 		assert.NoError(t, err)
 		t.Log("index:", ii, ";ss:", ss)
@@ -202,7 +200,6 @@ func TestRedisProxy_TryGetDistributedLock(t *testing.T) {
 	rs2, err := GetProxy().ReleaseDistributedLock(key, val)
 	assert.NoError(t, err)
 	assert.True(t, rs2)
-
 
 	rs3, err := GetProxy().TryGetDistributedLock(key, val)
 	assert.NoError(t, err)
@@ -265,11 +262,8 @@ func TestRedisProxy_SetBit(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, c4, int64(1))
 
-
-
 	GetProxy().Del(key)
 }
-
 
 func TestMGet(t *testing.T) {
 
@@ -299,9 +293,7 @@ func TestMGet(t *testing.T) {
 
 	vv, e := GetProxy().MGet(keys...)
 	fmt.Println(json.ToJsonIgnoreError(vv), e)
-	assert.Equal(t, len(vv), len(keys), "redis Get not equal %d  %d.",len(vv), len(keys))
+	assert.Equal(t, len(vv), len(keys), "redis Get not equal %d  %d.", len(vv), len(keys))
 
 	GetProxy().Del(keys...)
 }
-
-
