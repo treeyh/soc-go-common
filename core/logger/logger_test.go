@@ -19,7 +19,6 @@ func TestInitLogger(t *testing.T) {
 		FileSize:         1024,
 		FileNum:          20,
 		IsSyncConsoleOut: true,
-		Tag:              "aaa",
 	}
 
 	InitLogger(_logDefaultName, &logconfig, true)
