@@ -14,7 +14,7 @@ func LengthUnicode(str string) int {
 	return utf8.RuneCountInString(str)
 }
 
-func ObjectToString(obj interface{}) string {
+func Object2String(obj interface{}) string {
 
 	return fmt.Sprintf("%#v", obj)
 }

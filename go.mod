@@ -4,8 +4,8 @@ go 1.16
 
 require (
 	github.com/aliyun/alibaba-cloud-sdk-go v1.61.973
+	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20210202160940-bed99a852dfe // indirect
-	github.com/jinzhu/gorm v1.9.16
 	github.com/json-iterator/go v1.1.10
 	github.com/mattn/go-sqlite3 v2.0.1+incompatible // indirect
 	github.com/mediocregopher/radix/v3 v3.7.0
@@ -23,4 +23,6 @@ require (
 	golang.org/x/tools v0.1.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
+	gorm.io/driver/mysql v1.0.5 // indirect
+	gorm.io/gorm v1.21.7 // indirect
 )

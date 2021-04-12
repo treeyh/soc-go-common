@@ -1,16 +1,14 @@
 package database
 
 import (
-	"sync"
-	"time"
-
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mssql"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/treeyh/soc-go-common/core/config"
 	"github.com/treeyh/soc-go-common/core/errors"
+	"github.com/treeyh/soc-go-common/core/logger"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	glogger "gorm.io/gorm/logger"
+	"sync"
+	"time"
 )
 
 var (
@@ -18,6 +16,8 @@ var (
 	poolMutex sync.Mutex
 
 	_MasterConfigName = "master"
+
+	log = logger.Logger()
 )
 
 // InitDataSource 初始化db
@@ -31,33 +31,90 @@ func InitDataSource(dbConfigs map[string]config.DBConfig) {
 	}
 }
 
+// getLogLevel 获取日志记录级别
+func getLogLevel(level string) glogger.LogLevel {
+
+	if level == "info" {
+		return glogger.Info
+	} else if level == "warn" {
+		return glogger.Warn
+	} else if level == "error" {
+		return glogger.Error
+	} else if level == "silent" {
+		return glogger.Silent
+	} else {
+		return glogger.Warn
+	}
+}
+
 func initDataSourcePool(name string, config config.DBConfig) errors.AppError {
 
-	maxIdle := 20
+	maxIdle := 15
 	if config.MaxIdleConns > 0 {
 		maxIdle = config.MaxIdleConns
 	}
 
-	maxOpenConns := 50
+	maxOpenConns := 30
 	if config.MaxOpenConns > 0 {
 		maxOpenConns = config.MaxOpenConns
 	}
 
-	connMaxLifetime := time.Duration(3600)
+	connMaxLifetime := time.Duration(3600) * time.Second
 	if config.ConnMaxLifetime > 0 {
-		connMaxLifetime = time.Duration(config.ConnMaxLifetime)
+		connMaxLifetime = time.Duration(config.ConnMaxLifetime) * time.Second
 	}
 
-	db, err := gorm.Open(config.Type, config.DBUrl)
+	slowThreshold := 1000
+	if config.SlowThreshold > 0 {
+		slowThreshold = config.SlowThreshold
+	}
+
+	var glog glogger.Interface
+	if config.LogMode {
+		glog = glogger.New(log, glogger.Config{
+			SlowThreshold: time.Duration(slowThreshold) * time.Millisecond,
+			Colorful:      false,
+			LogLevel:      getLogLevel(config.LogLevel),
+		})
+	}
+
+	gconfig := &gorm.Config{
+		SkipDefaultTransaction:                   false,
+		NamingStrategy:                           nil,
+		FullSaveAssociations:                     false,
+		Logger:                                   glog,
+		NowFunc:                                  nil,
+		DryRun:                                   false,
+		PrepareStmt:                              false,
+		DisableAutomaticPing:                     false,
+		DisableForeignKeyConstraintWhenMigrating: false,
+		DisableNestedTransaction:                 false,
+		AllowGlobalUpdate:                        false,
+		QueryFields:                              false,
+		CreateBatchSize:                          0,
+		ClauseBuilders:                           nil,
+		ConnPool:                                 nil,
+		Dialector:                                nil,
+		Plugins:                                  nil,
+	}
+	// dsn := "gorm:gorm@tcp(localhost:9910)/gorm?charset=utf8&parseTime=True&loc=Local"
+	db, err := gorm.Open(mysql.New(mysql.Config{
+		DSN: config.DbUrl,
+	}), gconfig)
 	if err != nil {
 		panic(" db init fail. name:" + name + ". err:" + err.Error())
 		return errors.NewAppErrorByExistError(errors.DbInitConnFail, err)
 	}
-	db.LogMode(config.LogMode)
 
-	db.DB().SetConnMaxLifetime(connMaxLifetime * time.Second)
-	db.DB().SetMaxIdleConns(maxIdle)
-	db.DB().SetMaxOpenConns(maxOpenConns)
+	sqlDB, err := db.DB()
+	if err != nil {
+		panic(" db get db fail. name:" + name + ". " + err.Error())
+		return errors.NewAppErrorByExistError(errors.DbInitConnFail, err)
+	}
+
+	sqlDB.SetMaxIdleConns(maxIdle)
+	sqlDB.SetMaxOpenConns(maxOpenConns)
+	sqlDB.SetConnMaxIdleTime(connMaxLifetime)
 
 	dbPools[name] = db
 

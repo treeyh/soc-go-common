@@ -75,7 +75,7 @@ func do(ctx context.Context, method string, url string, querys map[string]string
 	}
 
 	if err != nil {
-		log.ErrorCtx(ctx, logmsg+"  error:"+err.Error(), logger.GetTraceField(ctx))
+		log.ErrorCtx(ctx, logmsg+"  error:"+err.Error())
 		return "", 0, errors.NewAppErrorByExistError(errors.HttpCreateRequestFail, err)
 	}
 
@@ -106,15 +106,15 @@ func do(ctx context.Context, method string, url string, querys map[string]string
 
 			injectErr := tracer.(opentracing.Tracer).Inject(span.Context(), opentracing.HTTPHeaders, opentracing.HTTPHeadersCarrier(req.Header))
 			if injectErr != nil {
-				log.ErrorCtx(ctx, "error:"+injectErr.Error(), logger.GetTraceField(ctx))
+				log.ErrorCtx(ctx, "error:"+injectErr.Error())
 			}
 		}
 	}
 
-	log.InfoCtx(ctx, logmsg, logger.GetTraceField(ctx))
+	log.InfoCtx(ctx, logmsg)
 	resp, err := client.Do(req)
 	if err != nil {
-		log.ErrorCtx(ctx, "error:"+err.Error(), logger.GetTraceField(ctx))
+		log.ErrorCtx(ctx, "error:"+err.Error())
 		return "", 0, errors.NewAppErrorByExistError(errors.HttpRequestFail, err)
 	}
 
@@ -126,11 +126,11 @@ func do(ctx context.Context, method string, url string, querys map[string]string
 	}()
 
 	if err != nil {
-		log.ErrorCtx(ctx, "error:"+err.Error(), logger.GetTraceField(ctx))
+		log.ErrorCtx(ctx, "error:"+err.Error())
 		return "", resp.StatusCode, errors.NewAppErrorByExistError(errors.HttpRequestFail, err)
 	}
 	content := string(b)
-	log.InfoCtx(ctx, "result:"+content, logger.GetTraceField(ctx))
+	log.InfoCtx(ctx, "result:"+content)
 
 	return content, resp.StatusCode, nil
 }

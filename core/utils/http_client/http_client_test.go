@@ -14,5 +14,8 @@ func TestGet(t *testing.T) {
 	fmt.Println(statue)
 	fmt.Println(err)
 
+	assert.Equal(t, statue, 200)
+	assert.NoError(t, err)
+
 	assert.True(t, result != "")
 }

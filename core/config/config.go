@@ -24,8 +24,9 @@ type RedisConfig struct {
 
 //数据库配置
 type DBConfig struct {
+	// Type 数据库类型，目前仅支持 mysql
 	Type  string `json:"type"`
-	DBUrl string `json:"dbUrl"`
+	DbUrl string `json:"dbUrl"`
 	// MaxIdleConns 连接池中的最大闲置连接数
 	MaxIdleConns int `json:"maxIdleConns"`
 	// MaxOpenConns 数据库的最大连接数量
@@ -34,6 +35,10 @@ type DBConfig struct {
 	ConnMaxLifetime int `json:"connMaxLifetime"`
 	// LogMode 是否记录日志
 	LogMode bool `json:"logMode"`
+	// SlowThreshold 慢日志记录阈值，毫秒
+	SlowThreshold int `json:"slowThreshold"`
+	// LogLevel 日志级别,类型如下：silent：无日志; error：错误日志; warn：警告日志（默认）; info：info日志
+	LogLevel string `json:"logLevel"`
 }
 
 // TraceConfig trace配置
