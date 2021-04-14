@@ -30,6 +30,10 @@ func (t *Time) IsNull() bool {
 	return !t.IsNotNull()
 }
 
+func (t Time) ToTime() time.Time {
+	return time.Time(t)
+}
+
 func (t *Time) UnmarshalJSON(data []byte) (err error) {
 	//fmt.Println("UnmarshalJSON:", string(data))
 	date := strings.ReplaceAll(string(data), "\"", "")
