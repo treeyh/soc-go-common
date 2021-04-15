@@ -76,6 +76,8 @@ func initDataSourcePool(name string, config config.DBConfig) errors.AppError {
 			Colorful:      false,
 			LogLevel:      getLogLevel(config.LogLevel),
 		})
+	} else {
+		glog = nil
 	}
 
 	gconfig := &gorm.Config{
