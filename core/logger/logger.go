@@ -88,12 +88,6 @@ func GetErrorField(err error) zap.Field {
 //	return append(fields, zap.String(_logTagKey, s.name))
 //}
 
-func (s *AppLogger) Printf(msg string, args ...interface{}) {
-	m := fmt.Sprintf(msg, args...)
-	// 由于必须要记录日志，因此使用error级别
-	s.log.Error(m, zap.String("socLog", "gorm"))
-}
-
 func (s *AppLogger) Info(msg interface{}, fields ...zap.Field) {
 	s.log.Info(obj2String(msg), fields...)
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/treeyh/soc-go-common/core/config"
 	"github.com/treeyh/soc-go-common/core/errors"
 	"github.com/treeyh/soc-go-common/core/logger"
+	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	glogger "gorm.io/gorm/logger"
@@ -71,11 +72,11 @@ func initDataSourcePool(name string, config config.DBConfig) errors.AppError {
 
 	var glog glogger.Interface
 	if config.LogMode {
-		glog = glogger.New(log, glogger.Config{
+		glog = NewLogger(log, glogger.Config{
 			SlowThreshold: time.Duration(slowThreshold) * time.Millisecond,
 			Colorful:      false,
 			LogLevel:      getLogLevel(config.LogLevel),
-		})
+		}, zap.String("socLog", "gorm"))
 	} else {
 		glog = nil
 	}

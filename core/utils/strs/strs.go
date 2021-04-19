@@ -68,8 +68,8 @@ func UrlParse(url string) (string, string) {
 	return host, path
 }
 
-// ParseStr 将interface转成string
-func ParseStr(value interface{}) string {
+// ToString 将interface转成string
+func ToString(value interface{}) string {
 	var key string
 	if value == nil {
 		return key
