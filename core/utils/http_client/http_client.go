@@ -30,20 +30,20 @@ func InitTraceConfig(traceConfig *config.TraceConfig) {
 	tarceConfig = traceConfig
 }
 
-func Get(c context.Context, url string, querys map[string]string) (string, int, errors.AppError) {
-	return do(c, "GET", url, querys, nil, "")
+func Get(c context.Context, url string, querys map[string]string, headers map[string]string) (string, int, errors.AppError) {
+	return do(c, "GET", url, querys, headers, "")
 }
 
-func Post(c context.Context, url string, querys map[string]string, body string) (string, int, errors.AppError) {
-	return do(c, "POST", url, querys, nil, body)
+func Post(c context.Context, url string, querys map[string]string, headers map[string]string, body string) (string, int, errors.AppError) {
+	return do(c, "POST", url, querys, headers, body)
 }
 
-func Put(c context.Context, url string, querys map[string]string, body string) (string, int, errors.AppError) {
-	return do(c, "PUT", url, querys, nil, body)
+func Put(c context.Context, url string, querys map[string]string, headers map[string]string, body string) (string, int, errors.AppError) {
+	return do(c, "PUT", url, querys, headers, body)
 }
 
-func Delete(c context.Context, url string, querys map[string]string, body string) (string, int, errors.AppError) {
-	return do(c, "DELETE", url, querys, nil, body)
+func Delete(c context.Context, url string, querys map[string]string, headers map[string]string, body string) (string, int, errors.AppError) {
+	return do(c, "DELETE", url, querys, headers, body)
 }
 
 func do(ctx context.Context, method string, url string, querys map[string]string, headers map[string]string, body string) (string, int, errors.AppError) {

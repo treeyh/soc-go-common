@@ -8,7 +8,7 @@ import (
 
 func TestGet(t *testing.T) {
 
-	result, statue, err := Get(nil, "http://www.baidu.com", nil)
+	result, statue, err := Get(nil, "http://www.baidu.com", nil, nil)
 
 	fmt.Println(result)
 	fmt.Println(statue)
