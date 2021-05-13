@@ -56,7 +56,7 @@ func (wcp *WechatProxy) getAccessToken(ctx context.Context) (*WechatAccessTokenR
 	params["secret"] = wcp.wechatConfig.AppSecret
 	params["grant_type"] = "client_credential"
 
-	result, status, err := http_client.Get(ctx, url, params)
+	result, status, err := http_client.Get(ctx, url, params, nil)
 	if err != nil {
 		return nil, errors.NewAppErrorByExistError(errors.WechatRequestFail, err)
 	}
@@ -93,7 +93,7 @@ func (wcp *WechatProxy) getJson(ctx context.Context, url string, params map[stri
 	hasRetried := false
 RETRY:
 
-	str, httpStatus, err := http_client.Get(ctx, url, params)
+	str, httpStatus, err := http_client.Get(ctx, url, params, nil)
 	if err != nil {
 		return err
 	}
@@ -146,7 +146,7 @@ func (wcp *WechatProxy) postJson(ctx context.Context, url string, params map[str
 	hasRetried := false
 RETRY:
 
-	str, httpStatus, err := http_client.Post(ctx, url, params, body)
+	str, httpStatus, err := http_client.Post(ctx, url, params, nil, body)
 	if err != nil {
 		return err
 	}
