@@ -31,6 +31,8 @@ func CopyList(ctx context.Context, src interface{}, target interface{}) errors.A
 		if reflect.ValueOf(src).Len() <= 0 {
 			return nil
 		}
+	} else {
+		return nil
 	}
 	jsonStr, err := json.ToJson(src)
 	if err != nil {
