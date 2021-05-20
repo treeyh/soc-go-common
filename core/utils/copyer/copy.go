@@ -39,7 +39,6 @@ func CopyList(ctx context.Context, src interface{}, target interface{}) errors.A
 		logger.Logger().ErrorCtx(ctx, err)
 		return errors.NewAppError(errors.ObjectCopyFail)
 	}
-	print(jsonStr)
 	err = json.FromJson(jsonStr, target)
 	if err != nil {
 		logger.Logger().ErrorCtx(ctx, err)
