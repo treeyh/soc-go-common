@@ -1,6 +1,9 @@
 package json
 
 import (
+	"context"
+	"github.com/treeyh/soc-go-common/core/errors"
+	"github.com/treeyh/soc-go-common/core/logger"
 	"time"
 	"unsafe"
 
@@ -15,6 +18,7 @@ type TimeEncoder struct {
 }
 
 var loc, _ = time.LoadLocation("Local")
+var log = logger.Logger()
 
 func (td *TimeDecoder) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
 	str := iter.ReadString()
@@ -59,10 +63,19 @@ func init() {
 	jsonextra.RegisterFuzzyDecoders()
 }
 
-func ToJson(obj interface{}) (string, error) {
+func ToJson(obj interface{}) (string, errors.AppError) {
 	bs, err := json.Marshal(obj)
 	if err != nil {
-		return "", err
+		return "", errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
+	}
+	return string(bs), nil
+}
+
+func ToJsonCtx(ctx context.Context, obj interface{}) (string, errors.AppError) {
+	bs, err := json.Marshal(obj)
+	if err != nil {
+		log.ErrorCtx2(ctx, err, "json encode fail.")
+		return "", errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 	}
 	return string(bs), nil
 }
@@ -72,10 +85,19 @@ func ToJsonIgnoreError(obj interface{}) string {
 	return jstr
 }
 
-func FromJson(jsonStr string, obj interface{}) error {
+func FromJson(jsonStr string, obj interface{}) errors.AppError {
 	err := json.Unmarshal([]byte(jsonStr), obj)
 	if err != nil {
-		return err
+		return errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
+	}
+	return nil
+}
+
+func FromJsonCtx(ctx context.Context, jsonStr string, obj interface{}) errors.AppError {
+	err := json.Unmarshal([]byte(jsonStr), obj)
+	if err != nil {
+		log.ErrorCtx2(ctx, err, "json decode fail.")
+		return errors.NewAppErrorByExistError(errors.RedisOperationFail, err)
 	}
 	return nil
 }

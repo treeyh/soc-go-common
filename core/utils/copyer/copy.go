@@ -16,12 +16,12 @@ func Copy(ctx context.Context, src interface{}, target interface{}) errors.AppEr
 	jsonStr, err := json.ToJson(src)
 	if err != nil {
 		logger.Logger().ErrorCtx(ctx, err)
-		return errors.NewAppError(errors.ObjectCopyFail)
+		return errors.NewAppErrorByExistError(errors.ObjectCopyFail, err)
 	}
 	err = json.FromJson(jsonStr, target)
 	if err != nil {
 		logger.Logger().ErrorCtx(ctx, err)
-		return errors.NewAppError(errors.ObjectCopyFail)
+		return errors.NewAppErrorByExistError(errors.ObjectCopyFail, err)
 	}
 	return nil
 }
@@ -37,12 +37,12 @@ func CopyList(ctx context.Context, src interface{}, target interface{}) errors.A
 	jsonStr, err := json.ToJson(src)
 	if err != nil {
 		logger.Logger().ErrorCtx(ctx, err)
-		return errors.NewAppError(errors.ObjectCopyFail)
+		return errors.NewAppErrorByExistError(errors.ObjectCopyFail, err)
 	}
 	err = json.FromJson(jsonStr, target)
 	if err != nil {
 		logger.Logger().ErrorCtx(ctx, err)
-		return errors.NewAppError(errors.ObjectCopyFail)
+		return errors.NewAppErrorByExistError(errors.ObjectCopyFail, err)
 	}
 	return nil
 }
