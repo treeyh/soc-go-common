@@ -1,6 +1,7 @@
 package types
 
 import (
+	"context"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"github.com/treeyh/soc-go-common/core/utils/copyer"
@@ -50,7 +51,7 @@ func TestUnixTime_MarshalJSON(t *testing.T) {
 	t.Log(order1.Int64)
 
 	order2 := &Order1{}
-	copyer.Copy(&order, order2)
+	copyer.Copy(context.Background(), &order, order2)
 	//
 	t.Log(order2.CreateTime)
 	assert.Equal(t, order2.Int64.ToInt64(), int64(64))
@@ -119,7 +120,7 @@ func TestTime0(t *testing.T) {
 	fmt.Println(time.Now())
 	var s time.Time
 	//var o Time = time.Now()
-	fmt.Println(copyer.Copy(Time(time.Now()), s))
+	fmt.Println(copyer.Copy(context.Background(), Time(time.Now()), s))
 	fmt.Println(s)
 	fmt.Println(time.Now().UTC())
 	a, _ := time.Parse(consts.AppTimeFormat, time.Now().Format(consts.AppTimeFormat))
