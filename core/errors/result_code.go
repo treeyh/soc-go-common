@@ -114,6 +114,12 @@ var (
 	// RedisLockGetFail 获取redis锁失败
 	RedisLockGetFail = NewResultCode(100105, "获取redis锁失败")
 
+	// SkyWalkingNotInit SkyWalking未初始化
+	SkyWalkingNotInit = NewResultCode(100151, "SkyWalking未初始化")
+
+	// SkyWalkingSpanNotInit SkyWalking span 未初始化
+	SkyWalkingSpanNotInit = NewResultCode(100152, "SkyWalking span 未初始化")
+
 	// WechatOperationError 微信操作错误
 	WechatOperationError = NewResultCode(100201, "%s 微信操作错误")
 

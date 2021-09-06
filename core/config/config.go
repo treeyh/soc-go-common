@@ -8,7 +8,7 @@ type LogConfig struct {
 	IsSyncConsoleOut bool   `json:"isSyncConsoleOut"`
 }
 
-//redis配置
+// RedisConfig redis配置
 type RedisConfig struct {
 	Host           string `json:"host"`
 	Port           int    `json:"port"`
@@ -22,7 +22,7 @@ type RedisConfig struct {
 	WriteTimeout   int    `json:"writeTimeout"`
 }
 
-//数据库配置
+// DBConfig 数据库配置
 type DBConfig struct {
 	// Type 数据库类型，目前仅支持 mysql
 	Type  string `json:"type"`
@@ -45,6 +45,10 @@ type DBConfig struct {
 type TraceConfig struct {
 	// Enable 是否开启
 	Enable bool `json:"enable"`
+	// Type 类型，仅支持 SkyWalking
+	Type string `json:"type"`
+	// Namespace 命名空间，默认为空，有值的话会加到header头的key前缀传递，如：sw8变为{namespace}-sw8
+	Namespace string `json:"namespace"`
 	// Server 服务地址
 	Server string `json:"server"`
 }

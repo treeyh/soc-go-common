@@ -1,15 +1,18 @@
 package consts
 
 import (
+	"github.com/SkyAPM/go2sky"
 	"os"
 	"time"
 )
 
-//默认空时间
+// 默认空时间
+
 const BlankTime = "1970-01-01 00:00:00"
 const BlankDate = "1970-01-01"
 
 //全局日期格式
+
 const AppDateFormat = "2006-01-02"
 const AppDateFormat2 = "20060102"
 const AppMonthFormat = "200601"
@@ -20,7 +23,7 @@ const AppSystemTimeFormat8 = "2006-01-02T15:04:05+08:00"
 
 var BlankTimeObject, _ = time.Parse(AppTimeFormat, BlankTime)
 
-//默认空字符串
+// BlankString 默认空字符串
 const BlankString = ""
 
 // linux操作系统
@@ -71,7 +74,7 @@ var _env = ""
 // GetCurrentEnv 获取当前环境值
 func GetCurrentEnv() string {
 	if _env == "" {
-		_env := os.Getenv(EvnSocRunName)
+		_env = os.Getenv(EvnSocRunName)
 		if "" == _env {
 			_env = EnvLocal
 		}
@@ -97,3 +100,28 @@ const (
 	// EmptyStr 空字符串
 	EmptyStr = ""
 )
+
+var (
+	_tracer *go2sky.Tracer
+	_report go2sky.Reporter
+)
+
+// SetTracer 设置 skywalking tracer对象
+func SetTracer(tracer *go2sky.Tracer) {
+	_tracer = tracer
+}
+
+// GetTracer 返回 skywalking tracer对象
+func GetTracer() *go2sky.Tracer {
+	return _tracer
+}
+
+// SetReporter 设置 skywalking report 对象
+func SetReporter(report go2sky.Reporter) {
+	_report = report
+}
+
+// GetReporter 返回 skywalking report 对象
+func GetReporter() go2sky.Reporter {
+	return _report
+}

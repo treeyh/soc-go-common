@@ -3,8 +3,7 @@ package http_client
 import (
 	"context"
 	"crypto/tls"
-	"github.com/opentracing/opentracing-go"
-	"github.com/opentracing/opentracing-go/ext"
+	"github.com/SkyAPM/go2sky"
 	"github.com/treeyh/soc-go-common/core/config"
 	"github.com/treeyh/soc-go-common/core/consts"
 	"github.com/treeyh/soc-go-common/core/errors"
@@ -12,6 +11,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	neturl "net/url"
+	v3 "skywalking.apache.org/repo/goapi/collect/language/agent/v3"
 	"strings"
 	"time"
 )
@@ -19,15 +19,17 @@ import (
 const timeOutSecond = 3
 
 var (
-	tarceConfig = &config.TraceConfig{
-		Enable: false,
-		Server: "",
+	_traceConfig = &config.TraceConfig{
+		Enable:    false,
+		Type:      "skywalking",
+		Namespace: "",
+		Server:    "",
 	}
 	log = logger.Logger()
 )
 
 func InitTraceConfig(traceConfig *config.TraceConfig) {
-	tarceConfig = traceConfig
+	_traceConfig = traceConfig
 }
 
 func Get(c context.Context, url string, querys map[string]string, headers map[string]string) (string, int, errors.AppError) {
@@ -73,7 +75,6 @@ func do(ctx context.Context, method string, url string, querys map[string]string
 	} else {
 		req, err = http.NewRequest(method, reqUrl, nil)
 	}
-
 	if err != nil {
 		log.ErrorCtx(ctx, logmsg+"  error:"+err.Error())
 		return "", 0, errors.NewAppErrorByExistError(errors.HttpCreateRequestFail, err)
@@ -89,26 +90,27 @@ func do(ctx context.Context, method string, url string, querys map[string]string
 		logmsg += header
 	}
 
-	if tarceConfig.Enable && ctx != nil {
-
-		tracer := ctx.Value(consts.TracerContextKey)
-		parentSpanContext := ctx.Value(consts.TraceParentSpanContextKey)
-
-		if tracer != nil && parentSpanContext != nil {
-			span := opentracing.StartSpan(
-				"call Http "+method,
-				opentracing.ChildOf(parentSpanContext.(opentracing.SpanContext)),
-				opentracing.Tag{Key: string(ext.Component), Value: "HTTP"},
-				ext.SpanKindRPCClient,
-			)
-
-			span.Finish()
-
-			injectErr := tracer.(opentracing.Tracer).Inject(span.Context(), opentracing.HTTPHeaders, opentracing.HTTPHeadersCarrier(req.Header))
-			if injectErr != nil {
-				log.ErrorCtx(ctx, "error:"+injectErr.Error())
+	var reqSpan go2sky.Span
+	if consts.GetTracer() != nil {
+		/// 设置 skywalking span
+		reqSpan, err = consts.GetTracer().CreateExitSpan(ctx, url, url, func(headerKey, headerValue string) error {
+			key := headerKey
+			if _traceConfig.Namespace != "" {
+				key = _traceConfig.Namespace + "-" + key
 			}
+			logmsg += key + "=" + headerValue + " "
+			req.Header.Set(key, headerValue)
+			return nil
+		})
+		if err != nil {
+			log.ErrorCtx2(ctx, err, errors.SkyWalkingSpanNotInit.Error()+" url:"+url)
+			return "", 0, errors.NewAppErrorByExistError(errors.SkyWalkingSpanNotInit, err)
 		}
+		reqSpan.SetComponent(2)
+		reqSpan.SetSpanLayer(v3.SpanLayer_Http)
+
+		reqSpan.Tag(go2sky.TagHTTPMethod, method)
+		reqSpan.Tag(go2sky.TagURL, url)
 	}
 
 	log.InfoCtx(ctx, logmsg)
@@ -116,6 +118,9 @@ func do(ctx context.Context, method string, url string, querys map[string]string
 	if err != nil {
 		log.ErrorCtx(ctx, "error:"+err.Error())
 		return "", 0, errors.NewAppErrorByExistError(errors.HttpRequestFail, err)
+	}
+	if reqSpan != nil {
+		reqSpan.End()
 	}
 
 	b, err := ioutil.ReadAll(resp.Body)
