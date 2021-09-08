@@ -4,6 +4,7 @@ import (
 	"github.com/treeyh/soc-go-common/core/config"
 	"github.com/treeyh/soc-go-common/core/errors"
 	"github.com/treeyh/soc-go-common/core/logger"
+	"github.com/treeyh/soc-go-common/library/tracing"
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -118,6 +119,8 @@ func initDataSourcePool(name string, config config.DBConfig) errors.AppError {
 	sqlDB.SetMaxIdleConns(maxIdle)
 	sqlDB.SetMaxOpenConns(maxOpenConns)
 	sqlDB.SetConnMaxIdleTime(connMaxLifetime)
+
+	db.Use(NewSkyWalkingPlugin(WithTracer(tracing.GetTracer())))
 
 	dbPools[name] = db
 
