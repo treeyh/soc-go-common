@@ -8,6 +8,13 @@ import (
 	"github.com/treeyh/soc-go-common/core/logger"
 )
 
+const (
+	HttpComponent int32 = 2
+
+	GormComponent  int32 = 700001
+	RadixComponent int32 = 700002
+)
+
 var (
 	log    = logger.Logger()
 	tracer *go2sky.Tracer

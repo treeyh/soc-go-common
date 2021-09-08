@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"context"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"github.com/treeyh/soc-go-common/core/config"
@@ -40,18 +41,18 @@ func TestGetProxy(t *testing.T) {
 
 	key := "test:cache"
 	val := "2222"
-	err := GetProxy().SetEx(key, val, 60)
+	err := GetProxy().SetEx(context.Background(), key, val, 60)
 	assert.NoError(t, err, "redis SetEx error not nil %+v", err)
-	v, e := GetProxy().Get(key)
+	v, e := GetProxy().Get(context.Background(), key)
 	fmt.Println(v, e)
 	assert.Equal(t, v, val, "redis Get not equal %s  %s.", v, val)
 
 	val = "333"
-	err = GetProxyByName(_node1).SetEx(key, val, 60)
+	err = GetProxyByName(_node1).SetEx(context.Background(), key, val, 60)
 
 	assert.NoError(t, err, "redis SetEx error not nil")
 
-	v, e = GetProxyByName(_node1).Get(key)
+	v, e = GetProxyByName(_node1).Get(context.Background(), key)
 	fmt.Println(v, e)
 
 	assert.Equal(t, v, val, "redis Get not equal %s  %s.", v, val)
@@ -65,31 +66,31 @@ func TestRedisProxy_SetEx(t *testing.T) {
 	val := "a"
 	sleep := 2
 
-	err := GetProxy().SetEx(key, val, sleep)
+	err := GetProxy().SetEx(context.Background(), key, val, sleep)
 	assert.NoError(t, err)
 
-	v, err := GetProxy().Get(key)
+	v, err := GetProxy().Get(context.Background(), key)
 	assert.NoError(t, err)
 	assert.Equal(t, val, v)
 
 	time.Sleep(time.Duration(sleep+1) * time.Second)
 
-	v2, err := GetProxy().Get(key)
+	v2, err := GetProxy().Get(context.Background(), key)
 	assert.NoError(t, err)
 	assert.Equal(t, v2, "")
 
-	err = GetProxy().SetEx(key, val, sleep)
+	err = GetProxy().SetEx(context.Background(), key, val, sleep)
 	assert.NoError(t, err)
 
-	v1, err := GetProxy().Get(key)
+	v1, err := GetProxy().Get(context.Background(), key)
 	assert.NoError(t, err)
 	assert.Equal(t, val, v1)
 
-	GetProxy().Expire(key, 3+sleep)
+	GetProxy().Expire(context.Background(), key, 3+sleep)
 
 	time.Sleep(time.Duration(sleep+1) * time.Second)
 
-	v4, err := GetProxy().Get(key)
+	v4, err := GetProxy().Get(context.Background(), key)
 	assert.NoError(t, err)
 	assert.Equal(t, v4, val)
 }
@@ -103,18 +104,18 @@ func TestRedisProxy_Del(t *testing.T) {
 		key := fmt.Sprintf("test:TestRedisProxy_Del_%d", i)
 		val := "a"
 
-		err := GetProxy().Set(key, val)
+		err := GetProxy().Set(context.Background(), key, val)
 		assert.NoError(t, err)
 
-		v, err := GetProxy().Get(key)
+		v, err := GetProxy().Get(context.Background(), key)
 		assert.NoError(t, err)
 		assert.Equal(t, val, v)
 
-		count, err := GetProxy().Del(key)
+		count, err := GetProxy().Del(context.Background(), key)
 		assert.NoError(t, err)
 		assert.Equal(t, count, 1)
 
-		v2, err := GetProxy().Get(key)
+		v2, err := GetProxy().Get(context.Background(), key)
 		assert.NoError(t, err)
 		assert.Equal(t, v2, "")
 	}
@@ -128,27 +129,27 @@ func TestRedisProxy_Incrby(t *testing.T) {
 
 	count := int64(100)
 
-	c1, err := GetProxy().Incrby(key, count)
+	c1, err := GetProxy().Incrby(context.Background(), key, count)
 	assert.NoError(t, err)
 	assert.Equal(t, c1, count)
 
-	c2, err := GetProxy().Incrby(key, count)
+	c2, err := GetProxy().Incrby(context.Background(), key, count)
 	assert.NoError(t, err)
 	assert.Equal(t, c2, count+c1)
 
-	c3, err := GetProxy().Decrby(key, count)
+	c3, err := GetProxy().Decrby(context.Background(), key, count)
 	assert.NoError(t, err)
 	assert.Equal(t, c3, c2-count)
 
-	c4, err := GetProxy().Get(key)
+	c4, err := GetProxy().Get(context.Background(), key)
 	assert.NoError(t, err)
 	assert.Equal(t, c4, strconv.FormatInt(c3, 10))
 
-	c5, err := GetProxy().Exist(key)
+	c5, err := GetProxy().Exist(context.Background(), key)
 	assert.NoError(t, err)
 	assert.True(t, c5)
 
-	c, err := GetProxy().Del(key)
+	c, err := GetProxy().Del(context.Background(), key)
 	assert.NoError(t, err)
 	assert.Equal(t, c, 1)
 }
@@ -162,13 +163,13 @@ func TestRedisProxy_Scan(t *testing.T) {
 		key := fmt.Sprintf("test:TestRedisProxy_Scan_%d", i)
 		val := "a"
 
-		err := GetProxy().Set(key, val)
+		err := GetProxy().Set(context.Background(), key, val)
 		assert.NoError(t, err)
 	}
 
 	index := int64(0)
 	for i := 0; i < 100; i++ {
-		ii, ss, err := GetProxy().Scan(index, "", 10)
+		ii, ss, err := GetProxy().Scan(context.Background(), index, "", 10)
 		assert.NoError(t, err)
 		t.Log("index:", ii, ";ss:", ss)
 		index = ii
@@ -182,7 +183,7 @@ func TestRedisProxy_Scan(t *testing.T) {
 		key := fmt.Sprintf("test:TestRedisProxy_Scan_%d", i)
 		val := "a"
 
-		err := GetProxy().Set(key, val)
+		err := GetProxy().Set(context.Background(), key, val)
 		assert.NoError(t, err)
 	}
 }
@@ -193,22 +194,22 @@ func TestRedisProxy_TryGetDistributedLock(t *testing.T) {
 
 	key := "test:TestRedisProxy_TryGetDistributedLock"
 	val := "a"
-	rs, err := GetProxy().TryGetDistributedLock(key, val)
+	rs, err := GetProxy().TryGetDistributedLock(context.Background(), key, val)
 	assert.NoError(t, err)
 	assert.True(t, rs)
 
-	rs2, err := GetProxy().ReleaseDistributedLock(key, val)
+	rs2, err := GetProxy().ReleaseDistributedLock(context.Background(), key, val)
 	assert.NoError(t, err)
 	assert.True(t, rs2)
 
-	rs3, err := GetProxy().TryGetDistributedLock(key, val)
+	rs3, err := GetProxy().TryGetDistributedLock(context.Background(), key, val)
 	assert.NoError(t, err)
 	assert.True(t, rs3)
 
-	err = GetProxy().SetEx(key, "b", 10)
+	err = GetProxy().SetEx(context.Background(), key, "b", 10)
 	assert.NoError(t, err)
 
-	rs4, err := GetProxy().ReleaseDistributedLock(key, val)
+	rs4, err := GetProxy().ReleaseDistributedLock(context.Background(), key, val)
 	assert.NoError(t, err)
 	assert.False(t, rs4)
 
@@ -225,16 +226,16 @@ func TestRedisProxy_HMGet(t *testing.T) {
 		"c": "3",
 	}
 
-	err := GetProxy().HMSet(key, sm)
+	err := GetProxy().HMSet(context.Background(), key, sm)
 	assert.NoError(t, err)
 
-	sm2, err := GetProxy().HMGet(key, "a", "b", "c")
+	sm2, err := GetProxy().HMGet(context.Background(), key, "a", "b", "c")
 	assert.NoError(t, err)
 	assert.Equal(t, sm["a"], sm2["a"])
 	assert.Equal(t, sm["b"], sm2["b"])
 	assert.Equal(t, sm["c"], sm2["c"])
 
-	GetProxy().Del(key)
+	GetProxy().Del(context.Background(), key)
 }
 
 func TestRedisProxy_SetBit(t *testing.T) {
@@ -243,26 +244,26 @@ func TestRedisProxy_SetBit(t *testing.T) {
 
 	key := "test:TestRedisProxy_SetBit"
 
-	err := GetProxy().SetBit(key, 0, 1, 10)
+	err := GetProxy().SetBit(context.Background(), key, 0, 1, 10)
 	assert.NoError(t, err)
 
-	c, err := GetProxy().GetBit(key, 0)
+	c, err := GetProxy().GetBit(context.Background(), key, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, c, 1)
 
-	c2, err := GetProxy().GetBit(key, 4)
+	c2, err := GetProxy().GetBit(context.Background(), key, 4)
 	assert.NoError(t, err)
 	assert.Equal(t, c2, 0)
 
-	c3, err := GetProxy().BitCount(key)
+	c3, err := GetProxy().BitCount(context.Background(), key)
 	assert.NoError(t, err)
 	assert.Equal(t, c3, 1)
 
-	c4, err := GetProxy().BitFieldGetU(key, 1, 0)
+	c4, err := GetProxy().BitFieldGetU(context.Background(), key, 1, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, c4, int64(1))
 
-	GetProxy().Del(key)
+	GetProxy().Del(context.Background(), key)
 }
 
 func TestMGet(t *testing.T) {
@@ -274,14 +275,14 @@ func TestMGet(t *testing.T) {
 		"test:bbb": "bbb",
 		"test:ccc": "ccc",
 	}
-	err := GetProxy().MSet(kvs)
+	err := GetProxy().MSet(context.Background(), kvs)
 	fmt.Println(err)
 
-	v, e := GetProxy().Get("test:bbb")
+	v, e := GetProxy().Get(context.Background(), "test:bbb")
 	fmt.Println(v, e)
 
 	assert.Equal(t, v, "bbb", "redis Get not equal %s  %s.", v, "bbb")
-	v, e = GetProxy().Get("test:aaa")
+	v, e = GetProxy().Get(context.Background(), "test:aaa")
 	fmt.Println(v, e)
 	assert.Equal(t, v, "aaa", "redis Get not equal %s  %s.", v, "aaa")
 
@@ -291,9 +292,9 @@ func TestMGet(t *testing.T) {
 	keys[2] = "test:bbb"
 	keys[3] = "test:ccc"
 
-	vv, e := GetProxy().MGet(keys...)
+	vv, e := GetProxy().MGet(context.Background(), keys...)
 	fmt.Println(json.ToJsonIgnoreError(vv), e)
 	assert.Equal(t, len(vv), len(keys), "redis Get not equal %d  %d.", len(vv), len(keys))
 
-	GetProxy().Del(keys...)
+	GetProxy().Del(context.Background(), keys...)
 }

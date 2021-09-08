@@ -9,6 +9,7 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	glogger "gorm.io/gorm/logger"
+	"strings"
 	"sync"
 	"time"
 )
@@ -120,7 +121,17 @@ func initDataSourcePool(name string, config config.DBConfig) errors.AppError {
 	sqlDB.SetMaxOpenConns(maxOpenConns)
 	sqlDB.SetConnMaxIdleTime(connMaxLifetime)
 
-	db.Use(NewSkyWalkingPlugin(WithTracer(tracing.GetTracer())))
+	// 截取 db url : user:password@tcp(host:3306)/dbName?charset=utf8mb4&parseTime=True&loc=Asia%2FShanghai
+	addr := ""
+	addrs := strings.Split(config.DbUrl, "@")
+	if len(addrs) > 1 {
+		addrs = strings.Split(addrs[1], "?")
+		if len(addrs) > 1 {
+			addr = addrs[0]
+		}
+	}
+
+	db.Use(NewSkyWalkingPlugin(WithTracer(tracing.GetTracer()), WithUrl(addr)))
 
 	dbPools[name] = db
 

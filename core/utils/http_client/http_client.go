@@ -5,9 +5,9 @@ import (
 	"crypto/tls"
 	"github.com/SkyAPM/go2sky"
 	"github.com/treeyh/soc-go-common/core/config"
-	"github.com/treeyh/soc-go-common/core/consts"
 	"github.com/treeyh/soc-go-common/core/errors"
 	"github.com/treeyh/soc-go-common/core/logger"
+	"github.com/treeyh/soc-go-common/library/tracing"
 	"io/ioutil"
 	"net/http"
 	neturl "net/url"
@@ -91,9 +91,9 @@ func do(ctx context.Context, method string, url string, querys map[string]string
 	}
 
 	var reqSpan go2sky.Span
-	if consts.GetTracer() != nil {
+	if tracing.GetTracer() != nil {
 		/// 设置 skywalking span
-		reqSpan, err = consts.GetTracer().CreateExitSpan(ctx, url, url, func(headerKey, headerValue string) error {
+		reqSpan, err = tracing.GetTracer().CreateExitSpan(ctx, url, url, func(headerKey, headerValue string) error {
 			key := headerKey
 			if _traceConfig.Namespace != "" {
 				key = _traceConfig.Namespace + "-" + key
@@ -106,7 +106,7 @@ func do(ctx context.Context, method string, url string, querys map[string]string
 			log.ErrorCtx2(ctx, err, errors.SkyWalkingSpanNotInit.Error()+" url:"+url)
 			return "", 0, errors.NewAppErrorByExistError(errors.SkyWalkingSpanNotInit, err)
 		}
-		reqSpan.SetComponent(2)
+		reqSpan.SetComponent(tracing.HttpComponent)
 		reqSpan.SetSpanLayer(v3.SpanLayer_Http)
 
 		reqSpan.Tag(go2sky.TagHTTPMethod, method)

@@ -20,7 +20,7 @@ type ResultCode struct {
 }
 
 // https://github.com/pkg/errors/blob/master/errors.go
-// Application Error interface
+// AppError Application Error interface
 type AppError interface {
 	Error() string
 
@@ -30,9 +30,6 @@ type AppError interface {
 
 	GetError() error
 }
-
-
-
 
 func Wrap(err AppError, resultCode ResultCode) AppError {
 	if err == nil {

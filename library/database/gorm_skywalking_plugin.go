@@ -6,6 +6,7 @@ import (
 	"github.com/SkyAPM/go2sky"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/treeyh/soc-go-common/core/errors"
+	"github.com/treeyh/soc-go-common/library/tracing"
 	"gorm.io/gorm"
 	v3 "skywalking.apache.org/repo/goapi/collect/language/agent/v3"
 	"strconv"
@@ -94,14 +95,14 @@ func (p skyWalkingPlugin) injectBefore(db *gorm.DB, op operationName) {
 		return
 	}
 
-	dbSpan, err := p.opt.tracer.CreateExitSpan(db.Statement.Context, op.String(), db.Statement.DB.Name(), func(key, value string) error {
+	dbSpan, err := p.opt.tracer.CreateExitSpan(db.Statement.Context, p.opt.url, op.String(), func(key, value string) error {
 		return nil
 	})
 	if err != nil {
 		db.Logger.Error(context.TODO(), errors.SkyWalkingSpanNotInit.Error()+"; op:"+op.String()+"; err:"+err.Error())
 		return
 	}
-	dbSpan.SetComponent(2)
+	dbSpan.SetComponent(tracing.GormComponent)
 	dbSpan.SetSpanLayer(v3.SpanLayer_Database)
 
 	db.InstanceSet(skyWalkingSpanKey, dbSpan)
@@ -143,6 +144,8 @@ type options struct {
 	// tracer allows users to use customized and different tracer to makes tracing clearly.
 	tracer *go2sky.Tracer
 
+	url string
+
 	// Whether to log statement parameters or leave placeholders in the queries.
 	logSqlParameters bool
 
@@ -155,6 +158,7 @@ func defaultOption() *options {
 		logResult:        false,
 		tracer:           nil,
 		logSqlParameters: true,
+		url:              "mysql",
 		errorTagHook:     defaultErrorTagHook,
 	}
 }
@@ -176,6 +180,17 @@ func WithTracer(tracer *go2sky.Tracer) applyOption {
 		}
 
 		o.tracer = tracer
+	}
+}
+
+// WithUrl allows to use customized tracer rather than the global one only.
+func WithUrl(url string) applyOption {
+	return func(o *options) {
+		if url == "" {
+			return
+		}
+
+		o.url = url
 	}
 }
 

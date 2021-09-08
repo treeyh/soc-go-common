@@ -5,7 +5,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/treeyh/soc-go-common/core/config"
 	"github.com/treeyh/soc-go-common/core/utils/file"
-	"github.com/treeyh/soc-go-common/core/utils/json"
+	soc_json "github.com/treeyh/soc-go-common/core/utils/json"
 	"path"
 	"strconv"
 	"testing"
@@ -71,7 +71,7 @@ func initDb() {
 	dbJson, _ := file.ReadSmallFile(path.Join(file.GetCurrentPath(), "..", "..", "tests", "database.log"))
 
 	dbConfig := &config.DBConfig{}
-	err := json.FromJson(*dbJson, dbConfig)
+	err := soc_json.FromJson(*dbJson, dbConfig)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -104,7 +104,7 @@ func TestGetDB(t *testing.T) {
 
 	assert.NoError(t, err)
 
-	fmt.Println(json.ToJsonIgnoreError(studentPo))
+	fmt.Println(soc_json.ToJsonIgnoreError(studentPo))
 
 	var studentPo2 StudentPo
 	row := GetDb().Where("id = ?", now).Where("del_flag = ?", 2).First(&studentPo2).RowsAffected

@@ -2,8 +2,10 @@ package redis
 
 import (
 	"fmt"
+	"github.com/SkyAPM/go2sky"
 	"github.com/mediocregopher/radix/v3"
 	"github.com/treeyh/soc-go-common/core/errors"
+	"github.com/treeyh/soc-go-common/library/tracing"
 	"strconv"
 	"sync"
 	"time"
@@ -11,11 +13,17 @@ import (
 	"github.com/treeyh/soc-go-common/core/config"
 )
 
-
 var (
-	redisPools = make(map[string]*radix.Pool)
+	redisPools = make(map[string]*redisPool)
 	poolMutex  sync.Mutex
 )
+
+type redisPool struct {
+	name   string
+	pool   *radix.Pool
+	tracer *go2sky.Tracer
+	addr   string
+}
 
 // InitRedisPool 初始化redis
 func InitRedisPool(redisConfigs map[string]config.RedisConfig) {
@@ -59,7 +67,7 @@ func initRedisPool(name string, config config.RedisConfig) {
 	if config.User != "" && config.Password != "" {
 		opts = append(opts, radix.DialAuthUser(config.User, config.Password))
 	} else if config.Password != "" {
-		opts = append(opts, radix.DialAuthPass( config.Password))
+		opts = append(opts, radix.DialAuthPass(config.Password))
 	}
 	opts = append(opts, radix.DialSelectDB(config.Database), radix.DialConnectTimeout(connectTimeout),
 		radix.DialReadTimeout(readTimeout), radix.DialWriteTimeout(writeTimeout), radix.DialTimeout(maxIdleTimeout))
@@ -74,14 +82,21 @@ func initRedisPool(name string, config config.RedisConfig) {
 	poolOpts = append(poolOpts, radix.PoolConnFunc(connFunc))
 
 	// 建立连接池
-	redisPool, err1 := radix.NewPool("tcp", config.Host+":"+strconv.Itoa(config.Port), poolSize, poolOpts...)
+	addr := config.Host + ":" + strconv.Itoa(config.Port)
+	_redisPool, err1 := radix.NewPool("tcp", addr, poolSize, poolOpts...)
 	if err1 != nil {
 		panic(fmt.Sprintf("init redis pool fail. %+v", err1))
 	}
-	redisPools[name] = redisPool
+
+	redisPools[name] = &redisPool{
+		name:   name,
+		pool:   _redisPool,
+		tracer: tracing.GetTracer(),
+		addr:   addr,
+	}
 }
 
-func GetRedisPool(name string) *radix.Pool {
+func GetRedisPool(name string) *redisPool {
 	if redisPools == nil {
 		panic(errors.NewAppError(errors.RedisNotInit))
 	}
