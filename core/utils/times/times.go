@@ -57,6 +57,10 @@ func GetDateTimeStrByMillisecond(ms int64) string {
 	return time.Unix(second, 0).Format(consts.AppTimeFormat)
 }
 
+func GetDateTimeMillisecondStrByMillisecond(ms int64) string {
+	return time.Unix(0, ms*int64(time.Millisecond)).Format(consts.AppTimeFormatMillisecond)
+}
+
 func GetUnixTime(t types.Time) int64 {
 	loc, _ := time.LoadLocation("Asia/Shanghai")                                   //设置时区
 	tt, _ := time.ParseInLocation(consts.AppTimeFormat, FormatTimeByTypes(t), loc) //2006-01-02 15:04:05是转换的格式如php的"Y-m-d H:i:s"
@@ -93,6 +97,14 @@ func ParseTime(str string) (types.Time, errors.AppError) {
 
 func Parse(str string) (time.Time, errors.AppError) {
 	t, err := time.Parse(consts.AppTimeFormat, str)
+	if err != nil {
+		return time.Unix(0, 0), errors.NewAppErrorByExistError(errors.ParseTimeFail, err)
+	}
+	return t, nil
+}
+
+func ParseByFormat(format, str string) (time.Time, errors.AppError) {
+	t, err := time.Parse(format, str)
 	if err != nil {
 		return time.Unix(0, 0), errors.NewAppErrorByExistError(errors.ParseTimeFail, err)
 	}

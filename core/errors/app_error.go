@@ -20,6 +20,7 @@ type ResultCode struct {
 }
 
 // https://github.com/pkg/errors/blob/master/errors.go
+
 // AppError Application Error interface
 type AppError interface {
 	Error() string
@@ -93,7 +94,7 @@ func NewResultCode(code int, message string) ResultCode {
 	return rci
 }
 
-// NewAppErrorExistError 基于error创建应用错误，如果error为nil，则返回nil
+// NewAppErrorByExistError 基于error创建应用错误，如果error为nil，则返回nil
 func NewAppErrorByExistError(rc ResultCode, err error, e ...interface{}) AppError {
 	if err == nil {
 		return nil

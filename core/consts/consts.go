@@ -16,9 +16,10 @@ const AppDateFormat = "2006-01-02"
 const AppDateFormat2 = "20060102"
 const AppMonthFormat = "200601"
 const AppTimeFormat = "2006-01-02 15:04:05"
+const AppTimeFormatMillisecond = "2006-01-02 15:04:05.999"
 const AppTimeFormat2 = "20060102150405"
-const AppSystemTimeFormat = "2006-01-02T15:04:05Z"
-const AppSystemTimeFormat8 = "2006-01-02T15:04:05+08:00"
+const AppSystemTimeFormat = "2006-01-02T15:04:05Z07:00"
+const AppSystemTimeFormat8 = "2006-01-02T15:04:05.999Z07:00"
 
 var BlankTimeObject, _ = time.Parse(AppTimeFormat, BlankTime)
 
@@ -83,13 +84,29 @@ func GetCurrentEnv() string {
 }
 
 const (
+	// HeaderTraceIdKey 用于http header
+	HeaderTraceIdKey = "soc-trace-id"
 
-	// TraceIdKey 用于http header
-	TraceIdKey = "SOC-TRACE-ID"
+	// HeaderAppCodeKey 用于http header
+	HeaderAppCodeKey = "soc-app-code"
 
-	TracerContextKey = "SOC-Trace"
+	// HeaderPartnerCodeKey 合作方id的http header
+	HeaderPartnerCodeKey = "soc-partner-code"
 
-	TraceParentSpanContextKey = "SOC-ParentSpanContext"
+	// HeaderSignKey 请求签名 http header
+	HeaderSignKey = "soc-sign"
+
+	// HeaderTimestampKey 请求时间戳 http header
+	HeaderTimestampKey = "soc-timestamp"
+
+	// HeaderSignPolicyKey 请求签名策略 http header
+	HeaderSignPolicyKey = "soc-sign-policy"
+
+	// ContextTracerKey traceId 的 context key
+	ContextTracerKey = "soc_trace_id"
+
+	// ContextParentSpanKey parent span 的 context key
+	ContextParentSpanKey = "soc_parent_span"
 )
 
 // LineSep 换行符

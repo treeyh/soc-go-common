@@ -65,7 +65,7 @@ func GetTraceField(ctx context.Context) zap.Field {
 	if ctx == nil {
 		return zap.String(_logTraceIdKey, "")
 	}
-	val := ctx.Value(consts.TraceIdKey)
+	val := ctx.Value(consts.ContextTracerKey)
 	if val == nil {
 		return zap.String(_logTraceIdKey, "")
 	}
