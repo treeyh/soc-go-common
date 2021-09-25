@@ -84,23 +84,6 @@ func GetCurrentEnv() string {
 }
 
 const (
-	// HeaderTraceIdKey 用于http header
-	HeaderTraceIdKey = "soc-trace-id"
-
-	// HeaderAppCodeKey 用于http header
-	HeaderAppCodeKey = "soc-app-code"
-
-	// HeaderPartnerCodeKey 合作方id的http header
-	HeaderPartnerCodeKey = "soc-partner-code"
-
-	// HeaderSignKey 请求签名 http header
-	HeaderSignKey = "soc-sign"
-
-	// HeaderTimestampKey 请求时间戳 http header
-	HeaderTimestampKey = "soc-timestamp"
-
-	// HeaderSignPolicyKey 请求签名策略 http header
-	HeaderSignPolicyKey = "soc-sign-policy"
 
 	// ContextTracerKey traceId 的 context key
 	ContextTracerKey = "soc_trace_id"
