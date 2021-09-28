@@ -2,12 +2,18 @@ package file
 
 import (
 	"github.com/treeyh/soc-go-common/core/errors"
+	"github.com/treeyh/soc-go-common/core/logger"
 	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"time"
+)
+
+var (
+	log = logger.Logger()
 )
 
 // GetCurrentPath 获取调用方当前目录路径
@@ -86,4 +92,43 @@ func GetDirWalk(filePath string) (map[string]os.FileInfo, error) {
 		})
 
 	return files, err
+}
+
+// GetCurrentAbPath 最终方案-全兼容
+func GetCurrentAbPath() string {
+	dir := GetCurrentAbPathByExecutable()
+	if strings.Contains(dir, GetTmpDir()) {
+		return GetCurrentAbPathByCaller()
+	}
+	return dir
+}
+
+// GetTmpDir 获取系统临时目录，兼容go run
+func GetTmpDir() string {
+	dir := os.Getenv("TEMP")
+	if dir == "" {
+		dir = os.Getenv("TMP")
+	}
+	res, _ := filepath.EvalSymlinks(dir)
+	return res
+}
+
+// GetCurrentAbPathByExecutable 获取当前执行文件绝对路径
+func GetCurrentAbPathByExecutable() string {
+	exePath, err := os.Executable()
+	if err != nil {
+		log.Fatal(err)
+	}
+	res, _ := filepath.EvalSymlinks(filepath.Dir(exePath))
+	return res
+}
+
+// GetCurrentAbPathByCaller 获取当前执行文件绝对路径（go run）
+func GetCurrentAbPathByCaller() string {
+	var abPath string
+	_, filename, _, ok := runtime.Caller(0)
+	if ok {
+		abPath = path.Dir(filename)
+	}
+	return abPath
 }
