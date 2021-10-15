@@ -18,8 +18,8 @@ const AppMonthFormat = "200601"
 const AppTimeFormat = "2006-01-02 15:04:05"
 const AppTimeFormatMillisecond = "2006-01-02 15:04:05.999"
 const AppTimeFormat2 = "20060102150405"
-const AppSystemTimeFormat = "2006-01-02T15:04:05Z07:00"
-const AppSystemTimeFormat8 = "2006-01-02T15:04:05.999Z07:00"
+const AppSystemTimeFormat = "2006-01-02T15:04:05Z0700"
+const AppSystemTimeFormat8 = "2006-01-02T15:04:05.999Z0700"
 
 var BlankTimeObject, _ = time.Parse(AppTimeFormat, BlankTime)
 
