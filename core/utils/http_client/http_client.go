@@ -16,7 +16,7 @@ import (
 	"time"
 )
 
-const timeOutSecond = 3
+const timeOutSecond = 20
 
 var (
 	_traceConfig = &config.TraceConfig{
