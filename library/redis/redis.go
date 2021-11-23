@@ -157,11 +157,15 @@ func (rp *RedisProxy) Expire(ctx context.Context, key string, expire int) (bool,
 	return result == 1, err
 }
 
-func (rp *RedisProxy) TryGetDistributedLock(ctx context.Context, key string, v string) (bool, errors.AppError) {
+func (rp *RedisProxy) TryGetDistributedLock(ctx context.Context, key string, v string, timeOut int) (bool, errors.AppError) {
 	end := times.GetNowMillisecond() + _DistributedTimeOut*1000
+	tout := _DistributedTimeOut
+	if timeOut > 0 {
+		tout = timeOut
+	}
 	for times.GetNowMillisecond() <= end {
 		var result int64
-		err := rp.do(ctx, _LockDistributedLuaScript.Cmd(&result, key, v, strconv.Itoa(_DistributedTimeOut)))
+		err := rp.do(ctx, _LockDistributedLuaScript.Cmd(&result, key, v, strconv.Itoa(tout)))
 		if err != nil {
 			return false, err
 		}
