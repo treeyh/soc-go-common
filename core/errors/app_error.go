@@ -2,6 +2,7 @@ package errors
 
 import (
 	"fmt"
+	pkgErrors "github.com/pkg/errors"
 )
 
 var (
@@ -16,7 +17,7 @@ type ResultCode struct {
 
 	args []interface{}
 
-	err error
+	error error
 }
 
 // https://github.com/pkg/errors/blob/master/errors.go
@@ -32,20 +33,8 @@ type AppError interface {
 	GetError() error
 }
 
-func Wrap(err AppError, resultCode ResultCode) AppError {
-	if err == nil {
-		return NewAppError(resultCode)
-	}
-
-	return nil
-}
-
-func UnWrap() AppError {
-	return nil
-}
-
 func (rc *ResultCode) Error() string {
-	return rc.Message()
+	return rc.error.Error()
 }
 
 // Code 返回状态编号
@@ -63,7 +52,7 @@ func (rc *ResultCode) Message() string {
 
 // GetError 返回error
 func (rc *ResultCode) GetError() error {
-	return rc.err
+	return rc.error
 }
 
 // SetCode 不开放  code readonly
@@ -76,8 +65,7 @@ func (rc *ResultCode) GetError() error {
 // 	rc.message = message
 // }
 
-// NewResultCode 创建新的resultCode
-// code编号不允许与已有的重复
+// NewResultCode 创建新的resultCode，code编号不允许与已有的重复，一般启动初始化时调用
 func NewResultCode(code int, message string) ResultCode {
 	if code < 0 {
 		panic(fmt.Sprintf("result code: code %d must greater than zero", code))
@@ -94,26 +82,53 @@ func NewResultCode(code int, message string) ResultCode {
 	return rci
 }
 
+// NewResultCodeIgnoreDuplicate 创建新的resultCode 允许code重复，运行时调用
+func NewResultCodeIgnoreDuplicate(code int, message string, args ...interface{}) ResultCode {
+	rci := ResultCode{
+		code:    code,
+		message: message,
+		args:    args,
+	}
+	return rci
+}
+
 // NewAppErrorByExistError 基于error创建应用错误，如果error为nil，则返回nil
-func NewAppErrorByExistError(rc ResultCode, err error, e ...interface{}) AppError {
+func NewAppErrorByExistError(rc ResultCode, err error, args ...interface{}) AppError {
 	if err == nil {
 		return nil
 	}
-
-	rc.err = err
-	rc.message += "; err:" + err.Error()
-	if e != nil && len(e) == 0 {
-		return &rc
+	rcc := &ResultCode{
+		code:    rc.code,
+		message: rc.message + "; err:" + err.Error(),
+		error:   pkgErrors.Wrap(err, rc.message+"; err:"+err.Error()),
 	}
-
-	rc.args = e
-	return &rc
+	if len(args) > 0 {
+		rcc.message = fmt.Sprintf(rc.message, args...) + "; err:" + err.Error()
+		rcc.error = pkgErrors.Wrap(err, rcc.message)
+		return rcc
+	}
+	if len(rc.args) > 0 {
+		rcc.message = fmt.Sprintf(rc.message, rc.args...) + "; err:" + err.Error()
+		rcc.error = pkgErrors.Wrap(err, rcc.message)
+	}
+	return rcc
 }
 
-func NewAppError(rc ResultCode, e ...interface{}) AppError {
-	if e == nil || (e != nil && len(e) == 0) {
-		return &rc
+func NewAppError(rc ResultCode, args ...interface{}) AppError {
+	rcc := &ResultCode{
+		code:    rc.code,
+		message: rc.message,
+		args:    args,
 	}
-	rc.args = e
-	return &rc
+	if len(args) > 0 {
+		rcc.error = pkgErrors.New(fmt.Sprintf(rc.message, args...))
+		return rcc
+	}
+	if len(rc.args) > 0 {
+		rcc.args = rc.args
+		rcc.error = pkgErrors.New(fmt.Sprintf(rc.message, rc.args...))
+		return rcc
+	}
+	rcc.error = pkgErrors.New(rc.message)
+	return rcc
 }

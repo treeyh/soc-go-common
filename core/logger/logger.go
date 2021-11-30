@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/treeyh/soc-go-common/core/config"
 	"github.com/treeyh/soc-go-common/core/consts"
+	"github.com/treeyh/soc-go-common/core/errors"
 	"github.com/treeyh/soc-go-common/core/utils/strs"
 	"os"
 	"strconv"
@@ -21,8 +22,9 @@ var (
 	_logger         = map[string]*AppLogger{}
 	_logTagKey      = "tag"
 	_logDefaultName = "default"
-	_logTraceIdKey  = "socTraceId"
-	_logErrorKey    = "socError"
+	_logTraceIdKey  = "traceId"
+	_logErrorKey    = "error"
+	_logStackKey    = "stack"
 )
 
 var _defaultLogConfig = config.LogConfig{
@@ -72,11 +74,15 @@ func GetTraceField(ctx context.Context) zap.Field {
 	return zap.String(_logTraceIdKey, val.(string))
 }
 
-func GetErrorField(err error) zap.Field {
+func GetErrorField(err error) []zap.Field {
 	if err == nil {
-		return zap.String(_logErrorKey, "")
+		return []zap.Field{}
 	}
-	return zap.String(_logErrorKey, obj2String(err))
+	if _, ok := err.(errors.AppError); ok {
+		return []zap.Field{zap.String(_logErrorKey, obj2String(err)),
+			zap.String(_logStackKey, fmt.Sprintf("%+v", err.(errors.AppError).GetError()))}
+	}
+	return []zap.Field{zap.String(_logErrorKey, obj2String(err))}
 }
 
 //func (s *AppLogger) addTagField(fields []zap.Field) []zap.Field {
@@ -110,11 +116,12 @@ func (s *AppLogger) ErrorCtx(ctx context.Context, msg interface{}, fields ...zap
 }
 
 func (s *AppLogger) Error2(err error, msg interface{}, fields ...zap.Field) {
-	s.log.Error(obj2String(msg), append(fields, GetErrorField(err))...)
+	s.log.Error(obj2String(msg), append(fields, GetErrorField(err)...)...)
 }
 
 func (s *AppLogger) ErrorCtx2(ctx context.Context, err error, msg interface{}, fields ...zap.Field) {
-	s.log.Error(obj2String(msg), append(fields, GetTraceField(ctx), GetErrorField(err))...)
+	fields = append(fields, GetErrorField(err)...)
+	s.log.Error(obj2String(msg), append(fields, GetTraceField(ctx))...)
 }
 
 func (s *AppLogger) Errorf(fmtstr string, args ...interface{}) {

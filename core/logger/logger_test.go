@@ -3,6 +3,7 @@ package logger
 import (
 	"fmt"
 	"github.com/treeyh/soc-go-common/core/config"
+	"github.com/treeyh/soc-go-common/core/errors"
 	"testing"
 )
 
@@ -24,5 +25,8 @@ func TestInitLogger(t *testing.T) {
 	InitLogger(_logDefaultName, &logconfig, true)
 
 	log.Info("123")
+
+	err := errors.NewAppError(errors.ParamError, "body")
+	log.Error2(err, "test error")
 
 }
