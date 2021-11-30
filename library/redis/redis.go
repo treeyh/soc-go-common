@@ -63,6 +63,9 @@ func (rp *RedisProxy) Set(ctx context.Context, key string, value string) errors.
 }
 
 func (rp *RedisProxy) MSet(ctx context.Context, fieldValue map[string]string) errors.AppError {
+	if len(fieldValue) <= 0 {
+		return nil
+	}
 	args := make([]string, 0)
 	args = append(args)
 	for k, v := range fieldValue {
@@ -84,6 +87,10 @@ func (rp *RedisProxy) Get(ctx context.Context, key string) (string, errors.AppEr
 
 func (rp *RedisProxy) MGet(ctx context.Context, keys ...string) ([]string, errors.AppError) {
 	ls := make([]string, len(keys))
+	if len(keys) <= 0 {
+		return ls, nil
+	}
+
 	err := rp.do(ctx, radix.Cmd(&ls, "mget", keys...))
 
 	if err != nil {
@@ -225,7 +232,10 @@ func (rp *RedisProxy) HExists(ctx context.Context, key, field string) (bool, err
 }
 
 func (rp *RedisProxy) HMGet(ctx context.Context, key string, fields ...interface{}) (map[string]string, errors.AppError) {
-	result := map[string]string{}
+	result := make(map[string]string)
+	if len(fields) <= 0 {
+		return result, nil
+	}
 
 	var rs []string
 	err := rp.do(ctx, radix.FlatCmd(&rs, "HMGET", key, fields...))
@@ -248,7 +258,10 @@ func (rp *RedisProxy) HMGet(ctx context.Context, key string, fields ...interface
 }
 
 func (rp *RedisProxy) HMSet(ctx context.Context, key string, fieldValue map[string]string) errors.AppError {
-	args := []interface{}{}
+	if len(fieldValue) <= 0 {
+		return nil
+	}
+	args := make([]interface{}, 0)
 	for k, v := range fieldValue {
 		args = append(append(args, k), v)
 	}
