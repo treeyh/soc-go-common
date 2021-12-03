@@ -13,6 +13,7 @@ import (
 	v3 "skywalking.apache.org/repo/goapi/collect/language/agent/v3"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 const (
@@ -40,6 +41,7 @@ var (
 	_LockDistributedLuaScript   = radix.NewEvalScript(1, _LockDistributedLua)
 	_UnLockDistributedLuaScript = radix.NewEvalScript(1, _UnLockDistributedLua)
 
+	_initLock    sync.Mutex
 	_redisCaches = make(map[string]*RedisProxy)
 
 	log = logger.Logger()
@@ -366,6 +368,13 @@ func GetProxyByName(name string) *RedisProxy {
 	if v, ok := _redisCaches[name]; ok {
 		return v
 	}
+
+	_initLock.Lock()
+	defer _initLock.Unlock()
+	if v, ok := _redisCaches[name]; ok {
+		return v
+	}
+
 	redisProxy := &RedisProxy{
 		name: name,
 	}
