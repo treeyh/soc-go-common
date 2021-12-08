@@ -61,7 +61,7 @@ type WeChatConfig struct {
 	AppSecret string `json:"appSecret"`
 	// Host 微信接口host
 	Host string `json:"host"`
-	// Type 类型，weapp：微信小程序
+	// Type 类型，weapp：微信小程序 app：应用
 	Type string `json:"type"`
 
 	// Token 由开发者可以任意填写，用作生成签名
