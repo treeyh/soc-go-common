@@ -18,6 +18,29 @@ type WechatCode2SessionResp struct {
 	UnionId string `json:"unionid"`
 }
 
+// WechatCode2AccessTokenResp 微信code获取accessToken返回
+type WechatCode2AccessTokenResp struct {
+	WechatErrorResp
+
+	// AccessToken 接口调用凭证
+	AccessToken string `json:"access_token"`
+
+	// ExpiresIn access_token 接口调用凭证超时时间，单位（秒）
+	ExpiresIn int `json:"expires_in"`
+
+	// RefreshToken 用户刷新 access_token
+	RefreshToken string `json:"refresh_token"`
+
+	// Openid 授权用户唯一标识
+	Openid string `json:"openid"`
+
+	// Scope 用户授权的作用域，使用逗号（,）分隔
+	Scope string `json:"scope"`
+
+	// Unionid 当且仅当该移动应用已获得该用户的 userinfo 授权时，才会出现该字段
+	Unionid string `json:"unionid"`
+}
+
 type WechatAccessTokenResp struct {
 	WechatErrorResp
 
@@ -59,6 +82,9 @@ type WechatUserInfo struct {
 
 	// Headimgurl 用户头像，最后一个数值代表正方形头像大小（有 0、46、64、96、132 数值可选，0 代表 640*640 正方形头像），用户没有头像时该项为空。若用户更换头像，原有头像 URL 将失效。
 	Headimgurl string `json:"headimgurl"`
+
+	// Privilege 用户特权信息，json 数组，如微信沃卡用户为（chinaunicom）
+	Privilege []string `json:"privilege"`
 
 	// SubscribeTime 用户关注时间，为时间戳。如果用户曾多次关注，则取最后关注时间
 	SubscribeTime int64 `json:"subscribe_time"`

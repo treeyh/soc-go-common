@@ -115,7 +115,7 @@ RETRY:
 			hasRetried = true
 			ErrorStructValue.Set(errorZeroValue)
 
-			err := wcp.buildAccessTokenParams(ctx, params, isAccessToken, true)
+			err = wcp.buildAccessTokenParams(ctx, params, isAccessToken, true)
 			if err != nil {
 				return err
 			}
@@ -168,7 +168,7 @@ RETRY:
 			hasRetried = true
 			ErrorStructValue.Set(errorZeroValue)
 
-			err := wcp.buildAccessTokenParams(ctx, params, isAccessToken, true)
+			err = wcp.buildAccessTokenParams(ctx, params, isAccessToken, true)
 			if err != nil {
 				return err
 			}

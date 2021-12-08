@@ -64,7 +64,7 @@ func GetProxyByName(name string) *WechatProxy {
 	return nil
 }
 
-// Decrypt Weixin APP's AES Data
+// DecryptEncryptedData Weixin APP's AES Data
 // If isJSON is true, Decrypt return JSON type.
 // If isJSON is false, Decrypt return map type.
 func (wcp *WechatProxy) DecryptEncryptedData(ctx context.Context, sessionKey string, encryptedData string, iv string, isJSON bool) (interface{}, errors.AppError) {
