@@ -46,7 +46,16 @@ func InitWeChatConfig(weChatConfigs map[string]config.WeChatConfig) {
 
 	wechatProxys1 := make(map[string]*WechatProxy)
 	for k, v := range weChatConfigs {
-		wechatProxys1[k] = &WechatProxy{wechatConfig: &v}
+		vv := &config.WeChatConfig{
+			AppId:               v.AppId,
+			AppSecret:           v.AppSecret,
+			Host:                v.Host,
+			Type:                v.Type,
+			Token:               v.Token,
+			EncodingAESKey:      v.EncodingAESKey,
+			MessageEncodingType: v.MessageEncodingType,
+		}
+		wechatProxys1[k] = &WechatProxy{wechatConfig: vv}
 	}
 	wechatProxys = wechatProxys1
 }
