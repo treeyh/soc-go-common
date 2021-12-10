@@ -10,6 +10,7 @@ import (
 	"github.com/treeyh/soc-go-common/core/config"
 	"github.com/treeyh/soc-go-common/core/errors"
 	"github.com/treeyh/soc-go-common/core/logger"
+	"github.com/treeyh/soc-go-common/core/utils/copyer"
 	"github.com/treeyh/soc-go-common/core/utils/json"
 	"sort"
 	"strings"
@@ -46,14 +47,10 @@ func InitWeChatConfig(weChatConfigs map[string]config.WeChatConfig) {
 
 	wechatProxys1 := make(map[string]*WechatProxy)
 	for k, v := range weChatConfigs {
-		vv := &config.WeChatConfig{
-			AppId:               v.AppId,
-			AppSecret:           v.AppSecret,
-			Host:                v.Host,
-			Type:                v.Type,
-			Token:               v.Token,
-			EncodingAESKey:      v.EncodingAESKey,
-			MessageEncodingType: v.MessageEncodingType,
+		vv := &config.WeChatConfig{}
+		err := copyer.Copy(context.Background(), v, vv)
+		if err != nil {
+			panic(fmt.Sprintf("init wechat config fail. %+v", err))
 		}
 		wechatProxys1[k] = &WechatProxy{wechatConfig: vv}
 	}
