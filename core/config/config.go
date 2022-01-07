@@ -81,3 +81,11 @@ type ALiYunConfig struct {
 	// RegionId 阿里云访问区域
 	RegionId string `json:"regionId"`
 }
+
+// I18nConfig 国际化配置
+type I18nConfig struct {
+	// Enable 是否开启
+	Enable bool `json:"enable"`
+	// Path 国际化文件配置目录
+	Path string `json:"path"`
+}
