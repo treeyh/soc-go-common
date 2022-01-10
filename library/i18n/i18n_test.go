@@ -12,6 +12,8 @@ func TestInitI18n(t *testing.T) {
 		Path:   "D:\\i18n",
 	})
 
-	assert.Equal(t, Get("zh", "aaa.asdfasdf"), "7")
-	assert.Equal(t, GetByDefault("zh", "aaa.asdfaasdf", "default"), "default")
+	assert.Equal(t, Get("zh", "aaa.aaa"), "%s 4 3")
+	assert.Equal(t, Get("zh", "aaa.bbb"), "5 %s 41")
+	assert.Equal(t, Get("zh", "aaa.ccc"), "61 13")
+	assert.Equal(t, GetByDefault("zh", "aaa.ddd", "default"), "default")
 }

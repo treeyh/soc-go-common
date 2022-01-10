@@ -88,4 +88,6 @@ type I18nConfig struct {
 	Enable bool `json:"enable"`
 	// Path 国际化文件配置目录
 	Path string `json:"path"`
+	// DefaultLang 默认语言
+	DefaultLang string `json:"defaultLang"`
 }
