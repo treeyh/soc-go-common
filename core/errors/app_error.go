@@ -31,6 +31,8 @@ type AppError interface {
 	Message() string
 
 	GetError() error
+
+	Args() []interface{}
 }
 
 func (rc *ResultCode) Error() string {
@@ -53,6 +55,11 @@ func (rc *ResultCode) Message() string {
 // GetError 返回error
 func (rc *ResultCode) GetError() error {
 	return rc.error
+}
+
+// Args 返回error的Args
+func (rc *ResultCode) Args() []interface{} {
+	return rc.args
 }
 
 // SetCode 不开放  code readonly
