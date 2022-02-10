@@ -19,7 +19,7 @@ var (
 
 // InitI18n 初始化i18n
 func InitI18n(i18nConf *config.I18nConfig) {
-	if !i18nConf.Enable {
+	if i18nConf == nil || !i18nConf.Enable {
 		return
 	}
 	files, err := ioutil.ReadDir(i18nConf.Path)
