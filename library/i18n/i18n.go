@@ -15,6 +15,8 @@ var (
 
 	// langMaps 语言map
 	langMaps = make(map[string]*viper.Viper)
+
+	defaultLang = ""
 )
 
 // InitI18n 初始化i18n
@@ -22,6 +24,7 @@ func InitI18n(i18nConf *config.I18nConfig) {
 	if i18nConf == nil || !i18nConf.Enable {
 		return
 	}
+	defaultLang = i18nConf.DefaultLang
 	files, err := ioutil.ReadDir(i18nConf.Path)
 	if err != nil {
 		panic(fmt.Sprintf("init i18n fail. err: %+v", err))
@@ -41,6 +44,10 @@ func InitI18n(i18nConf *config.I18nConfig) {
 		maps[langKey] = loadLangMap(filePath)
 	}
 	langMaps = maps
+}
+
+func GetDefaultLang() string {
+	return defaultLang
 }
 
 func loadLangMap(filePath string) *viper.Viper {
