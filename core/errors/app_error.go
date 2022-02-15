@@ -32,6 +32,8 @@ type AppError interface {
 
 	GetError() error
 
+	GetMessage() string
+
 	Args() []interface{}
 }
 
@@ -50,6 +52,11 @@ func (rc *ResultCode) Message() string {
 		return rc.message
 	}
 	return fmt.Sprintf(rc.message, rc.args...)
+}
+
+// GetMessage 返回error
+func (rc *ResultCode) GetMessage() string {
+	return rc.message
 }
 
 // GetError 返回error
