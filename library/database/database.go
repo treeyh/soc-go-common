@@ -127,7 +127,7 @@ func initDataSourcePool(name string, config config.DBConfig) errors.AppError {
 	if len(addrs) > 1 {
 		addrs = strings.Split(addrs[1], "?")
 		if len(addrs) > 1 {
-			addr = addrs[0]
+			addr = strings.ReplaceAll(strings.ReplaceAll(addrs[0], "tcp(", ""), ")", "")
 		}
 	}
 

@@ -49,6 +49,7 @@ var (
 
 type RedisProxy struct {
 	name string
+	peer string
 }
 
 func (rp *RedisProxy) ZAdd(ctx context.Context, key string, score float64, value string) errors.AppError {
@@ -329,11 +330,11 @@ func (rp *RedisProxy) do(ctx context.Context, a radix.Action) errors.AppError {
 	var err error
 	if pool.tracer != nil {
 		// sky walking span
-		peer := strings.Join(a.Keys(), " ")
-		if peer == "" {
-			peer = "No Peer"
+		opName := strings.Join(a.Keys(), " ")
+		if rp.peer == "" {
+			rp.peer = pool.addr + ":" + strconv.Itoa(pool.database)
 		}
-		redisSpan, err = pool.tracer.CreateExitSpan(ctx, pool.addr, peer, func(key, value string) error {
+		redisSpan, err = pool.tracer.CreateExitSpan(ctx, opName, rp.peer, func(key, value string) error {
 			return nil
 		})
 		if err != nil {

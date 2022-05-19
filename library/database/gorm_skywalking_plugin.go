@@ -95,11 +95,11 @@ func (p skyWalkingPlugin) injectBefore(db *gorm.DB, op operationName) {
 		return
 	}
 
-	dbSpan, err := p.opt.tracer.CreateExitSpan(db.Statement.Context, p.opt.url, op.String(), func(key, value string) error {
+	dbSpan, err := p.opt.tracer.CreateExitSpan(db.Statement.Context, op.String(), p.opt.url, func(key, value string) error {
 		return nil
 	})
 	if err != nil {
-		db.Logger.Error(context.TODO(), errors.SkyWalkingSpanNotInit.Error()+"; op:"+op.String()+"; err:"+err.Error())
+		db.Logger.Error(context.TODO(), errors.SkyWalkingSpanNotInit.Error()+"; url:"+p.opt.url+"; op:"+op.String()+"; err:"+err.Error())
 		return
 	}
 	dbSpan.SetComponent(tracing.GormComponent)

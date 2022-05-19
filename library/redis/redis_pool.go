@@ -19,10 +19,11 @@ var (
 )
 
 type redisPool struct {
-	name   string
-	pool   *radix.Pool
-	tracer *go2sky.Tracer
-	addr   string
+	name     string
+	pool     *radix.Pool
+	tracer   *go2sky.Tracer
+	addr     string
+	database int
 }
 
 // InitRedisPool 初始化redis
@@ -89,10 +90,11 @@ func initRedisPool(name string, config config.RedisConfig) {
 	}
 
 	redisPools[name] = &redisPool{
-		name:   name,
-		pool:   _redisPool,
-		tracer: tracing.GetTracer(),
-		addr:   addr,
+		name:     name,
+		pool:     _redisPool,
+		tracer:   tracing.GetTracer(),
+		addr:     addr,
+		database: config.Database,
 	}
 }
 
