@@ -75,14 +75,15 @@ func GetTraceField(ctx context.Context) zap.Field {
 }
 
 func GetErrorField(err error) []zap.Field {
+	fs := make([]zap.Field, 0)
 	if err == nil {
-		return []zap.Field{}
+		return fs
 	}
+	fs = append(fs, zap.String(_logErrorKey, obj2String(err)))
 	if _, ok := err.(errors.AppError); ok {
-		return []zap.Field{zap.String(_logErrorKey, obj2String(err)),
-			zap.String(_logStackKey, fmt.Sprintf("%+v", err.(errors.AppError).GetError()))}
+		fs = append(fs, zap.String(_logStackKey, fmt.Sprintf("%+v", err.(errors.AppError).GetError())))
 	}
-	return []zap.Field{zap.String(_logErrorKey, obj2String(err))}
+	return fs
 }
 
 //func (s *AppLogger) addTagField(fields []zap.Field) []zap.Field {
