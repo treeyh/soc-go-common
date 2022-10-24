@@ -1,6 +1,6 @@
 module github.com/treeyh/soc-go-common
 
-go 1.17
+go 1.19
 
 require (
 	github.com/SkyAPM/go2sky v1.2.0
