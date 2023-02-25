@@ -16,7 +16,7 @@ require (
 	github.com/tealeg/xlsx/v2 v2.0.1
 	go.uber.org/zap v1.17.0
 	golang.org/x/net v0.0.0-20210903162142-ad29c8ab022f // indirect
-	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
+	golang.org/x/sys v0.1.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	gorm.io/driver/mysql v1.0.5
 	gorm.io/gorm v1.21.7
