@@ -10,11 +10,11 @@ import (
 
 const (
 
-	// 一分钟的秒数
+	// MinuteSecond 一分钟的秒数
 	MinuteSecond = 60
-	// 一小时的秒数
+	// HourSecond 一小时的秒数
 	HourSecond = MinuteSecond * 60
-	// 一天的秒数
+	// DaySecond 一天的秒数
 	DaySecond = HourSecond * 24
 )
 
@@ -151,7 +151,7 @@ func GetDateTimeLongByTime(t time.Time) int64 {
 	return i
 }
 
-//获取当天时间段：2019-08-12 00:00:00 - 2019-08-12 23:59:59
+// 获取当天时间段：2019-08-12 00:00:00 - 2019-08-12 23:59:59
 func GetTodayTimeQuantum() []time.Time {
 	timeStr := time.Now().Format(consts.AppDateFormat)
 	b, _ := time.Parse(consts.AppDateFormat, timeStr)
@@ -159,7 +159,7 @@ func GetTodayTimeQuantum() []time.Time {
 	return []time.Time{b, a}
 }
 
-//2019-09-03
+// 2019-09-03
 func GetYesterdayDate() string {
 	timeStr := time.Now().Format(consts.AppDateFormat)
 	b, _ := time.Parse(consts.AppDateFormat, timeStr)

@@ -30,6 +30,11 @@ type Order3 struct {
 	Int64      int64     `json:"int64"`
 }
 
+func TestUnixTime(t *testing.T) {
+	str := time.Now().Format(consts.AppSystemTimeFormat8)
+	t.Log(str)
+}
+
 func TestUnixTime_MarshalJSON(t *testing.T) {
 
 	order := Order{

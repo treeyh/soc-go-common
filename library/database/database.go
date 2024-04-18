@@ -2,11 +2,13 @@ package database
 
 import (
 	"github.com/treeyh/soc-go-common/core/config"
+	"github.com/treeyh/soc-go-common/core/consts"
 	"github.com/treeyh/soc-go-common/core/errors"
 	"github.com/treeyh/soc-go-common/core/logger"
 	"github.com/treeyh/soc-go-common/library/tracing"
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	glogger "gorm.io/gorm/logger"
 	"strings"
@@ -102,10 +104,20 @@ func initDataSourcePool(name string, config config.DBConfig) errors.AppError {
 		Dialector:                                nil,
 		Plugins:                                  nil,
 	}
-	// dsn := "gorm:gorm@tcp(localhost:9910)/gorm?charset=utf8&parseTime=True&loc=Local"
-	db, err := gorm.Open(mysql.New(mysql.Config{
-		DSN: config.DbUrl,
-	}), gconfig)
+
+	// mysql dsn := "gorm:gorm@tcp(localhost:9910)/gorm?charset=utf8&parseTime=True&loc=Local"
+	// postgresql dsn := "user=gorm password=gorm dbname=gorm port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+	var db *gorm.DB
+	var err error
+	if consts.DBTypePostgresql == config.Type {
+		db, err = gorm.Open(postgres.New(postgres.Config{
+			DSN: config.DbUrl,
+		}), gconfig)
+	} else {
+		db, err = gorm.Open(mysql.New(mysql.Config{
+			DSN: config.DbUrl,
+		}), gconfig)
+	}
 	if err != nil {
 		panic(" db init fail. name:" + name + ". err:" + err.Error())
 		return errors.NewAppErrorByExistError(errors.DbInitConnFail, err)

@@ -48,6 +48,9 @@ const (
 
 	// DBTypeMysql 数据库类型
 	DBTypeMysql = "mysql"
+
+	// DBTypePostgresql 数据库类型
+	DBTypePostgresql = "postgresql"
 )
 
 const (
