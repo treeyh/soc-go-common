@@ -73,6 +73,37 @@ func TestTime(t *testing.T) {
 	t.Log(ti)
 	t.Log(time.Time(ti))
 
+	time1, err := time.Parse(consts.AppSystemTimeFormat8, "2019-06-06T11:11:11+0700")
+	t.Log(time1)
+
+}
+
+func TestTimeZone(t *testing.T) {
+	now, _ := time.Parse(consts.AppSystemTimeFormat8, "2020-01-01T10:12:00+0500")
+	//now3, _ := time.Parse(consts.AppSystemTimeFormat8, "2020-01-01T09:12:00+0400")
+	t.Log(now)
+	t.Log(now.UnixNano())
+	t.Log(now.Zone())
+
+	nLoc := time.FixedZone("+0545", 5.75*3600)
+	nTime := now.In(nLoc)
+
+	t.Log(nTime)
+	t.Log(nTime.UnixNano())
+	t.Log(nTime.Zone())
+
+	timeOffset := int(5.75 * 3600)
+	tzTime := now.In(globalTimeZoneMap[timeOffset])
+
+	t.Log(tzTime)
+	t.Log(tzTime.UnixNano())
+	t.Log(tzTime.Zone())
+
+	tzTime2 := InByOffset(now, timeOffset)
+
+	t.Log(tzTime2)
+	t.Log(tzTime2.UnixNano())
+	t.Log(tzTime2.Zone())
 }
 
 func TestTime2(t *testing.T) {
@@ -123,13 +154,13 @@ func TestTime0(t *testing.T) {
 	fmt.Println(time.Now().Format(consts.AppTimeFormat))
 	fmt.Println(",,,", Time0().String())
 	fmt.Println(time.Now())
-	var s time.Time
-	//var o Time = time.Now()
-	fmt.Println(copyer.Copy(context.Background(), Time(time.Now()), s))
-	fmt.Println(s)
-	fmt.Println(time.Now().UTC())
-	a, _ := time.Parse(consts.AppTimeFormat, time.Now().Format(consts.AppTimeFormat))
-	fmt.Println(a, a.Add(-time.Hour*8))
+	//var s time.Time
+	////var o Time = time.Now()
+	//fmt.Println(copyer.Copy(context.Background(), Time(time.Now()), s))
+	//fmt.Println(s)
+	//fmt.Println(time.Now().UTC())
+	//a, _ := time.Parse(consts.AppTimeFormat, time.Now().Format(consts.AppTimeFormat))
+	//fmt.Println(a, a.Add(-time.Hour*8))
 }
 
 type TestStruct struct {

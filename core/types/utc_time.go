@@ -4,6 +4,7 @@ import (
 	"github.com/treeyh/soc-go-common/core/consts"
 	"github.com/treeyh/soc-go-common/core/logger"
 	"io"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -28,6 +29,15 @@ func (t *UtcTime) IsNull() bool {
 
 func (t UtcTime) ToTime() time.Time {
 	return time.Time(t)
+}
+
+// InByOffset 时间时区转换
+func (t UtcTime) InByOffset(offset int) UtcTime {
+	if zone, ok := globalTimeZoneMap[offset]; ok {
+		return UtcTime(t.ToTime().In(zone))
+	} else {
+		return UtcTime(t.ToTime().In(time.FixedZone(strconv.Itoa(offset), offset)))
+	}
 }
 
 func (t *UtcTime) UnmarshalJSON(data []byte) (err error) {
