@@ -95,6 +95,10 @@ func GetErrorField(err error) []zap.Field {
 //	return append(fields, zap.String(_logTagKey, s.name))
 //}
 
+func (s *AppLogger) Printf(ctx context.Context, msg string, fields ...interface{}) {
+	s.log.Info(msg, zap.Any("zapAny", fields), GetTraceField(ctx))
+}
+
 func (s *AppLogger) Info(msg interface{}, fields ...zap.Field) {
 	s.log.Info(obj2String(msg), fields...)
 }
