@@ -5,7 +5,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/treeyh/soc-go-common/core/config"
 	"github.com/treeyh/soc-go-common/core/logger"
-	"io/ioutil"
+	"os"
 	"path"
 	"strings"
 )
@@ -25,7 +25,8 @@ func InitI18n(i18nConf *config.I18nConfig) {
 		return
 	}
 	defaultLang = i18nConf.DefaultLang
-	files, err := ioutil.ReadDir(i18nConf.Path)
+	files, err := os.ReadDir(i18nConf.Path)
+	//files, err := ioutil.ReadDir(i18nConf.Path)
 	if err != nil {
 		panic(fmt.Sprintf("init i18n fail. err: %+v", err))
 	}
@@ -39,7 +40,7 @@ func InitI18n(i18nConf *config.I18nConfig) {
 		if index < 1 {
 			continue
 		}
-		langKey := f.Name()[0:index]
+		langKey := strings.ToLower(f.Name()[0:index])
 		filePath := path.Join(i18nConf.Path, f.Name())
 		maps[langKey] = loadLangMap(filePath)
 	}
@@ -62,6 +63,7 @@ func loadLangMap(filePath string) *viper.Viper {
 }
 
 func Get(lang, key string) string {
+	lang = strings.ToLower(lang)
 	if v, ok := langMaps[lang]; ok {
 		return v.GetString(key)
 	}
