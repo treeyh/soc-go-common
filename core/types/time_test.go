@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"github.com/treeyh/soc-go-common/core/utils/copyer"
+	"reflect"
 	"testing"
 	"time"
 
@@ -46,7 +47,7 @@ func TestUnixTime_MarshalJSON(t *testing.T) {
 	orderBytes, err := json.ToJson(order)
 	assert.NoError(t, err)
 
-	t.Log(orderBytes)
+	t.Log("orderBytes = " + orderBytes)
 
 	order1 := &Order{}
 	json.FromJson(orderBytes, order1)
@@ -62,6 +63,74 @@ func TestUnixTime_MarshalJSON(t *testing.T) {
 	assert.Equal(t, order2.Int64.ToInt64(), int64(64))
 	t.Log(order2.Int64)
 
+}
+
+func TestUnixTime_MarshalJSONZone(t *testing.T) {
+
+	order := Order3{
+		OrderId:    "10001",
+		CreateTime: time.Now(),
+		Int64:      int64(1234567890),
+	}
+
+	orderBytes, err := json.ToJson(order)
+	assert.NoError(t, err)
+
+	t.Log("orderBytes = " + orderBytes)
+
+	order.CreateTime = InByOffset(order.CreateTime, 3*3600)
+	orderBytes2, err := json.ToJson(order)
+	assert.NoError(t, err)
+	t.Log("orderBytes2 = " + orderBytes2)
+
+	order1 := &Order{}
+	json.FromJson(orderBytes, order1)
+	t.Log("== order1 ==")
+	t.Log(order1.CreateTime)
+	t.Log(order1.CreateTime.ToTime().Zone())
+
+	order2 := &Order{}
+	json.FromJson(orderBytes2, order2)
+	t.Log("== order2 ==")
+	t.Log(order2.CreateTime)
+	t.Log(order2.CreateTime.ToTime().Zone())
+	orderBytes3 := json.ToJsonIgnoreError(order2)
+	t.Log("orderBytes3 = " + orderBytes3)
+
+	order3 := &Order{}
+	json.FromJson(orderBytes, order3)
+	t.Log("== order3 ==")
+	t.Log(order3.CreateTime)
+
+	order4 := &Order{}
+	json.FromJson(orderBytes2, order4)
+	t.Log("== order4 ==")
+	t.Log(order4.CreateTime)
+	typeof := reflect.TypeOf(order4.CreateTime)
+	t.Log(typeof)
+	for i := 0; i < typeof.NumMethod(); i++ {
+		fmt.Printf("method is %s, type is %s, kind is %s.\n", typeof.Method(i).Name, typeof.Method(i).Type, typeof.Method(i).Type.Kind())
+	}
+
+	order5 := &Order3{}
+	json.FromJson(orderBytes, order5)
+	t.Log("== order5 ==")
+	t.Log(order5.CreateTime)
+	t.Log(order5.CreateTime.Zone())
+
+	order6 := &Order3{}
+	json.FromJson(orderBytes2, order6)
+	t.Log("== order6 ==")
+	t.Log(order6.CreateTime)
+	t.Log(order6.CreateTime.Zone())
+	t.Log("order6 = " + json.ToJsonIgnoreError(order6))
+
+	order7 := &Order3{}
+	json.FromJson(orderBytes3, order7)
+	t.Log("== order7 ==")
+	t.Log(order6.CreateTime)
+	t.Log(order6.CreateTime.Zone())
+	t.Log("order7 = " + json.ToJsonIgnoreError(order6))
 }
 
 func TestTime(t *testing.T) {
@@ -136,7 +205,7 @@ func TestTime2(t *testing.T) {
 		Int64:      64,
 	}
 	str := json.ToJsonIgnoreError(ttt)
-	t.Log(str)
+	t.Log("Order3 = " + str)
 	tt2 := &Order{}
 	json.FromJson(str, tt2)
 	t.Log(tt2.Int64)

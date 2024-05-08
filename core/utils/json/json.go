@@ -27,7 +27,12 @@ func (td *TimeDecoder) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
 	now, err := time.ParseInLocation(consts.AppTimeFormat, str, loc)
 
 	if err != nil {
-		*((*time.Time)(ptr)) = time.Unix(0, 0)
+		mayBlank2, err2 := time.Parse(consts.AppSystemTimeFormat8, str)
+		if err2 == nil {
+			*((*time.Time)(ptr)) = mayBlank2
+		} else {
+			*((*time.Time)(ptr)) = time.Unix(0, 0)
+		}
 	} else if mayBlank.IsZero() {
 		*((*time.Time)(ptr)) = mayBlank
 	} else {
@@ -43,13 +48,15 @@ func (codec *TimeEncoder) IsEmpty(ptr unsafe.Pointer) bool {
 func (codec *TimeEncoder) Encode(ptr unsafe.Pointer, stream *jsoniter.Stream) {
 	ts := *((*time.Time)(ptr))
 	if !ts.IsZero() {
-		timestamp := ts.Unix()
-		tm := time.Unix(timestamp, 0)
-		format := tm.Format(consts.AppTimeFormat)
+		//timestamp := ts.Unix()
+		//tm := time.Unix(timestamp, 0)
+		//format := tm.Format(consts.AppTimeFormat)
+
+		format := ts.Format(consts.AppSystemTimeFormat8)
 		stream.WriteString(format)
 	} else {
-		mayBlank, _ := time.Parse(consts.AppTimeFormat, consts.BlankString)
-		stream.WriteString(mayBlank.Format(consts.AppTimeFormat))
+		mayBlank, _ := time.Parse(consts.AppSystemTimeFormat8, consts.BlankString)
+		stream.WriteString(mayBlank.Format(consts.AppSystemTimeFormat8))
 	}
 }
 
