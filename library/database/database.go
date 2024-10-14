@@ -110,8 +110,10 @@ func initDataSourcePool(name string, config config.DBConfig) errors.AppError {
 	var db *gorm.DB
 	var err error
 	if consts.DBTypePostgresql == config.Type {
+		dbUrl := "postgres://" + strings.TrimSpace(config.DbUrl)
+
 		db, err = gorm.Open(postgres.New(postgres.Config{
-			DSN: config.DbUrl,
+			DSN: dbUrl,
 		}), gconfig)
 	} else {
 		db, err = gorm.Open(mysql.New(mysql.Config{
