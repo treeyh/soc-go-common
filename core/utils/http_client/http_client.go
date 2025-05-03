@@ -3,17 +3,18 @@ package http_client
 import (
 	"context"
 	"crypto/tls"
+	"io"
+	"net/http"
+	neturl "net/url"
+	"strings"
+	"time"
+
 	"github.com/SkyAPM/go2sky"
 	"github.com/treeyh/soc-go-common/core/config"
 	"github.com/treeyh/soc-go-common/core/errors"
 	"github.com/treeyh/soc-go-common/core/logger"
 	"github.com/treeyh/soc-go-common/library/tracing"
-	"io/ioutil"
-	"net/http"
-	neturl "net/url"
 	v3 "skywalking.apache.org/repo/goapi/collect/language/agent/v3"
-	"strings"
-	"time"
 )
 
 const timeOutSecond = 20
@@ -55,7 +56,7 @@ func do(ctx context.Context, method string, url string, querys map[string]string
 	}
 
 	client := &http.Client{
-		Timeout:   time.Second * timeOutSecond, //默认3秒超时时间
+		Timeout:   time.Second * timeOutSecond, // 默认3秒超时时间
 		Transport: tr,
 	}
 
@@ -80,7 +81,7 @@ func do(ctx context.Context, method string, url string, querys map[string]string
 		return "", 0, errors.NewAppErrorByExistError(errors.HttpCreateRequestFail, err)
 	}
 
-	//设置header
+	// 设置header
 	if headers != nil {
 		header := "  header:"
 		for k, v := range headers {
@@ -92,7 +93,7 @@ func do(ctx context.Context, method string, url string, querys map[string]string
 
 	var reqSpan go2sky.Span
 	if tracing.GetTracer() != nil {
-		/// 设置 skywalking span
+		// / 设置 skywalking span
 		reqSpan, err = tracing.GetTracer().CreateExitSpan(ctx, url, url, func(headerKey, headerValue string) error {
 			key := headerKey
 			if _traceConfig.Namespace != "" {
@@ -123,7 +124,7 @@ func do(ctx context.Context, method string, url string, querys map[string]string
 		reqSpan.End()
 	}
 
-	b, err := ioutil.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
 	defer func() {
 		if resp != nil && resp.Body != nil {
 			resp.Body.Close()

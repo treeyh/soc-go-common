@@ -1,15 +1,16 @@
 package file
 
 import (
-	"github.com/treeyh/soc-go-common/core/errors"
-	"github.com/treeyh/soc-go-common/core/logger"
-	"io/ioutil"
+	"io/fs"
 	"os"
 	"path"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/treeyh/soc-go-common/core/errors"
+	"github.com/treeyh/soc-go-common/core/logger"
 )
 
 var (
@@ -34,7 +35,7 @@ func ExistFile(filePath string) bool {
 
 // ReadSmallFile 读取小文件，一次性读取
 func ReadSmallFile(filePath string) (*string, errors.AppError) {
-	tmpContent, err := ioutil.ReadFile(filePath)
+	tmpContent, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, errors.NewAppErrorByExistError(errors.FileReadFail, err)
 	}
@@ -69,13 +70,25 @@ func IsDir(filePath string) (bool, error) {
 		return false, err
 	}
 
-	//是否是目录
+	// 是否是目录
 	return fileInfo.IsDir(), nil
 }
 
 // GetDirSon 返回目录下子文件/目录列表
-func GetDirSon(filePath string) ([]os.FileInfo, error) {
-	return ioutil.ReadDir(filePath)
+func GetDirSon(filePath string) ([]fs.FileInfo, error) {
+	dirs, err := os.ReadDir(filePath)
+	if err != nil {
+		return nil, err
+	}
+	infos := make([]fs.FileInfo, 0, len(dirs))
+	for _, entry := range dirs {
+		info, err := entry.Info()
+		if err != nil {
+			return nil, err
+		}
+		infos = append(infos, info)
+	}
+	return infos, nil
 }
 
 // GetDirWalk 递归获取路径子文件，目录列表

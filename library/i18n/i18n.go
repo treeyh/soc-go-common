@@ -2,12 +2,13 @@ package i18n
 
 import (
 	"fmt"
-	"github.com/spf13/viper"
-	"github.com/treeyh/soc-go-common/core/config"
-	"github.com/treeyh/soc-go-common/core/logger"
 	"os"
 	"path"
 	"strings"
+
+	"github.com/spf13/viper"
+	"github.com/treeyh/soc-go-common/core/config"
+	"github.com/treeyh/soc-go-common/core/logger"
 )
 
 var (
@@ -26,7 +27,6 @@ func InitI18n(i18nConf *config.I18nConfig) {
 	}
 	defaultLang = i18nConf.DefaultLang
 	files, err := os.ReadDir(i18nConf.Path)
-	//files, err := ioutil.ReadDir(i18nConf.Path)
 	if err != nil {
 		panic(fmt.Sprintf("init i18n fail. err: %+v", err))
 	}
@@ -55,7 +55,7 @@ func loadLangMap(filePath string) *viper.Viper {
 	conf := viper.New()
 	conf.SetConfigFile(filePath)
 	conf.SetConfigType("yaml")
-	//尝试进行配置读取
+	// 尝试进行配置读取
 	if err := conf.ReadInConfig(); err != nil {
 		panic(fmt.Sprintf("init i18n fail. path: %s; err: %+v", filePath, err))
 	}
