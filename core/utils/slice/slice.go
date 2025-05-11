@@ -1,9 +1,10 @@
 package slice
 
 import (
-	"github.com/treeyh/soc-go-common/core/errors"
 	"reflect"
 	"strings"
+
+	"github.com/treeyh/soc-go-common/core/errors"
 )
 
 // SliceUniqueString 通过map去重slice
@@ -66,6 +67,16 @@ func EqualString(v string, sl []string) bool {
 func ContainString(v string, sl []string) bool {
 	for _, vv := range sl {
 		if strings.Contains(v, vv) {
+			return true
+		}
+	}
+	return false
+}
+
+// HasPrefixString 判断string是否包含在前缀数组的string中
+func HasPrefixString(v string, sl []string) bool {
+	for _, vv := range sl {
+		if strings.HasPrefix(v, vv) {
 			return true
 		}
 	}
