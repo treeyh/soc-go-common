@@ -2,8 +2,11 @@ package copyer
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
+	"fmt"
 	"testing"
+
+	"github.com/jinzhu/copier"
+	"github.com/stretchr/testify/assert"
 )
 
 type Source struct {
@@ -14,18 +17,46 @@ type Destination struct {
 	Name string `json:"name"`
 }
 
+type User struct {
+	Name string `json:"name"`
+	Role string `json:"role"`
+	Age  int32  `json:"age"`
+}
+
+// func (user *User) DoubleAge() int32 {
+// 	return 2 * user.Age
+// }
+
+type Employee struct {
+	Name      string `json:"name"`
+	Age       int32  `json:"age"`
+	DoubleAge int32  `json:"doubleAge"`
+	SuperRole string `json:"superRole"`
+}
+
+// func (employee *Employee) Role(role string) {
+// 	employee.SuperRole = "Super " + role
+// }
+
 func TestCopy(t *testing.T) {
 
-	s := &Source{
-		Name: "test",
-	}
-	d := &Destination{}
+	user := User{Name: "Jinzhu", Age: 18, Role: "Admin"}
+	employee := Employee{}
 
-	ss := &[]*Source{s}
-	dd := &[]*Destination{d}
-	Copy(context.Background(), ss, dd)
+	copier.Copy(&employee, &user)
+	fmt.Printf("%#v\n", employee)
 
-	assert.Equal(t, "test", (*dd)[0].Name)
+	sss := &Source{Name: "test"}
+	ddd := &Destination{}
+
+	err2 := Copy(context.Background(), sss, ddd)
+	fmt.Println(err2)
+	fmt.Printf("%#v\n", ddd)
+	assert.Equal(t, "test", ddd.Name)
+
+	// ss := &[]*Source{s}
+	// dd := &[]*Destination{d}
+	// Copy(context.Background(), s, d)
 
 	ls := make([]Source, 0)
 	ls = append(ls, Source{
